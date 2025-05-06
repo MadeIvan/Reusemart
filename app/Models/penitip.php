@@ -4,18 +4,24 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Laravel\Sanctum\HasApiTokens; 
 
-class Penitip extends Model
+
+
+
+class Penitip extends Authenticatable
 {
-    use HasFactory;
+    use HasFactory, HasApiTokens;
     protected $table = 'penitip'; 
     public $timestamps = false;   
 
     protected $fillable = [
         'idPenitip',
+        'nik',
         'idTopeseller',
         'idDompet',
-        'usernama',
+        'username',
         'password',
         'namaPenitip'
     ];
