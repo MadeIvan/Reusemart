@@ -17,4 +17,4 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::post('penitip/login', [PenitipLoginController::class, 'login']);
+// Route::post('penitip/login', [PenitipLoginController::class, 'login']);
