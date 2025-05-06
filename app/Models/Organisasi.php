@@ -26,5 +26,6 @@ class Organisasi extends Authenticatable
         'password',
         'namaOrganisasi',
         'alamat',
+        'email',
     ];
 }

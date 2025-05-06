@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class AlamatController extends Controller
 {
+    ////////////////////////////STORE///////////////////////////////
     public function store(Request $request){
         try{
             $pembeliId = Auth::id(); 
@@ -56,6 +57,7 @@ class AlamatController extends Controller
         }
     }
 
+    //////////////////////SHOW ALL ///////////////////////
     public function index()
     {
         // return response()->json([
@@ -156,6 +158,8 @@ class AlamatController extends Controller
         }
     }
 
+
+    ////////////////////SHOW BY ID////////////////////////
     public function show($id)
     {
         // $pembeli = auth('pembeli')->user();
@@ -194,6 +198,8 @@ class AlamatController extends Controller
         }
     }
 
+
+    ////////////////////////////////DELETE///////////////////////////////
     public function delete($id){
         try{
             $pembeli = Auth::user();
@@ -221,6 +227,7 @@ class AlamatController extends Controller
         }
     }
 
+    ////////////////////////UPDATE/////////////////////////
     public function update(Request $request, $id){
         $request->validate([
             'alamat'=> 'required|string|max:255',

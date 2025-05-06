@@ -18,3 +18,15 @@ Route::get('/', function () {
 });
 
 Route::post('penitip/login', [PenitipLoginController::class, 'login']);
+
+Route::get('/organisasi/register', function () {
+    return view('registerorganisasi');
+});
+
+Route::get('/pegawai/login', function () {
+    return view('loginPegawai');
+});
+
+Route::get('/organisasi', function () {
+    return view('showOrganisasi');
+});

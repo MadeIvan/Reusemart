@@ -12,7 +12,7 @@ class JabatanMiddleware
     {
         $user = Auth::guard('pegawai')->user();
 
-        if ($user || in_array($user->idJabatan, $roles)) {
+        if ($user || in_array($user->idJabatan, $idjabatan)) {
             return $next($request);
         }
 
