@@ -37,8 +37,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/organisasi/register', [OrganisasiController::class, 'register']);
 Route::post('/organisasi/login', [OrganisasiController::class, 'login']);
 Route::get('/check-email-username', [OrganisasiController::class, 'checkEmailUsername']);
+
 Route::post('/pembeli/register', [PembeliController::class, 'register']);
 Route::post('/pembeli/login', [PembeliController::class, 'login']);
+Route::get('/check-email-username', [PembeliController::class, 'checkEmailUsername']);
 
 Route::post('/pegawai/register', [PegawaiController::class, 'register']);
 Route::post('/pegawai/login', [PegawaiController::class, 'login']);

@@ -30,3 +30,7 @@ Route::get('/pegawai/login', function () {
 Route::get('/organisasi', function () {
     return view('showOrganisasi');
 });
+
+Route::get('/pembeli/register', function () {
+    return view('registerPembeli');
+});

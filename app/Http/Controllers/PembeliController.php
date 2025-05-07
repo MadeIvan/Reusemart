@@ -82,46 +82,57 @@ class PembeliController extends Controller
     // }
 
     public function login(Request $request)
-{
-    $request->validate([
-        'username' => 'required|string|max:255',
-        'password'=> 'required|string|min:8',
-    ]);
+    {
+        $request->validate([
+            'username' => 'required|string|max:255',
+            'password'=> 'required|string|min:8',
+        ]);
 
-    $pembeli = Pembeli::where('username', $request->username)->first();
+        $pembeli = Pembeli::where('username', $request->username)->first();
 
-    if (!$pembeli) {
+        if (!$pembeli) {
+            return response()->json([
+                "status" => false,
+                "message" => "User not found",
+            ], 404);
+        }
+
+        if ($pembeli->deleted_at) {
+            return response()->json([
+                "status" => false,
+                "message" => "Your account has been deactivated.",
+            ], 403);
+        }
+
+        if (!Hash::check($request->password, $pembeli->password)) {
+            return response()->json([
+                "status" => false,
+                "message" => "Invalid credentials",
+            ], 401);
+        }
+
+        // Login success
+        $token = $pembeli->createToken('Personal Access Token')->plainTextToken;
+
         return response()->json([
-            "status" => false,
-            "message" => "User not found",
-        ], 404);
+            "status" => true,
+            "message" => "Login successful",
+            "data" => [
+                "pembeli" => $pembeli,
+                "token" => $token
+            ]
+        ], 200);
     }
 
-    if ($pembeli->deleted_at) {
+    public function checkEmailUsername(Request $request)
+    {
+        $emailExists = Pembeli::where('email', $request->email)->exists();
+        $usernameExists = Pembeli::where('username', $request->username)->exists();
+
         return response()->json([
-            "status" => false,
-            "message" => "Your account has been deactivated.",
-        ], 403);
+            'emailExists' => $emailExists,
+            'usernameExists' => $usernameExists
+        ]);
     }
-
-    if (!Hash::check($request->password, $pembeli->password)) {
-        return response()->json([
-            "status" => false,
-            "message" => "Invalid credentials",
-        ], 401);
-    }
-
-    // Login success
-    $token = $pembeli->createToken('Personal Access Token')->plainTextToken;
-
-    return response()->json([
-        "status" => true,
-        "message" => "Login successful",
-        "data" => [
-            "pembeli" => $pembeli,
-            "token" => $token
-        ]
-    ], 200);
-}
 
 }
