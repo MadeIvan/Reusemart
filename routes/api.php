@@ -50,7 +50,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::middleware(['auth:pegawai','role:2'])->group(function () {
     Route::get('/organisasi', [OrganisasiController::class, 'index']);
-    Route::get('/organisasi/{id}', [OrganisasiController::class, 'show']);
+    Route::get('/organisasi/search}', [OrganisasiController::class, 'show']);
     Route::put('/organisasi/update/{id}', [OrganisasiController::class, 'update']);
     Route::delete('/organisasi/delete/{id}', [OrganisasiController::class, 'destroy']);
 });

@@ -28,14 +28,21 @@ class OrganisasiController extends Controller
         }
     }
 
-    public function show($id){ //search
+    public function show(Request $request){ //search
         try{
-            $data = Organisasi::find($id);
+            $query = $request->input('q');
+    
+            $results = Organisasi::where('idOrganisasi', 'like', '%' . $query . '%')
+                ->orWhere('namaOrganisasi', 'like', '%' . $query . '%')
+                ->orWhere('username', 'like', '%' . $query . '%')
+                ->orWhere('alamat', 'like', '%' . $query . '%')
+                ->orWhere('email', 'like', '%' . $query . '%')
+                ->get();
+    
             return response()->json([
-                "status" => true,
-                "message" => "Get successful",
-                "data" => $data
-            ], 200);
+                'status' => 200,
+                'data' => $results,
+            ]);
         }catch(Exception $e){
             return response()->json([
                 "status" => false,
@@ -57,17 +64,14 @@ class OrganisasiController extends Controller
         $lastNumber = 0;
 
         if ($last) {
-            // Ambil angka dari ID terakhir, misalnya 'ORG12' -> 12
             $lastNumber = (int) str_replace('ORG', '', $last->idOrganisasi);
         }
 
-        // Generate ID baru dengan menambahkan angka terakhir + 1
         $newId = 'ORG' . ($lastNumber + 1);
 
-        // Cek apakah ID baru sudah ada, baik yang aktif maupun yang sudah dihapus (soft delete)
         while (Organisasi::where('idOrganisasi', $newId)->withTrashed()->exists()) {
-            $lastNumber++;  // Increment angka ID
-            $newId = 'ORG' . $lastNumber;  // Update ID baru
+            $lastNumber++;  
+            $newId = 'ORG' . $lastNumber; 
         }
 
         $organisasi = Organisasi::create([
@@ -79,34 +83,11 @@ class OrganisasiController extends Controller
             'email'=> $request->email,
         ]);
 
-
-        // $organisasi = Organisasi::create([
-        //     'username' => $request->username,
-        //     'password'=> Hash::make($request->password),
-        //     'namaOrganisasi'=> $request->namaOrganisasi,
-        //     'alamat'=> $request->alamat
-        // ]);
-
         return response()->json([
             "status" => true,
             "message" => "Get successful",
             "data" => $organisasi
         ], 200);
-
-        // try{
-        //     $data = Organisasi::create($request->all());
-        //     return response()->json([
-        //         "status" => true,
-        //         "message" => "Get successful",
-        //         "data" => $data
-        //     ], 200);
-        // }catch(Exception $e){
-        //     return response()->json([
-        //         "status" => false,
-        //         "message" => $e->getMessage(),
-        //         "data" => null
-        //     ], 400);
-        // }
     }
 
     public function login(Request $request){ //login
@@ -157,13 +138,11 @@ class OrganisasiController extends Controller
             'username' => 'required',
             'namaOrganisasi'=> 'required',
             'alamat'=> 'required',
-            'email'=> 'required',
         ]);
 
         $organisasi->username = $validatedData['username'];
         $organisasi->namaOrganisasi = $validatedData['namaOrganisasi'];
         $organisasi->alamat = $validatedData['alamat'];
-        $organisasi->alamat = $validatedData['email'];
 
         $organisasi->update($validatedData);
 
@@ -183,31 +162,13 @@ class OrganisasiController extends Controller
         }
     }
 
-    // public function destroy($id){
-    //     try{
-    //         $data = Organisasi::find($id);
-    //         $data->delete();
-    //         return response()->json([
-    //             "status" => true,
-    //             "message" => "Get successful",
-    //             "data" => $data
-    //         ], 200);
-    //     }catch(Exception $e){
-    //         return response()->json([
-    //             "status" => false,
-    //             "message" => $e->getMessage(),
-    //             "data" => null
-    //         ], 400);
-    //     }
-    // }
-
     public function destroy($id){ //delete
         // $data = Auth::user();
         $data = Organisasi::find($id);
 
         if (!$data) {
             return response()->json([
-                'message' => 'You are not logged in',
+                'message' => 'Organisasi tidak ditemukan',
             ], 403);
         }
         

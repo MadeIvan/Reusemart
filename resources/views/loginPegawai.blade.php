@@ -36,7 +36,7 @@
                 </div>
 
                 <div class="d-flex justify-content-center login-button">
-                    <button type="submit" class="btn btn-success item-center">Login</button>
+                    <button type="submit" class="btn btn-success item-center" id="loginButton">Login</button>
                 </div>
             </form>
         </div>
@@ -44,70 +44,79 @@
 </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const loginButton = document.querySelector('.login-button button');
-            loginButton.addEventListener('click', async function (e) {
-                e.preventDefault();
-                try{
-                    const username = document.getElementById('username').value.trim();
-                    const password = document.getElementById('password').value.trim();
+         document.getElementById('loginButton').addEventListener('click', function () {
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
 
-                    if (!username || !password) {
-                        Toastify({
-                            text: "Mohon untuk mengisi username dan password.",
-                            duration: 3000,
-                            close: true,
-                            gravity: "top",
-                            position: "right",
-                            backgroundColor: "rgb(214, 10, 10)",
-                        }).showToast();
-                        return;
-                    }
+        if (!username || !password) {
+            Toastify({
+                text: "Mohon untuk mengisi username dan password.",
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "rgb(214, 10, 10)",
+            }).showToast();
+            return; // Stop proses jika input kosong
+        }
 
-                    const data = {
-                        username,
-                        password,
-                    };
-
-                    const loginResponse = await fetch("http://127.0.0.1:8000/api/pegawai/login", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify(data),
-                    });
-
-                    if (!loginResponse.ok) {
-                        const errorData = await loginResponse.json();
-                        throw errorData;
-                    }
-
-                    const loginResult = await loginResponse.json();
-                    Toastify({
-                        text: "login berhasil!",
-                        duration: 3000,
-                        close: true,
-                        gravity: "top",
-                        position: "right",
-                        backgroundColor: "rgb(95, 211, 99)",
-                    }).showToast();
-
-                    // setTimeout(() => {
-                    //     window.location.href = "{{ url('/Login') }}";
-                    // }, 3000);
-                }catch(error){
-                    console.log(error);
-                    Toastify({
-                        text: "Terjadi kesalahan saat login. Silakan coba lagi.",
-                        duration: 3000,
-                        close: true,
-                        gravity: "top",
-                        position: "right",
-                        backgroundColor: "rgb(214, 10, 10)",
-                    }).showToast();
-                }
-            })
+        fetch("http://127.0.0.1:8000/api/pegawai/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ username, password }),
         })
+        .then(response => {
+            console.log('Response Status:', response.status);
+            if (!response.ok) {
+                throw new Error('Invalid username or password');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Response Data:', data);
+
+            if (data.data.token) {
+                localStorage.setItem('token', data.data.token);
+
+                Toastify({
+                    text: "Login berhasil!",
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#8bc34a",
+                }).showToast();
+
+                // Uncomment jika ingin redirect setelah login
+                // setTimeout(() => {
+                //     window.location.href = "/HomeSetelahLogin"; // Ubah URL sesuai kebutuhan
+                // }, 2000);
+            } else {
+                Toastify({
+                    text: "Username atau password salah.",
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "rgb(221, 25, 25)",
+                }).showToast();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error.message);
+            Toastify({
+                text: "Terjadi kesalahan saat login. Silakan coba lagi.",
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "rgb(221, 25, 25)",
+            }).showToast();
+        });
+    });
+
     </script>
 
 </body>
