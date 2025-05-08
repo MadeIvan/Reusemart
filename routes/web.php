@@ -1,7 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
+use App\Http\Controllers\PenitipLoginController;
+
 use App\Http\Controllers\BarangController;
+
 
 
 /*
@@ -26,8 +30,36 @@ Route::get('/getBarang/{id}', function () {
     return view('detailBarang');
 });
 
+
+Route::post('penitip/login', [PenitipLoginController::class, 'login']);
+
+Route::get('/organisasi/register', function () {
+    return view('registerorganisasi');
+});
+
+Route::get('/pegawai/login', function () {
+    return view('loginPegawai');
+});
+
+Route::get('/organisasi', function () {
+    return view('showOrganisasi');
+});
+
+Route::get('/pembeli/register', function () {
+    return view('registerPembeli');
+});
+
+Route::get('/pembeli/login', function () {
+    return view('loginPembeliBuatCekAja');
+});
+
+Route::get('/pembeli/alamat', function () {
+    return view('showAlamat');
+});
+
 // routes/web.php
 // Route::get('/getBarang/{id}', [BarangController::class, 'show'])->name('product.show');
 
 
 // Route::get('/products', [BarangController::class, 'index']);
+
