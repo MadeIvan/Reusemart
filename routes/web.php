@@ -34,3 +34,11 @@ Route::get('/organisasi', function () {
 Route::get('/pembeli/register', function () {
     return view('registerPembeli');
 });
+
+Route::get('/pembeli/login', function () {
+    return view('loginPembeliBuatCekAja');
+});
+
+Route::get('/pembeli/alamat', function () {
+    return view('showAlamat');
+});

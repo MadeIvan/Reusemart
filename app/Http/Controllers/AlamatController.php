@@ -60,83 +60,6 @@ class AlamatController extends Controller
     //////////////////////SHOW ALL ///////////////////////
     public function index()
     {
-        // return response()->json([
-        //     "status" => true,
-        //     "message" => "MALAS",
-        // ]);
-//-------------------------------------
-        // $data = Alamat::all();
-        //     return response()->json([
-        //         "status" => true,
-        //         "message" => "Get successful",
-        //         "data" => $data
-        //     ], 200);
-//-------------------------------------
-        // try {
-        //     if (!Auth::guard('pembeli')->check()) {
-        //         return response()->json([
-        //             "status" => false,
-        //             "message" => "Pembeli Belum Login",
-        //             "data" => null
-        //         ], 400);
-        //     }
-    
-        //     // Mendapatkan data pembeli yang sedang login
-        //     // $pembeli = Auth::guard('pembeli')->user();
-        //     // $pembeliId = $pembeli->idPembeli;
-
-        //     $pembeliId = Auth::id();
-    
-        //     $alamat = Alamat::where('idPembeli', $pembeliId)->get();
-
-        //     if ($alamat->isEmpty()) {
-        //         return response()->json([
-        //             "status" => false,
-        //             "message" => "Tidak ada alamat ditemukan untuk pembeli ini",
-        //             "data" => null
-        //         ], 404);
-        //     } 
-
-        //     return response()->json([
-        //         "status" => true,
-        //         "message" => "Get Successfull",
-        //         "data" => $alamat
-        //     ], 200);
-        // } catch (Exception $e) {
-        //     return response()->json([
-        //         "status" => false,
-        //         "message" => "Something went wrong",
-        //         "data" => $e->getMessage()
-        //     ], 400);
-        // }
-//-------------------------------------
-        // try{
-        //     // $pembeliId = Auth::id();
-        //     Auth::guard('pembeli')->check();
-        //     $pembeliId = Auth::guard('pembeli')->user()->id;
-
-        //     if(!$pembeliId){
-        //         return response()->json([
-        //             "status" => false,
-        //             "message" => "Pembeli Belum Login",
-        //             "data" => $pembeliId,
-        //         ], 400);
-        //     }
-
-        //     $alamat = Alamat::where('idPembeli', $pembeliId)->get();
-        //     return response()->json([
-        //         "status" => true,
-        //         "message" => "Get Successfull",
-        //         "data" => $alamat
-        //     ], 200);    
-        // }catch(Exception $e){
-        //     return response()->json([
-        //         "status" => false,
-        //         "message" => "Something went wrong",
-        //         "data" => $e->getMessage()
-        //     ], 400);
-        // }
-//-------------------------------------.
         // $pembeli = auth('pembeli')->user();
         // $pembeliId = $pembeli->idPembeli;
         $pembeli = Auth::user();
@@ -160,9 +83,8 @@ class AlamatController extends Controller
 
 
     ////////////////////SHOW BY ID////////////////////////
-    public function show($id)
+    public function show(Request $request)
     {
-        // $pembeli = auth('pembeli')->user();
         $pembeli = Auth::id();
         if(!$pembeli){
             return response()->json([
@@ -171,24 +93,17 @@ class AlamatController extends Controller
                 "data" => null,
             ], 400);
         }
-        
+
         try{
-            $alamat = Alamat::where('idAlamat', $id)
-                        ->where('idPembeli', $pembeli)
-                        ->first();
-            if($alamat){
-                return response()->json([
-                    "status" => true,
-                    "message" => "Get Successfull",
-                    "data" => $alamat
-                ], 200);    
-            }else{
-                return response()->json([
-                    "status" => false,
-                    "message" => "Alamat Tidak Ditemukan",
-                    "data" => null
-                ], 404);
-            }
+            $query = $request->input('q');
+    
+            $results = Alamat::where('alamat', 'like', '%' . $query . '%')
+                ->get();
+    
+            return response()->json([
+                'status' => 200,
+                'data' => $results,
+            ]);
         }catch(Exception $e){
             return response()->json([
                 "status" => false,
