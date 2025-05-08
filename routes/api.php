@@ -20,3 +20,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::get('/getBarang',[BarangController::class, 'index']);
+Route::get('/getBarang/{id}', [BarangController::class, 'show']);

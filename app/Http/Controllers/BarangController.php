@@ -26,16 +26,27 @@ class BarangController extends Controller
 }
 
     // Show Barang by id
-    public function show($id)
-    {
-        $barang = Barang::find($id);
-        
+    public function show($idBarang)
+{
+    try {
+        // Try to find the barang by its ID
+        $barang = Barang::find( $idBarang);
+
+        // If the barang is found, return it as JSON
         if ($barang) {
             return response()->json($barang);
         } else {
+            // If the barang is not found, return a 404 error with a custom message
             return response()->json(['message' => 'Barang not found'], 404);
         }
+    } catch (\Exception $e) {
+        // Catch any exception and return a 500 internal server error
+        return response()->json([
+            'error' => 'An error occurred while fetching the product.',
+            'message' => $e->getMessage(), // Include the exception message for debugging
+        ], 500);
     }
+}
 
     // Create a new Barang
     public function store(Request $request)

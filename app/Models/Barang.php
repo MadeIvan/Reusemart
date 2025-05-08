@@ -10,9 +10,10 @@ class Barang extends Model
 {
     use HasFactory;
     protected $table = 'barang';
-
+    protected $keyType = 'string';
+    protected $primaryKey ='idBarang';
     protected $fillable = [
-        'idBarang',
+        'idBarang' ,
         'idTransaksiDonasi',
         'namaBarang',
         'beratBarang',

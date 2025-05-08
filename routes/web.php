@@ -18,4 +18,16 @@ use App\Http\Controllers\BarangController;
 Route::get('/', function () {
     return view('home');
 });
+
+// routes/web.php
+// Route::get('/getBarang/{id}', [BarangController::class, 'show']);
+
+Route::get('/getBarang/{id}', function () {
+    return view('detailBarang');
+});
+
+// routes/web.php
+// Route::get('/getBarang/{id}', [BarangController::class, 'show'])->name('product.show');
+
+
 // Route::get('/products', [BarangController::class, 'index']);
