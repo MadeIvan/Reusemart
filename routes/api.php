@@ -52,17 +52,18 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::middleware(['auth:pegawai','role:2'])->group(function () {
     Route::get('/organisasi', [OrganisasiController::class, 'index']);
-    Route::get('/organisasi/search}', [OrganisasiController::class, 'show']);
+    Route::get('/organisasi/search', [OrganisasiController::class, 'show']);
     Route::put('/organisasi/update/{id}', [OrganisasiController::class, 'update']);
     Route::delete('/organisasi/delete/{id}', [OrganisasiController::class, 'destroy']);
 });
 
 Route::middleware(['auth:pembeli'])->group(function () {
     Route::post('/pembeli/alamat', [AlamatController::class, 'store']);
-    Route::get('/pembeli/alamat', [AlamatController::class, 'index']);
-    Route::get('/pembeli/alamat/{id}', [AlamatController::class, 'show']);
+    Route::get('/pembeli/alamat/', [AlamatController::class, 'index']);
+    Route::get('/pembeli/alamat/search', [AlamatController::class, 'show']);
     Route::put('/pembeli/alamat/update/{id}', [AlamatController::class, 'update']);
     Route::delete('/pembeli/alamat/delete/{id}', [AlamatController::class, 'delete']);
+    Route::put('/pembeli/alamat/set-default/{id}', [AlamatController::class, 'setAsDefault']);
 });
 
 // Route::get('/pembeli/alamat', [AlamatController::class, 'index'])->middleware(['pembeli']);

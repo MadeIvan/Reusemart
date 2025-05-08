@@ -5,12 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reusemart</title>
 
-	<script>
-		const token = localStorage.getItem("token");
-			if (!token) {
-				window.location.href = "{{ url('/pegawai/login') }}";
-			}
-	</script>
 
 	<!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -23,6 +17,14 @@
     <!-- Toastify JS -->
     <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
+	<script>
+		document.addEventListener("DOMContentLoaded", function() {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                window.location.href = "{{ url('/pegawai/login') }}";
+            }
+        });
+	</script>
 
     <style>
         body{
@@ -227,6 +229,13 @@
 
 <!-- //////////////////////////INI SCRIPT DELETE/////////////////////////// -->
 <script>
+
+document.addEventListener("DOMContentLoaded", function() {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                window.location.href = "{{ url('/pegawai/login') }}";
+            }
+        });
     let selectedDeleteId = null;
 
     function handleDelete(id) {
