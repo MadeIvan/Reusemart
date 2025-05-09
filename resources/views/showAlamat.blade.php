@@ -5,12 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reusemart</title>
 
-	<script>
-		const token = localStorage.getItem("token");
-			if (!token) {
-				window.location.href = "{{ url('/pembeli/login') }}";
-			}
-	</script>
+    <!-- <script>
+// Cek token saat halaman dimuat
+document.addEventListener("DOMContentLoaded", function() {
+    if (!localStorage.getItem("token")) {
+        // Jika token tidak ada, redirect ke halaman login
+        window.location.href = "{{ url('/pembeli/login') }}";
+    }
+});
+</script> -->
 
 	<!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -52,6 +55,14 @@
 </head>
 
 <body>
+    <script>
+    if (!localStorage.getItem("token")) {
+        window.location.href = "/pembeli/login";
+
+    }
+</script>
+
+
     <!-- ////////////////////INI MODAL DELETE///////////////////////////// -->
     <div class="modal fade" id="deleteAlamat" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">

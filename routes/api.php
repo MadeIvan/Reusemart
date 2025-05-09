@@ -9,6 +9,7 @@ use App\Http\Controllers\AlamatController;
 use App\Http\Middleware\PembeliMiddleware;
 use App\Http\Middleware\JabatanMiddleware;
 use App\Http\Controllers\PegawaiController;
+use App\Http\Controllers\PenitipController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,6 +47,12 @@ Route::post('/pegawai/register', [PegawaiController::class, 'register']);
 Route::post('/pegawai/login', [PegawaiController::class, 'login']);
 Route::get('/pegawai', [PegawaiController::class, 'index']);
 
+Route::post('/penitip/login', [PenitipController::class, 'login']);
+Route::post('/penitip/register', [PenitipController::class, 'register']);
+Route::get('/check-nik', [PenitipController::class, 'checkNIK']);
+
+
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout']);
 });
@@ -57,13 +64,20 @@ Route::middleware(['auth:pegawai','role:2'])->group(function () {
     Route::delete('/organisasi/delete/{id}', [OrganisasiController::class, 'destroy']);
 });
 
-Route::middleware(['auth:pembeli'])->group(function () {
-    Route::post('/pembeli/alamat', [AlamatController::class, 'store']);
+// Route::middleware(['auth:sanctum', 'auth.pembeli'])->group(function () {
+    Route::post('/pembeli/alamat', [AlamatController::class, 'store'])->middleware(['auth:sanctum', 'auth.pembeli']);
     Route::get('/pembeli/alamat/', [AlamatController::class, 'index']);
     Route::get('/pembeli/alamat/search', [AlamatController::class, 'show']);
     Route::put('/pembeli/alamat/update/{id}', [AlamatController::class, 'update']);
     Route::delete('/pembeli/alamat/delete/{id}', [AlamatController::class, 'delete']);
     Route::put('/pembeli/alamat/set-default/{id}', [AlamatController::class, 'setAsDefault']);
+// });
+
+Route::middleware(['auth:penitip'])->group(function () {
+    Route::get('/penitip/dashboard', [PenitipController::class, 'show']);
+    Route::get('/penitip/profile', [PenitipController::class, 'myData']);
+    
+// 
 });
 
 // Route::get('/pembeli/alamat', [AlamatController::class, 'index'])->middleware(['pembeli']);

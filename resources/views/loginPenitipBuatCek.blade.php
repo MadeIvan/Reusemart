@@ -24,7 +24,7 @@
     <div class="container vh-100 d-flex justify-content-center align-items-center">
     <div class="row w-100 justify-content-center">
         <div class="col-md-6 border p-4 rounded shadow">
-        <h2 class="text-center" style="color:rgb(24, 134, 4); font-weight: bold;">Login Pembeli</h2>
+        <h2 class="text-center" style="color:rgb(24, 134, 4); font-weight: bold;">Login Penitip</h2>
             <form>
                 <div class="mb-3">
                     <label for="username" class="form-label"><strong>Username</strong></label>
@@ -35,8 +35,8 @@
                     <input type="password" class="form-control" id="password">
                 </div>
 
-                <div class="d-flex justify-content-center login-button">
-                    <button type="submit" class="btn btn-success item-center" id="loginButton">Login</button>
+                <div class="d-flex justify-content-center login-button" >
+                    <button type="button" class="btn btn-success item-center" id="loginButton">Login</button>
                 </div>
             </form>
         </div>
@@ -60,7 +60,7 @@
             return; // Stop proses jika input kosong
         }
 
-        fetch("http://127.0.0.1:8000/api/pembeli/login", {
+        fetch("http://127.0.0.1:8000/api/penitip/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -90,9 +90,10 @@
                 }).showToast();
 
                 // Uncomment jika ingin redirect setelah login
-                // setTimeout(() => {
-                //     window.location.href = "/HomeSetelahLogin"; // Ubah URL sesuai kebutuhan
-                // }, 2000);
+                setTimeout(() => {
+                    // href="{{url('/penitip/dashboard')}}"
+                    window.location.href = "{{ url('/penitip/dashboard') }}";
+                }, 10);
             } else {
                 Toastify({
                     text: "Username atau password salah.",

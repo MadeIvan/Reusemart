@@ -21,7 +21,7 @@ class PembeliController extends Controller
         $lastNumber = 0;
 
         if ($last) {
-            $lastNumber = (int) str_replace('B', '', $last->idOrganisasi);
+            $lastNumber = (int) str_replace('B', '', $last->idPembeli);
         }
 
         $newId = 'B' . ($lastNumber + 1);

@@ -42,3 +42,19 @@ Route::get('/pembeli/login', function () {
 Route::get('/pembeli/alamat', function () {
     return view('showAlamat');
 });
+
+Route::get('/penitip/dashboard', function () {
+    return view('dashboardPenitip');
+});
+
+Route::get('/penitip/profile', function () {
+    return view('profilePenitip');
+});
+
+Route::get('/penitip/register', function () {
+    return view('registerPenitip');
+});
+
+Route::get('/penitip/login', function () {
+    return view('loginPenitipBuatCek');
+});

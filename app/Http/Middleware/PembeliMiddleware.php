@@ -15,16 +15,16 @@ class PembeliMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    // public function handle(Request $request, Closure $next)
-    // {
-    //     if (Auth::guard('pembeli')->check()) {
-    //         return $next($request);
-    //     }
+    public function handle(Request $request, Closure $next)
+    {
+        $user = Auth::guard('pembeli')->user();
 
-    //     // Redirect non-pembeli users
-    //     return response()->json([
-    //         'status' => false,
-    //         'message' => 'Unauthorized. Only pembeli can access this route.'
-    //     ], 401);
-    // }
+        if (!$user) {
+            return response()->json([
+                'message' => 'Unauthenticated - pembeli only.'
+            ], 401);
+        }
+
+        return $next($request);
+    }
 }

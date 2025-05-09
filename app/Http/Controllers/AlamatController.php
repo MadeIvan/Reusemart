@@ -13,7 +13,8 @@ class AlamatController extends Controller
     public function store(Request $request){
         try{
             //////////CEK ID PEMBELI/////////
-            $pembeliId = Auth::id(); 
+            $pembeli = auth('pembeli')->user();
+        $pembeliId = $pembeli->idPembeli;
     
             $request->validate([
                 'alamat'=> 'required|string|max:255',
@@ -68,9 +69,9 @@ class AlamatController extends Controller
     //////////////////////SHOW ALL ///////////////////////
     public function index()
     {
-        // $pembeli = auth('pembeli')->user();
-        // $pembeliId = $pembeli->idPembeli;
-        $pembeli = Auth::user();
+        $pembeli = auth('pembeli')->user();
+        $pembeliId = $pembeli->idPembeli;
+        // $pembeli = Auth::user();
 
         // Ambil semua alamat milik pembeli yang login
         $alamatList = $pembeli->alamat()->get();
@@ -93,7 +94,9 @@ class AlamatController extends Controller
     ////////////////////SEARCH////////////////////////
     public function show(Request $request)
     {
-        $pembeli = Auth::id();
+       // $pembeliId = Auth::id();
+        $pembeli = auth('pembeli')->user();
+        $pembeliId = $pembeli->idPembeli;
         if(!$pembeli){
             return response()->json([
                 "status" => false,
@@ -126,7 +129,9 @@ class AlamatController extends Controller
     ////////////////////////////////DELETE///////////////////////////////
     public function delete($id){
         try{
-            $pembeli = Auth::user();
+           // $pembeliId = Auth::id();
+           $pembeli = auth('pembeli')->user();
+           $pembeliId = $pembeli->idPembeli;
             if(!$pembeli){
                 return response()->json([
                     "status" => false,
@@ -159,7 +164,9 @@ class AlamatController extends Controller
         ]);
 
         //cek id pembeli
-        $pembeliId = Auth::id();
+        // $pembeliId = Auth::id();
+        $pembeli = auth('pembeli')->user();
+        $pembeliId = $pembeli->idPembeli;
 
         // cek idAlamat
         $alamat = Alamat::where('idAlamat', $id)
@@ -188,8 +195,9 @@ class AlamatController extends Controller
 
     ////////////////////////SET DEFAULT/////////////////////////
     public function setAsDefault($id){
-        $pembeliId = Auth::id();
-
+        // $pembeliId = Auth::id();
+        $pembeli = auth('pembeli')->user();
+        $pembeliId = $pembeli->idPembeli;
         // Set jadi ga default
         Alamat::where('idPembeli', $pembeliId)->where('isDefault', true)->update(['isDefault' => false]);
 
