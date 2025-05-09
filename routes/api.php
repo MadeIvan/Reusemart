@@ -11,6 +11,7 @@ use App\Http\Middleware\PembeliMiddleware;
 use App\Http\Middleware\JabatanMiddleware;
 use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\PenitipController;
+use App\Http\Controllers\BarangController;
 
 
 /*
@@ -79,7 +80,8 @@ Route::middleware(['auth:pegawai','role:2'])->group(function () {
 Route::middleware(['auth:penitip'])->group(function () {
     Route::get('/penitip/dashboard', [PenitipController::class, 'show']);
     Route::get('/penitip/profile', [PenitipController::class, 'myData']);
-    
+    Route::post('/logout', [LoginController::class, 'logout']);
+    Route::get('/penitip/history', [PenitipController::class, 'loadBarang']);
 // 
 });
 

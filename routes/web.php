@@ -72,6 +72,10 @@ Route::get('/penitip/register', function () {
 Route::get('/penitip/login', function () {
     return view('loginPenitipBuatCek');
 });
+
+Route::get('/penitip/history', function () {
+    return view('historyPenitip');
+});
 // routes/web.php
 // Route::get('/getBarang/{id}', [BarangController::class, 'show'])->name('product.show');
 

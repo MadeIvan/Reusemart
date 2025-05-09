@@ -47,40 +47,6 @@ class PembeliController extends Controller
         ], 200);
     }
 
-    // public function login(Request $request){ //login
-    //     $request->validate([
-    //         'username' => 'required|string|max:255',
-    //         'password'=> 'required|string|min:8',
-    //     ]);
-
-    //     $pembeli = Pembeli::where('username', $request->username)->first();
-        
-    //     if($pembeli){
-    //         if($pembeli->deleteAt){
-    //             return response()->json([
-    //                 "status" => false,
-    //                 "message" => "Your account has been deactivated.",
-    //             ], 403);
-
-    //         }else if(Hash::check($request->password, $pembeli->password)){
-    //             $token = $pembeli->createToken('Personal Access Token')->plainTextToken;
-
-    //             return response()->json([
-    //                 "status" => true,
-    //                 "message" => "Login successful",
-    //                 "data" => [
-    //                     "pembeli" => $pembeli,
-    //                     "token" => $token
-    //                 ]
-    //             ], 200);
-    //         }
-    //         return response()->json([
-    //             "status" => false,
-    //             "message" => "Invalid credentials",
-    //         ], 401);
-    //     }
-    // }
-
     public function login(Request $request)
     {
         $request->validate([
@@ -133,6 +99,15 @@ class PembeliController extends Controller
             'emailExists' => $emailExists,
             'usernameExists' => $usernameExists
         ]);
+    }
+
+    public function logout (Request $request){
+        if (Auth::check()) {
+            $request->user()->currentAccessToken()->delete();
+            return response()->json(['message' => 'Logged out successfully']);
+        }
+    
+        return response()->json(['message' => 'Not logged in'], 401);
     }
 
 }

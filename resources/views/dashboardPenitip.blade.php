@@ -21,15 +21,16 @@
 	</script>
 
     <style>
-        .register-button button:hover {
-            background-color: #006666;
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Poppins', sans-serif;
         }
     </style>
 
 </head>
 <body>
     <!-- Navbar dengan container -->
-    <nav class="navbar navbar-expand-lg navbar-light" style="background-color:rgb(24, 134, 4);">
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color:rgb(255, 255, 255);">
         <div class="container-fluid">
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,28 +41,30 @@
                 <!-- Nav-bar kiri -->
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link active" href="{{url('/penitip/dashboard')}}">
+                        <a class="nav-link active text-black" href="{{url('/penitip/dashboard')}}" >
                             <strong>Home</strong>
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{url('/VerifBeasiswa')}}">
+                        <a class="nav-link text-black" href="{{url('/penitip/history')}}">
                             <strong>History Transaksi</strong>
                         </a>
                     </li>
-    
                 </ul>
 
                 <!-- Nav-bar kanan -->
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item active">
-                        <a class="nav-link d-flex align-items-center" href="{{url('/penitip/profile')}}">
-                            <i class="fas fa-tools"></i>
-                            <span>My Profile</span>
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 profile-menu"> 
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="profile-pic d-inline">
+                                <img src="{{ asset('img/pp.png') }}" alt="Profile Picture" style="width:35px;" class="rounded-circle">
+                            </div>
                         </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{url('/HomeSebelumLogin')}}"><strong>Logout</strong></a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" href="{{url('/penitip/profile')}}"><i class="fas fa-sliders-h fa-fw"></i> Profile</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" id="logoutLink"><i class="fas fa-sign-out-alt fa-fw" ></i> Log Out</a></li>
+                        </ul>
                     </li>
                 </ul>
             </div>
@@ -102,6 +105,38 @@
 </div>
 
     <script>
+        /////////////////////buat logout///////////////////////
+        document.getElementById('logoutLink').addEventListener('click', function (e) {
+            e.preventDefault();
+
+            const token = localStorage.getItem('token');
+
+            if (token) {
+                fetch('http://localhost:8000/api/logout', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data.message); // opsional: tampilkan pesan sukses logout
+                })
+                .catch(error => {
+                    console.error('Logout error:', error);
+                })
+                .finally(() => {
+                    // Bersihkan token & redirect ke halaman awal
+                    localStorage.removeItem('token');
+                    window.location.href = '/';
+                });
+            } else {
+                // Jika token tidak ada, langsung redirect
+                window.location.href = '/';
+            }
+        });
+
     </script>
 
 </body>

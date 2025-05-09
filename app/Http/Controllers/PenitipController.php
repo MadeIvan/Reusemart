@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Penitip;
+use App\Models\TransaksiPenitipan;
 use Illuminate\Support\Facades\Hash;
 
 
@@ -163,6 +164,21 @@ class PenitipController extends Controller
             "status" => true,
             "message" => "User retrieved successfully",
             "data" => $penitip
+        ]);
+    }
+
+    public function loadBarang(Request $request)
+    {
+        $penitip = auth('penitip')->user();
+
+        $penitipan = TransaksiPenitipan::with('transaksiPenitipan.barang')
+            ->where('idPenitip', $penitip->idPenitip)
+            ->get();
+
+        return response()->json([
+            "status" => true,
+            "message" => "Barang penitipan berhasil dimuat",
+            "data" => $penitipan
         ]);
     }
 }

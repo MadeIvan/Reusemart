@@ -31,6 +31,7 @@
             border-radius: 1rem;
             background-color: #ffffff;
             transition: transform 0.3s ease;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
         }
 
         .card:hover {
@@ -93,90 +94,86 @@
             </div>
         </div>
     </nav>
-    <!-- Main Content -->
-    <h1 class="text-center mb-4 mt-4" style="color:rgb(0, 138, 57); font-family: 'Bagel Fat One', system-ui;">
-        Profile Pengguna
-    </h1>
-    <div class="d-flex justify-content-center ms-5">
-    <!-- Profil Card -->
-    <div class="d-flex justify-content-center mt-4 mb-4">
-        <div class="card shadow-lg" style="width: 350px; border-radius: 1rem;">
-            <div class="card-body text-center">
-                <img src="{{ asset('img/pp.png') }}" alt="Avatar"
-                    class="img-fluid rounded-circle mb-3"
-                    style="width: 150px;" />
-                <h4 class="text-success">Penitip</h4>
-            </div>
-            <div class="row px-3 pb-3">
-                <!-- Poin -->
-                <div class="col-6 text-center">
-                    <h6 class="text-success"><strong>Poin</strong></h6>
-                    <p id="poin" class="text-muted">Loading...</p>
-                </div>
 
-                <!-- Saldo -->
-                <div class="col-6 text-center">
-                    <h6 class="text-success"><strong>Saldo</strong></h6>
-                    <p id="saldo" class="text-muted">Loading...</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!--//////////////////////////////////////////// Main Content//////////////////////////////////// -->
+    <h3 class="text-center mb-4 mt-4" style="color:rgb(0, 138, 57); font-family: 'Bagel Fat One', system-ui;">
+        Riwayat Penitipan Barang
+    </h3>
 
-    
-    <!-- Account Information Card -->
-    <div class="col-md-4 mb-4 mt-4 ms-5" style="width: 940px;">
-        <div class="card bg-subtle shadow-lg" style="border-radius: 0.5rem;">
-            <div class="card-body p-4">
-                <h3 class="text-center mb-5" style="color:rgb(0, 138, 57); font-family: 'Bagel Fat One', system-ui;">
-                    Informasi Umum
-                </h3>
-                <div class="row">
-                    <!-- Nama Lengkap -->
-                    <div class="col-md-6 mb-3">
-                        <div class="d-flex align-items-center">
-                            <div>
-                                <h6 style="color:rgb(0, 138, 57)"><strong>Nama Lengkap</strong></h6>
-                                <p id="namaPenitip" class="text-muted">Loading...</p>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- NIK -->
-                    <div class="col-md-6 mb-3">
-                        <div class="d-flex align-items-center">
-                            <div>
-                                <h6 style="color:rgb(0, 138, 57)"><strong>NIK</strong></h6>
-                                <p id="nik">Loading...</p>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- username -->
-                    <div class="col-md-6 mb-3">
-                        <div class="d-flex align-items-center">
-                            <div>
-                                <h6 style="color:rgb(0, 138, 57)"><strong>Username</strong></h6>
-                                <p id="username" class="text-muted">Loading...</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <div class="d-flex align-items-center">
-                            <div>
-                                <h6 style="color:rgb(0, 138, 57)"><strong>Alamat</strong></h6>
-                                <p id="alamat" class="text-muted">Loading...</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
+    <div id="barangContainer" class="row g-3 px-5"></div>
 
     <script>
+        document.addEventListener("DOMContentLoaded", function(){
+            const barangContainer = document.getElementById("barangContainer");            
+            fetchBarang();
+
+            ////////////////////////SHOW barang///////////////////////////////////
+            function fetchBarang(){
+                fetch("http://127.0.0.1:8000/api/penitip/history", {
+                    method: "GET",
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                        "Content-Type": "application/json",
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    barangData = data.data;
+                    renderBarang(data.data);
+                })
+                .catch(error => console.error("Error fetching barang:", error));
+            }
+
+            ////////////////////////CARD barang///////////////////////////////////
+            function renderBarang(data){
+                barangContainer.innerHTML = "";
+                data.forEach(item => {
+                    item.transaksi_penitipan.forEach(transaksi => {
+                        const barang = transaksi.barang;
+                        let statusClass = "";
+                        switch (barang.statusBarang.toLowerCase()) {
+                            case "dikembalikan":
+                                statusClass = "text-danger"; // merah
+                                break;
+                            case "didonasikan":
+                                statusClass = "text-primary"; // biru
+                                break;
+                            case "terjual":
+                                statusClass = "text-success"; // hijau
+                                break;
+                            case "tersedia":
+                                statusClass = "text-secondary"; // default/abu
+                        }
+                        const card = `
+                        <div class="col-md-3 p-2">
+                        <div class="card ">
+                            <img src="/img/${barang.image}" class="card-img-top" alt="Foto Produk"">
+                            <div class="card-body position-relative">
+                                <div class="d-flex align-items-center gap-2">
+                                    <h5 class="card-title mb-2 text-justify"><strong>${barang.namaBarang}</strong></h5>
+                                </div>
+                                <p class="card-subtitle ${statusClass} mt-2 ">${barang.statusBarang}</p>
+                            </div>
+                        </div>
+                    </div>
+                        `;
+                        barangContainer.innerHTML += card;
+                    });
+                });
+            }
+            
+            // searchInput.addEventListener("input", () => {
+            //     const query = searchInput.value.toLowerCase();
+            //     fetch(`http://127.0.0.1:8000/api/pembeli/alamat/search?q=${query}`, {
+            //         headers: { 
+            //             "Authorization": `Bearer ${localStorage.getItem('token')}` },
+            //     })
+            //         .then(response => response.json())
+            //         .then(data => renderAlamat(data.data))
+            //         .catch(error => console.error("Error searching alamat:", error));
+            // });
+        });
+
         /////////////////////buat profile/////////////////////
         const token = localStorage.getItem('token');
 
