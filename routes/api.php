@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
 use App\Http\Controllers\OrganisasiController;
 use App\Http\Controllers\PembeliController;
 use App\Http\Controllers\LoginController;
@@ -10,6 +11,7 @@ use App\Http\Middleware\PembeliMiddleware;
 use App\Http\Middleware\JabatanMiddleware;
 use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\PenitipController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +27,7 @@ use App\Http\Controllers\PenitipController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
 
 
 // Route::aliasMiddleware('pembeli', PembeliMiddleware::class);
@@ -81,3 +84,7 @@ Route::middleware(['auth:penitip'])->group(function () {
 });
 
 // Route::get('/pembeli/alamat', [AlamatController::class, 'index'])->middleware(['pembeli']);
+
+Route::get('/getBarang',[BarangController::class, 'index']);
+Route::get('/getBarang/{id}', [BarangController::class, 'show']);
+
