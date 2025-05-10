@@ -65,7 +65,5 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'role' => \App\Http\Middleware\JabatanMiddleware::class,
         'auth.pembeli' => \App\Http\Middleware\PembeliMiddleware::class,
-
-
     ];
 }

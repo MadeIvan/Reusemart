@@ -49,10 +49,8 @@
                                     <img src="{{ asset('${product.image}') }}" class="img-fluid" alt="${product.namaBarang}">
                                 </div>
                                 <div class="col-md-6">
-                                    <h2>${product.namaBarang}</h2>
-                                    // <p class="text-muted">Made by ${product.maker}</p>
+                                    <h2>${product.namaBarang}</h2>    
                                     <p class="text-success">Rp. ${formattedPrice}</p>
-                                    // <p>${product.description}</p>
 
                                     <!-- Add to Cart Button -->
                                     <button class="btn btn-dark">Add to Cart</button>

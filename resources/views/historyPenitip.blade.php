@@ -53,6 +53,83 @@
 
 </head>
 <body>
+
+    <!-- ////////////////////INI MODAL DETAIL///////////////////////////// -->
+    <!-- <div class="modal fade" id="detailBarang" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5" id="exampleModalLabel"><strong>Detail Barang</strong></h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <strong>Nama Barang : </strong><span id="namaBarang" name="namaBarang"></span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Berat Barang : </strong><span id="beratBarang" name="beratBarang"></span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Harga Barang : </strong><span id="harga" name="harga"></span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Tanggal Penitipan Barang : </strong><span id="tanggalPenitipan" name="tanggalPenitipan"></span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Tanggal Penitipan Selesai : </strong><span id="tanggalPenitipanSelesai" name="tanggalPenitipanSelesai"></span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Kategori Barang : </strong><span id="kategori" name="kategori"></span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Status Barang : </strong><span id="status" name="status"></span>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Tanggal Barang Terjual : </strong><span id="tanggalTerjual" name="tanggalTerjual"></span>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div> -->
+
+    <div class="modal fade" id="detailBarang" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title fs-5" id="exampleModalLabel"><strong>Detail Barang</strong></h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <strong>Nama Barang: </strong><span id="namaBarang"></span>
+                </div>
+                <div class="mb-3">
+                    <strong>Berat Barang: </strong><span id="beratBarang"></span>
+                </div>
+                <div class="mb-3">
+                    <strong>Harga Barang: </strong><span id="harga"></span>
+                </div>
+                <div class="mb-3">
+                    <strong>Tanggal Penitipan Barang: </strong><span id="tanggalPenitipan"></span>
+                </div>
+                <div class="mb-3">
+                    <strong>Tanggal Penitipan Selesai: </strong><span id="tanggalPenitipanSelesai"></span>
+                </div>
+                <div class="mb-3">
+                    <strong>Kategori Barang: </strong><span id="kategori"></span>
+                </div>
+                <div class="mb-3">
+                    <strong>Status Barang: </strong><span id="status"></span>
+                </div>
+                <div class="mb-3">
+                    <strong>Tanggal Barang Terjual: </strong><span id="tanggalTerjual"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
     <!-- Navbar dengan container -->
     <nav class="navbar navbar-expand-lg navbar-light" style="background-color:rgb(255, 255, 255);">
         <div class="container-fluid">
@@ -104,7 +181,8 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function(){
-            const barangContainer = document.getElementById("barangContainer");            
+            const barangContainer = document.getElementById("barangContainer");   
+            let idDetail = null;         
             fetchBarang();
 
             ////////////////////////SHOW barang///////////////////////////////////
@@ -146,16 +224,31 @@
                         }
                         const card = `
                         <div class="col-md-3 p-2">
-                        <div class="card ">
-                            <img src="/img/${barang.image}" class="card-img-top" alt="Foto Produk"">
-                            <div class="card-body position-relative">
-                                <div class="d-flex align-items-center gap-2">
-                                    <h5 class="card-title mb-2 text-justify"><strong>${barang.namaBarang}</strong></h5>
+                            <div class="card ">
+                                <img src="/img/${barang.image}" class="card-img-top" alt="Foto Produk"">
+                                <div class="card-body position-relative">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <h5 class="card-title mb-2 text-justify"><strong>${barang.namaBarang}</strong></h5>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mt-2">
+                                        <p class="card-subtitle ${statusClass} mt-2 ">${barang.statusBarang}</p>
+                                        <button class="btn btn-sm btn-outline-primary mt-3 button-detail" 
+                                            data-id="${barang.idBarang}" data-bs-toggle="modal" data-bs-target="#detailBarang"
+                                            data-namaBarang="${barang.namaBarang}"
+                                            data-beratBarang="${barang.beratBarang}"
+                                            data-harga="${barang.hargaBarang}"
+                                            data-kategori="${barang.kategori}"
+                                            data-tanggalPenitipan="${barang.tanggalPenitipan}"
+                                            data-tanggalPenitipanSelesai="${barang.tanggalPenitipanSelesai}"
+                                            data-status="${barang.statusBarang}"
+                                            
+                                            ">
+                                            Lihat Detail
+                                        </button>
+                                    </div>
                                 </div>
-                                <p class="card-subtitle ${statusClass} mt-2 ">${barang.statusBarang}</p>
                             </div>
                         </div>
-                    </div>
                         `;
                         barangContainer.innerHTML += card;
                     });
@@ -173,6 +266,29 @@
             //         .catch(error => console.error("Error searching alamat:", error));
             // });
         });
+
+        document.querySelectorAll(".button-detail").forEach(link => {
+            link.addEventListener("click", function () {
+            const namaBarang = this.getAttribute("data-namaBarang");
+            const beratBarang = this.getAttribute("data-beratBarang");
+            const hargaBarang = this.getAttribute("data-hargaBarang");
+            const kategori = this.getAttribute("data-kategori");
+            const tanggalPenitipan = this.getAttribute("data-tanggalPenitipan");
+            const tanggalPenitipanSelesai = this.getAttribute("data-tanggalPenitipanSelesai");
+            const statusBarang = this.getAttribute("data-statusBarang");
+            // const tanggalTerjual = this.getAttribute("data-tanggalTerjual");
+
+            // Isi modal dengan data barang
+            document.getElementById("namaBarang").textContent = namaBarang;
+            document.getElementById("beratBarang").textContent = beratBarang;
+            document.getElementById("hargaBarang").textContent = hargaBarang;
+            document.getElementById("kategori").textContent = kategori;
+            document.getElementById("tanggalPenitipan").textContent = tanggalPenitipan;
+            document.getElementById("tanggalPenitipanSelesai").textContent = tanggalPenitipanSelesai;
+            document.getElementById("statusBarang").textContent = statusBarang;
+            // document.getElementById("tanggalTerjual").textContent = tanggalTerjual;
+                });
+            });
 
         /////////////////////buat profile/////////////////////
         const token = localStorage.getItem('token');
