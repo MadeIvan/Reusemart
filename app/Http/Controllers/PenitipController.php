@@ -15,28 +15,22 @@ class PenitipController extends Controller
     // Login function for Penitip
     public function login(Request $request)
     {
-        // Validate incoming request data
+
         $validated = $request->validate([
             'username' => 'required|string',
             'password' => 'required|string',
         ]);
 
-        // Find penitip by username
         $penitip = Penitip::whereRaw('BINARY username = ?', [$request->username])->first();
 
-        // Check if user exists
         if (!$penitip) {
-            return response()->json(['message' => 'User not found'], 404);
+            return response()->json(['message' => 'User Tidak ditemukan'], 404);
         }
-
-        // Check if password is correct
         if (!Hash::check($request->password, $penitip->password)) {
-            return response()->json(['message' => 'Invalid credentials'], 401);
+            return response()->json(['message' => 'Username atau Password Salah'], 401);
         }
 
-        // Generate access token for the authenticated user
         $token = $penitip->createToken('Personal Access Token')->plainTextToken;
-        // Return response with user details and token
         return response()->json([
             'message' => 'Login successful',
             'penitip' => [
@@ -45,8 +39,8 @@ class PenitipController extends Controller
                 'namaPenitip' => $penitip->namaPenitip,
                 'idTopeSeller' => $penitip->idTopeSeller,
                 'idDompet' => $penitip->idDompet,
-                'Token' => $token
-            ]
+            ],
+            'Token' => $token
         ]);
     }
 
@@ -61,29 +55,28 @@ class PenitipController extends Controller
         ]);
     }
 
-    // Register function for Penitip
+    ///////////////////[REGISTER PENITIP]
     public function register(Request $request){
         $validator = Validator::make($request->all(), [
             'username' => 'required|string|unique:penitip,username|max:255',
             'password' => 'required|string|min:6',
             'namaPenitip' => 'required|string|max:255',
             'nik' => 'required|string|size:16',
-            'idTopeSeller' => 'nullable|integer',
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'message' => 'Validation failed',
-                'errors' => $validator->errors()
-            ], 400);
-        }
+    return response()->json([
+        'message' => 'Validation failed',
+        'errors' => $validator->errors()
+    ], 400);
+}
 
         try {
 
             $lastPenitip = DB::select("SELECT MAX(CAST(SUBSTRING(idPenitip, 2) AS UNSIGNED)) AS last_id FROM penitip");
             $lastPenitip = $lastPenitip[0]->last_id;
             $newId = $lastPenitip ? 'T' . ($lastPenitip + 1) : 'T1';
-
+            \Log::info("Created new penitip ID: {$newId}");
             $dompet = (new DompetController)->createDompetPenitip(null);
             $idDompet = (string) $dompet->idDompet;
 
@@ -94,7 +87,7 @@ class PenitipController extends Controller
                 'password' => Hash::make($request->password), 
                 'namaPenitip' => $request->namaPenitip,
                 'nik' => $request->nik,
-                'idTopeSeller' => $request->idTopeSeller,
+                'idTopeSeller' => null,
                 'idDompet' => $idDompet,
             ]);
             \Log::info("{$penitip->idPenitip},{$dompet->saldo}, {$idDompet}");
@@ -110,5 +103,69 @@ class PenitipController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+    /////////////////[GET PENITIP ID]////////////////////
+    public function getPenitipById($id)
+    {
+        $penitip = Penitip::find($id);
+
+        if (!$penitip) {
+            return response()->json([
+                'message' => 'Penitip not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $penitip
+        ]);
+    }
+    ////////////////[UPDATE PENITIP ID]////////////////////
+    public function updatePenitip(Request $request, $id){
+    $penitip = Penitip::whereRaw('BINARY idPenitip = ?', [$id])->first();
+
+    // Find the penitip record by its 
+
+    // Check if the penitip record exists
+    if (!$penitip) {
+        return response()->json([
+            'message' => 'Penitip not found'
+        ], 404);
+    }
+
+    // Validate the input data
+    $validated = $request->validate([
+        'username' => 'nullable|string|unique:penitip,username,' . $penitip->idPenitip . '|max:255',
+        'namaPenitip' => 'nullable|string|max:255',
+        'nik' => 'nullable|string|size:16',
+    ]);
+
+    // Only update the fields that can be updated
+    $penitip->update($validated);
+
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Penitip updated successfully!',
+        'data' => $penitip
+    ]);
+}
+
+    ////////////////////[DELETE PENITIP ID]////////////////////
+    public function deletePenitip($id)
+    {
+        $penitip = Penitip::find($id);
+
+        if (!$penitip) {
+            return response()->json([
+                'message' => 'Penitip not found'
+            ], 404);
+        }
+
+        $penitip->delete();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Penitip deleted successfully'
+        ]);
     }
 }

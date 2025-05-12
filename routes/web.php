@@ -16,5 +16,14 @@ use App\Http\Controllers\PenitipLoginController;
 Route::get('/', function () {
     return view('welcome');
 });
+Route::get('/UsersLogin', function () {
+    return view('UsersLogin');
+});
 
+Route::get('/pegawai/PegawaiLogin', function () {
+    return view('PegawaiLogin');
+});
+Route::get('/pegawai/PenitipData', function () {
+    return view('Pegawai.CsView');
+});
 // Route::post('penitip/login', [PenitipLoginController::class, 'login']);
