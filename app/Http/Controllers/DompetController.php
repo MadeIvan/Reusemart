@@ -7,17 +7,21 @@ use App\Models\Dompet;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
+
 class DompetController extends Controller
 {
     public function getAllDompet()
     {
+
         $dompet = Dompet::all();
         return response()->json($dompet);
     }
 
     public function getDompetById($id)
     {
+
         $dompet = Dompet::find($id);
+
         if ($dompet) {
             return response()->json($dompet);
         } else {
@@ -30,7 +34,9 @@ class DompetController extends Controller
         $lastDompet = DB::select("SELECT MAX(CAST(idDompet AS UNSIGNED)) AS last_id FROM dompet");
         $lastDompet = $lastDompet[0]->last_id;
         $newId = $lastDompet ? (intval($lastDompet) + 1) : 1; 
+
         $dompet = Dompet::create([
+
             'idDompet' => $newId, 
             'idPegawai' => null, 
             'idPenitip' => $idPenitip ?? null, 
@@ -43,7 +49,9 @@ class DompetController extends Controller
     public function updateDompet($idPenitip, $saldo, $idDompet)
     {
 
+
         $dompet = Dompet::find($idDompet);
+
 
         // Check if dompet exists
         if (!$dompet) {

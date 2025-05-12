@@ -58,6 +58,7 @@
                                             <p class="card-text text-success">Rp. ${formattedPrice}</p>
                                         </div>
                                         <a href="/getBarang/${product.idBarang}" class="btn btn-dark align-self-end">Lihat Barang</a>
+
                                     </div>
                                 </div>
                             </div>

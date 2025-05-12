@@ -24,15 +24,20 @@ class Diskusi extends Model
         'waktuMengirimDiskusi',
     ];
 
-    public function pembeli(){
+    public function pembeli()
+    {
         return $this->belongsTo(Pembeli::class, 'idPembeli', 'idPembeli');
     }
+
+    public function pegawai()
+    {
+        return $this->belongsTo(Pegawai::class, 'idPegawai', 'idPegawai');
+    }
+
 
     public function barang(){
         return $this->belongsTo(Barang::class, 'idBarang', 'idBarang');
     }
 
-    public function pegawai(){
-        return $this->belongsTo(Pegawai::class, 'idPegawai', 'idPegawai');
-    }
+
 }

@@ -15,6 +15,7 @@ class Pegawai extends Model
     protected $primaryKey = 'idPegawai';
     protected $keyType = 'string'; 
     public $timestamps = false;
+    public $incrementing = false; 
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
@@ -34,5 +35,10 @@ class Pegawai extends Model
 
     public function dompet(){
         return $this->belongsTo(Dompet::class, 'idDompet', 'idDompet');
+    }
+
+
+    public function diskusi(){
+        return $this->hasMany(Diskusi::class, 'idPegawai', 'idPegawai');
     }
 }

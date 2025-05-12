@@ -51,6 +51,10 @@ return [
         'pegawai' => [
             'driver' => 'sanctum',
             'provider' => 'pegawai',
+        ],
+        'penitip' => [
+            'driver' => 'sanctum',
+            'provider' => 'penitip',
         ]
 
     ],
@@ -85,6 +89,11 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\Pegawai::class,
         ],
+        'penitip' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Penitip::class,
+        ],
+
         
         // 'users' => [
         //     'driver' => 'database',

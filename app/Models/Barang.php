@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Monolog\Handler\TelegramBotHandler;
+use App\Models\Diskusi;
 
 class Barang extends Model 
 {
@@ -25,5 +26,22 @@ class Barang extends Model
         'image',
         'kategori',
     ];
+
+    public function diskusi()
+    {
+        return $this->hasMany(Diskusi::class, 'idBarang');
+    }
+
+    public function detailTransaksiPembelian()
+    {
+        return $this->hasMany(DetailTransaksiPembelian::class, 'idBarang', 'idBarang');
+    }
+
+    public function transaksiPembelian()
+    {
+        return $this->belongsTo(TransaksiPembelian::class, 'noNota', 'noNota');
+    }
+
+
 
 }

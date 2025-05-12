@@ -36,7 +36,11 @@
                 </div>
 
                 <div class="d-flex justify-content-center login-button">
-                    <button type="submit" class="btn btn-success item-center" id="loginButton">Login</button>
+                    <button type="button" class="btn btn-success item-center" id="loginButton">Login</button>
+                </div>
+
+                <div class="d-flex justify-content-center mt-3">
+                    <a type="button" class="lupa-link text-secondary text-decoration-none" id="lupaPwd" href="{{ url('lupa-password')}}">Lupa Kata Sandi?</a>
                 </div>
             </form>
         </div>
@@ -44,7 +48,7 @@
 </div>
 
     <script>
-         document.getElementById('loginButton').addEventListener('click', function () {
+        document.getElementById('loginButton').addEventListener('click', function () {
         const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value.trim();
 
@@ -78,7 +82,7 @@
             console.log('Response Data:', data);
 
             if (data.data.token) {
-                localStorage.setItem('token', data.data.token);
+                localStorage.setItem('token', data.token);
 
                 Toastify({
                     text: "Login berhasil!",
@@ -118,6 +122,5 @@
     });
 
     </script>
-
 </body>
 </html>

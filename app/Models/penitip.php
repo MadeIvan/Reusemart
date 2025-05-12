@@ -24,6 +24,8 @@ class Penitip extends Authenticatable
         'password',
         'namaPenitip',
         'idPenitip',
+        'deleted_at',
+
     ];
 
     protected $hidden = [
@@ -34,4 +36,6 @@ class Penitip extends Authenticatable
         return $this->belongsTo(Dompet::class, 'idDompet', 'idDompet');
     }
 
+
 }
+
