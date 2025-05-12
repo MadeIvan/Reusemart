@@ -1,10 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\PenitipLoginController;
-
 use App\Http\Controllers\BarangController;
+use Illuminate\Support\Facades\Password;
+
 
 
 
@@ -76,6 +76,27 @@ Route::get('/penitip/login', function () {
 Route::get('/penitip/history', function () {
     return view('historyPenitip');
 });
+
+Route::get('/lupa-password', function () {
+    return view('forgotPassword');
+});
+
+Route::post('/lupa-password', function (Request $request) {
+    $request->validate(['email' => 'required|email']);
+ 
+    $status = Password::sendResetLink(
+        $request->only('email')
+    );
+ 
+    return $status === Password::ResetLinkSent
+        ? back()->with(['status' => __($status)])
+        : back()->withErrors(['email' => __($status)]);
+})->middleware('guest')->name('password.email');
+
+Route::get('/lupa-password/{token}', function (string $token) {
+    return view('auth.reset-password', ['token' => $token]);
+})->middleware('guest')->name('password.reset');
+
 // routes/web.php
 // Route::get('/getBarang/{id}', [BarangController::class, 'show'])->name('product.show');
 

@@ -144,12 +144,12 @@ class PegawaiController extends Controller
         $validatedData = $request->validate([
             'namaPegawai'=> 'required',
             'username'=> 'required',
-            'password'=> 'required',
+            // 'password'=> 'required',
         ]);
 
         $pegawai->namaPegawai = $validatedData['namaPegawai'];
         $pegawai->username = $validatedData['username'];
-        $pegawai->password = $validatedData['password'];
+        // $pegawai->password = $validatedData['password'];
 
         $pegawai->update($validatedData);
 
@@ -214,4 +214,15 @@ class PegawaiController extends Controller
     //         'usernameExists' => $usernameExists
     //     ]);
     // }
+
+    function resetPassword($id){
+        $pegawai = Pegawai::find($id);
+
+        $pegawai->password =  Hash::make($pegawai->tanggalLahir);
+        $pegawai->update();
+
+        return response()->json([
+            'message' => 'Berhasil',
+        ]);
+    }
 }

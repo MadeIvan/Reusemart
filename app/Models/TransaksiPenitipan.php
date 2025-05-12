@@ -12,7 +12,7 @@ class TransaksiPenitipan extends Model
 {
     use HasFactory;
 
-    protected $table = 'transaksiPenitipan'; 
+    protected $table = 'transaksipenitipan'; 
     protected $primaryKey = 'idTransaksiPenitipan';
     protected $keyType = 'string'; 
     public $timestamps = false;   
@@ -39,7 +39,7 @@ class TransaksiPenitipan extends Model
         return $this->belongsTo(Penitip::class, 'idPenitip', 'idPenitip');
     }
 
-    public function transaksiPenitipan(){
+    public function detailTransaksiPenitipan(){
         return $this->hasMany(DetailTransaksiPenitipan::class, 'idTransaksiPenitipan', 'idTransaksiPenitipan');
     }
 }

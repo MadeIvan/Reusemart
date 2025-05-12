@@ -12,6 +12,7 @@ use App\Http\Middleware\JabatanMiddleware;
 use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\PenitipController;
 use App\Http\Controllers\BarangController;
+use App\Http\Controllers\DiskusiController;
 
 
 /*
@@ -54,7 +55,8 @@ Route::get('/pegawai', [PegawaiController::class, 'index']);
 Route::post('/penitip/login', [PenitipController::class, 'login']);
 Route::post('/penitip/register', [PenitipController::class, 'register']);
 Route::get('/check-nik', [PenitipController::class, 'checkNIK']);
-
+Route::post('/pembeli/lupa-password', [ForgotPasswordPembeliController::class, 'sendResetLinkEmail']);
+Route::put('/ganti-password/{id}', [PenitipController::class, 'changePassword']);
 
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -66,16 +68,20 @@ Route::middleware(['auth:pegawai','role:2'])->group(function () {
     Route::get('/organisasi/search', [OrganisasiController::class, 'show']);
     Route::put('/organisasi/update/{id}', [OrganisasiController::class, 'update']);
     Route::delete('/organisasi/delete/{id}', [OrganisasiController::class, 'destroy']);
+    Route::put('/pegawai/reset-password/{id}', [PegawaiController::class, 'resetPassword']);
+    // Route::get('/organisasi', [PegawaiController::class, 'index']);
 });
 
-// Route::middleware(['auth:sanctum', 'auth.pembeli'])->group(function () {
-    Route::post('/pembeli/alamat', [AlamatController::class, 'store'])->middleware(['auth:sanctum', 'auth.pembeli']);
-    Route::get('/pembeli/alamat/', [AlamatController::class, 'index']);
+Route::middleware(['auth:sanctum', 'auth.pembeli'])->group(function () {
+    Route::post('/pembeli/buat-alamat', [AlamatController::class, 'store']);
+    Route::get('/pembeli/alamat', [AlamatController::class, 'index']);
     Route::get('/pembeli/alamat/search', [AlamatController::class, 'show']);
     Route::put('/pembeli/alamat/update/{id}', [AlamatController::class, 'update']);
     Route::delete('/pembeli/alamat/delete/{id}', [AlamatController::class, 'delete']);
     Route::put('/pembeli/alamat/set-default/{id}', [AlamatController::class, 'setAsDefault']);
-// });
+    Route::post('/pembeli/buat-diskusi/{id}', [DiskusiController::class, 'store']);
+
+});
 
 Route::middleware(['auth:penitip'])->group(function () {
     Route::get('/penitip/dashboard', [PenitipController::class, 'show']);
@@ -89,4 +95,12 @@ Route::middleware(['auth:penitip'])->group(function () {
 
 Route::get('/getBarang',[BarangController::class, 'index']);
 Route::get('/getBarang/{id}', [BarangController::class, 'show']);
+Route::get('/diskusi/{id}',[DiskusiController::class, 'getByBarang']);
 
+
+// Route::middleware('auth:sanctum')->post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store']);
+// Route::post('/reset-password', [NewPasswordController::class, 'store']);
+// Route::middleware('auth:sanctum')->get('/email/verify-status', EmailVerificationPromptController::class);
+// Route::middleware(['auth:sanctum', 'signed'])->get('/email/verify/{id}/{hash}', VerifyEmailController::class)
+//      ->name('verification.verify');
+// Route::middleware('auth:sanctum')->put('/password/update', [PasswordController::class, 'update']);

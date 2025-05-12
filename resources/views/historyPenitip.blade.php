@@ -108,7 +108,7 @@
                     <strong>Berat Barang: </strong><span id="beratBarang"></span>
                 </div>
                 <div class="mb-3">
-                    <strong>Harga Barang: </strong><span id="harga"></span>
+                    <strong>Harga Barang: </strong><span id="hargaBarang"></span>
                 </div>
                 <div class="mb-3">
                     <strong>Tanggal Penitipan Barang: </strong><span id="tanggalPenitipan"></span>
@@ -120,7 +120,7 @@
                     <strong>Kategori Barang: </strong><span id="kategori"></span>
                 </div>
                 <div class="mb-3">
-                    <strong>Status Barang: </strong><span id="status"></span>
+                    <strong>Status Barang: </strong><span id="statusBarang"></span>
                 </div>
                 <div class="mb-3">
                     <strong>Tanggal Barang Terjual: </strong><span id="tanggalTerjual"></span>
@@ -171,6 +171,7 @@
             </div>
         </div>
     </nav>
+    <hr style="margin: 0; border: 2px solid #dee2e6;"/>
 
     <!--//////////////////////////////////////////// Main Content//////////////////////////////////// -->
     <h3 class="text-center mb-4 mt-4" style="color:rgb(0, 138, 57); font-family: 'Bagel Fat One', system-ui;">
@@ -225,23 +226,23 @@
                         const card = `
                         <div class="col-md-3 p-2">
                             <div class="card ">
-                                <img src="/img/${barang.image}" class="card-img-top" alt="Foto Produk"">
+                                <img src="/img/${barang.image}" class="card-img-top" alt="Foto Produk">
                                 <div class="card-body position-relative">
                                     <div class="d-flex align-items-center gap-2">
                                         <h5 class="card-title mb-2 text-justify"><strong>${barang.namaBarang}</strong></h5>
                                     </div>
                                     <div class="d-flex justify-content-between align-items-center mt-2">
                                         <p class="card-subtitle ${statusClass} mt-2 ">${barang.statusBarang}</p>
-                                        <button class="btn btn-sm btn-outline-primary mt-3 button-detail" 
-                                            data-id="${barang.idBarang}" data-bs-toggle="modal" data-bs-target="#detailBarang"
+                                        <button type = "button" class="btn btn-detail btn-outline-primary mt-3 " 
+                                            data-id="${barang.idBarang}" 
                                             data-namaBarang="${barang.namaBarang}"
                                             data-beratBarang="${barang.beratBarang}"
                                             data-harga="${barang.hargaBarang}"
                                             data-kategori="${barang.kategori}"
                                             data-tanggalPenitipan="${barang.tanggalPenitipan}"
                                             data-tanggalPenitipanSelesai="${barang.tanggalPenitipanSelesai}"
-                                            data-status="${barang.statusBarang}"
-                                            
+                                            data-statusBarang="${barang.statusBarang}"
+                                            data-bs-toggle="modal" data-bs-target="#detailBarang"
                                             ">
                                             Lihat Detail
                                         </button>
@@ -267,15 +268,16 @@
             // });
         });
 
-        document.querySelectorAll(".button-detail").forEach(link => {
-            link.addEventListener("click", function () {
-            const namaBarang = this.getAttribute("data-namaBarang");
-            const beratBarang = this.getAttribute("data-beratBarang");
-            const hargaBarang = this.getAttribute("data-hargaBarang");
-            const kategori = this.getAttribute("data-kategori");
-            const tanggalPenitipan = this.getAttribute("data-tanggalPenitipan");
-            const tanggalPenitipanSelesai = this.getAttribute("data-tanggalPenitipanSelesai");
-            const statusBarang = this.getAttribute("data-statusBarang");
+        document.querySelectorAll(".btn-detail").forEach(button => {
+            button.addEventListener("click", () => {
+            idDetail = button.getAttribute("data-id");
+            const namaBarang = button.getAttribute("data-namaBarang");
+            const beratBarang = button.getAttribute("data-beratBarang");
+            const hargaBarang = button.getAttribute("data-hargaBarang");
+            const kategori = button.getAttribute("data-kategori");
+            const tanggalPenitipan = button.getAttribute("data-tanggalPenitipan");
+            const tanggalPenitipanSelesai = button.getAttribute("data-tanggalPenitipanSelesai");
+            const statusBarang = button.getAttribute("data-statusBarang");
             // const tanggalTerjual = this.getAttribute("data-tanggalTerjual");
 
             // Isi modal dengan data barang

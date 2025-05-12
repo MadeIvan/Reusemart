@@ -14,7 +14,7 @@ class AlamatController extends Controller
         try{
             //////////CEK ID PEMBELI/////////
             $pembeli = auth('pembeli')->user();
-        $pembeliId = $pembeli->idPembeli;
+            $pembeliId = $pembeli->idPembeli;
     
             $request->validate([
                 'alamat'=> 'required|string|max:255',
@@ -97,6 +97,7 @@ class AlamatController extends Controller
        // $pembeliId = Auth::id();
         $pembeli = auth('pembeli')->user();
         $pembeliId = $pembeli->idPembeli;
+
         if(!$pembeli){
             return response()->json([
                 "status" => false,
@@ -108,9 +109,15 @@ class AlamatController extends Controller
         try{
             $query = $request->input('q');
     
-            $results = Alamat::where('alamat', 'like', '%' . $query . '%')
-                ->orWhere('kategori', 'like', '%' . $query . '%')
-                ->get();
+            // $results = Alamat::where('alamat', 'like', '%' . $query . '%')
+            //     ->orWhere('kategori', 'like', '%' . $query . '%')
+            //     ->get();
+            $results = Alamat::where('idPembeli', $pembeliId)  // Menambahkan filter berdasarkan pembeli yang login
+            ->where(function ($q) use ($query) {
+                $q->where('alamat', 'like', '%' . $query . '%')
+                  ->orWhere('kategori', 'like', '%' . $query . '%');
+            })
+            ->get();
     
             return response()->json([
                 'status' => 200,
@@ -195,22 +202,22 @@ class AlamatController extends Controller
 
     ////////////////////////SET DEFAULT/////////////////////////
     public function setAsDefault($id){
-        // $pembeliId = Auth::id();
         $pembeli = auth('pembeli')->user();
         $pembeliId = $pembeli->idPembeli;
+
+        ///////////////////////cek Alamat
+         $alamat = Alamat::where('idAlamat', $id)->where('idPembeli', $pembeliId)->first();
+
+        if (!$alamat) {
+            return response()->json(['message' => 'Alamat tidak ditemukan'], 404);
+        }
+        
         // Set jadi ga default
         Alamat::where('idPembeli', $pembeliId)->where('isDefault', true)->update(['isDefault' => false]);
 
         // Set jadi default
-        $alamat = Alamat::where('idAlamat', $id)->where('idPembeli', $pembeliId)->update(['isDefault' => true]);
+        $alamat->update(['isDefault' => true]);
 
-        if ($alamat) {
-            $alamat->isDefault = true;
-            $alamat->save();
-    
-            return response()->json(['message' => 'Berhasil mengatur sebagai alamat utama'], 200);
-        } else {
-            return response()->json(['message' => 'Alamat tidak ditemukan'], 404);
-        }
+        return response()->json(['message' => 'Berhasil mengatur sebagai alamat utama'], 200);
     }
 }

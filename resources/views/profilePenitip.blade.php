@@ -93,6 +93,9 @@
             </div>
         </div>
     </nav>
+    <hr style="margin: 0; border: 2px solid #dee2e6;"/>
+
+
     <!-- Main Content -->
     <h1 class="text-center mb-4 mt-4" style="color:rgb(0, 138, 57); font-family: 'Bagel Fat One', system-ui;">
         Profile Pengguna

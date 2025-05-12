@@ -70,6 +70,7 @@
             </div>
         </div>
     </nav>
+    <hr style="margin: 0; border: 2px solid #dee2e6;"/>
     <!-- Main Content -->
     <div class="container vh-100 d-flex justify-content-center align-items-center">
     <div class="row w-100 justify-content-center">

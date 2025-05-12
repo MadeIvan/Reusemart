@@ -145,18 +145,37 @@
 
 <!-- //////////////////////////INI SCRIPT SHOW ALL DAN SEARCH/////////////////////////// -->
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        fetch("http://127.0.0.1:8000/api/organisasi", {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                "Content-Type": "application/json",
-            },
-        })
-        .then(response => response.json())
-        .then(response => {
-            const organisasiList = document.getElementById("listOrganisasi");
-            const data = response.data;
+    document.addEventListener("DOMContentLoaded", function(){
+        const organisasiList = document.getElementById("listOrganisasi");
+        const inputSearch = document.getElementById("inputSearch");
+        let OrganisasiData = [];
+        let idToDelete = null;
+        let idToUpdate = null;
+        let idToDefault = null;
+        
+        fetchOrganisasi();
+
+        ////////////////////////SHOW ALAMAT///////////////////////////////////
+        function fetchOrganisasi(){
+            fetch("http://127.0.0.1:8000/api/organisasi", {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                    "Content-Type": "application/json",
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                OrganisasiData = data.data;
+                renderOrganisasi(data.data);
+            })
+            .catch(error => console.error("Error fetching organisasi:", error));
+        }
+
+        ////////////////////////Organisasi///////////////////////////////////
+        function renderOrganisasi(data){
+            // console.log("Rendering data:", data);
+            organisasiList.innerHTML = ""; 
 
             data.forEach(organisasi => {
                 const row = `
@@ -181,183 +200,133 @@
                 `;
                 organisasiList.innerHTML += row;
             });
+
             document.querySelectorAll(".btn-delete").forEach(button => {
                 button.addEventListener("click", () => {
-                    const id = button.getAttribute("data-id");
-                    handleDelete(id);
+                    idToDelete = button.getAttribute("data-id");
                 });
             });
 
             document.querySelectorAll(".btn-edit").forEach(button => {
-            button.addEventListener("click", () => {
-                const id = button.getAttribute("data-id");
-                const nama = button.getAttribute("data-nama");
-                const username = button.getAttribute("data-username");
-                const alamat = button.getAttribute("data-alamat");
-
-                document.getElementById("namaOrganisasi").value = nama;
-                document.getElementById("usernameOrganisasi").value = username;
-                document.getElementById("alamatOrganisasi").value = alamat;
-
-                handleUpdate(id);
+                button.addEventListener("click", () => {
+                    idToUpdate = button.getAttribute("data-id");
+                    const nama = button.getAttribute("data-nama");
+                    const username = button.getAttribute("data-username");
+                    const alamat = button.getAttribute("data-alamat");
+        
+                    document.getElementById("namaOrganisasi").value = nama;
+                    document.getElementById("usernameOrganisasi").value = username;
+                    document.getElementById("alamatOrganisasi").value = alamat;
+                });
             });
-        });
-        const searchInput = document.getElementById("inputSearch");
-        searchInput.addEventListener("input", () => {
-            const query = searchInput.value.toLowerCase();
+
+            document.querySelectorAll(".btn-outline-success").forEach(button => {
+                button.addEventListener("click", function () {
+                    idToDefault = this.getAttribute("data-id");
+                });
+            });
+        }
+
+        inputSearch.addEventListener("input", () => {
+            const query = inputSearch.value.toLowerCase();
             fetch(`http://127.0.0.1:8000/api/organisasi/search?q=${query}`, {
                 headers: { 
                     "Authorization": `Bearer ${localStorage.getItem('token')}` },
             })
                 .then(response => response.json())
-                .then(data => renderTable(data.data))
+                .then(data => renderOrganisasi(data.data))
                 .catch(error => console.error("Error searching organisasi:", error));
         });
-        })
-        .catch(error => {
-            console.error("Error:", error);
-            Toastify({
-                text: "Gagal mengambil data organisasi.",
-                duration: 3000,
-                gravity: "top",
-                position: "right",
-                backgroundColor: "#dc3545"
-            }).showToast();
+
+
+        //////////////////////UPDATE ORGANISASI///////////////////////////////////
+        document.getElementById("confirmUpdate").addEventListener('click', function(event) {
+            if (!idToUpdate) return;
+
+                const namaOrganisasi = document.getElementById("namaOrganisasi").value;
+                const username = document.getElementById("usernameOrganisasi").value;
+                const alamat = document.getElementById("alamatOrganisasi").value;
+
+                fetch(`http://127.0.0.1:8000/api/organisasi/update/${idToUpdate}`, {
+                    method: 'PUT',
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem('token')}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        username,
+                        namaOrganisasi,
+                        alamat,
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('updateOrganisasi'));
+                    if (modal) modal.hide();
+
+                    Toastify({
+                        text: "Berhasil Mengubah Organisasi",
+                        duration: 3000,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "#8bc34a",
+                    }).showToast();
+                    fetchOrganisasi();
+                    idToUpdate = null;
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    Toastify({
+                        text: "Gagal Mengubah Organisasi",
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "rgb(221, 25, 25)",
+                    }).showToast();
+                });
         });
-    });
-</script>
+        
 
-<!-- //////////////////////////INI SCRIPT DELETE/////////////////////////// -->
-<script>
+        ////////////////////////DELETE Organisasi///////////////////////////////////
+        document.getElementById("confirmDelete").addEventListener('click', function(event) {
+            if (!idToDelete) return;
 
-document.addEventListener("DOMContentLoaded", function() {
-            const token = localStorage.getItem("token");
-            if (!token) {
-                window.location.href = "{{ url('/pegawai/login') }}";
-            }
-        });
-    let selectedDeleteId = null;
+                fetch(`http://127.0.0.1:8000/api/organisasi/delete/${idToDelete}`, {
+                    method: 'DELETE',
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem('token')}`,
+                        "Content-Type": "application/json"
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('deleteOrganisasi'));
+                    if (modal) modal.hide();
 
-    function handleDelete(id) {
-        selectedDeleteId = id;
-    }
-
-    document.getElementById("confirmDelete").addEventListener("click", () => {
-        if (selectedDeleteId) {
-            fetch(`http://127.0.0.1:8000/api/organisasi/delete/${selectedDeleteId}`, {
-                method: "DELETE",
-                headers: {
-                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                    "Content-Type": "application/json",
-                },
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Gagal Menghapus Organisasi");
-                }
-                return response.json();
-            })
-            .then(data => {
-                Toastify({
-                    text: "Berhasil Menghapus Organisasi",
-                    duration: 3000,
-                    close: true,
-                    gravity: "top",
-                    position: "right",
-                    backgroundColor: "#8bc34a",
-                }).showToast();
-                location.reload();
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                Toastify({
-                    text: "Gagal Menghapus Organisasi",
-                    duration: 3000,
-                    gravity: "top",
-                    position: "right",
-                    backgroundColor: "rgb(221, 25, 25)",
-                }).showToast();
+                    Toastify({
+                        text: "Berhasil Menghapus Organisasi",
+                        duration: 3000,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "#8bc34a",
+                    }).showToast();
+                    fetchOrganisasi();
+                    idToDelete = null;
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    Toastify({
+                        text: "Gagal Menghapus Organisasi",
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "rgb(221, 25, 25)",
+                    }).showToast();
+                });
             });
-        }else{
-            Toastify({
-                text: "Gagal Menghapus Organisasi",
-                duration: 3000,
-                gravity: "top",
-                position: "right",
-                backgroundColor: "rgb(221, 25, 25)",
-            }).showToast();
-        }
     });
-</script>
-
-<!-- //////////////////////////INI SCRIPT UPDATE/////////////////////////// -->
-<script>
-    let selectedUpdateId = null;
-
-    function handleUpdate(id) {
-        selectedUpdateId = id;
-    }
-
-    document.getElementById("confirmUpdate").addEventListener("click", () => {
-        if (selectedUpdateId) {
-            const namaOrganisasi = document.getElementById("namaOrganisasi").value;
-            const username = document.getElementById("usernameOrganisasi").value;
-            const alamat = document.getElementById("alamatOrganisasi").value;
-
-            fetch(`http://127.0.0.1:8000/api/organisasi/update/${selectedUpdateId}`, {
-                method: "PUT",
-                headers: {
-                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    username,
-                    namaOrganisasi,
-                    alamat,
-                }),
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Gagal Mengubah Organisasi");
-                }
-                return response.json();
-            })
-            .then(data => {
-                Toastify({
-                    text: "Berhasil Mengubah Organisasi",
-                    duration: 3000,
-                    close: true,
-                    gravity: "top",
-                    position: "right",
-                    backgroundColor: "#8bc34a",
-                }).showToast();
-                location.reload();
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                Toastify({
-                    text: "Gagal Mengubah Organisasi",
-                    duration: 3000,
-                    gravity: "top",
-                    position: "right",
-                    backgroundColor: "rgb(221, 25, 25)",
-                }).showToast();
-            });
-        }else{
-            Toastify({
-                text: "Gagal Mengubah Organisasi",
-                duration: 3000,
-                gravity: "top",
-                position: "right",
-                backgroundColor: "rgb(221, 25, 25)",
-            }).showToast();
-        }
-    });
-</script>
-
-<!-- //////////////////////////INI SCRIPT search/////////////////////////// -->
-<script>
-
 </script>
 
 </body>

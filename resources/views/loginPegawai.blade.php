@@ -36,7 +36,7 @@
                 </div>
 
                 <div class="d-flex justify-content-center login-button">
-                    <button type="submit" class="btn btn-success item-center" id="loginButton">Login</button>
+                    <button type="button" class="btn btn-success item-center" id="loginButton">Login</button>
                 </div>
             </form>
         </div>
@@ -60,7 +60,7 @@
             return; // Stop proses jika input kosong
         }
 
-        fetch("http://127.0.0.1:8000/api/pembeli/login", {
+        fetch("http://127.0.0.1:8000/api/pegawai/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -90,9 +90,9 @@
                 }).showToast();
 
                 // Uncomment jika ingin redirect setelah login
-                // setTimeout(() => {
-                //     window.location.href = "/HomeSetelahLogin"; // Ubah URL sesuai kebutuhan
-                // }, 2000);
+                setTimeout(() => {
+                    window.location.href = "/organisasi"; // Ubah URL sesuai kebutuhan
+                }, 2000);
             } else {
                 Toastify({
                     text: "Username atau password salah.",

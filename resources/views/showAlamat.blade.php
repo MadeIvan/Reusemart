@@ -359,7 +359,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 const alamat = document.getElementById("alamatCreate").value;
                 const isDefault = document.getElementById("isDefault").checked ? 1 : 0;
 
-                fetch("http://127.0.0.1:8000/api/pembeli/alamat", {
+                fetch("http://127.0.0.1:8000/api/pembeli/buat-alamat", {
                     method: "POST",
                     headers: {
                         "Authorization": `Bearer ${localStorage.getItem("token")}`,

@@ -6,6 +6,27 @@
     <title>Product Detail</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
+<style>
+    .diskusi-tanggal-pembeli{
+        display: flex;
+        justify-content: right;
+        gap: 10px;
+    }
+
+    .diskusi-tanggal-pegawai{
+        display: flex;
+        justify-content: left;
+        gap: 10px;
+    }
+
+    .diskusi-pegawai{
+        display: flex;
+        justify-content: right;
+        gap: 10px;
+    }
+</style>
+
 <body>
     <header class="bg-dark text-white p-4">
         <div class="container text-center">
@@ -15,6 +36,19 @@
 
     <div class="container my-5" id="product-detail">
         <!-- Product details will be dynamically loaded here -->
+    </div>
+
+    <div class="container my-3" id="diskusi-container">
+        <!-- Diskusi produk akan muncul di sini -->
+    </div>
+
+    <div class="container my-3 kirim-diskusi">
+        <div class="col-md-8 mt-3">
+            <textarea class="form-control " id="exampleFormControlTextarea1" rows="2" placeholder="Tulis Komentar"></textarea>
+        </div>
+        <div class="d-flex justify-content-end col-md-8 mt-3">
+            <button class="btn btn-dark">Kirim</button>
+        </div>
     </div>
 
     <footer class="bg-dark text-white text-center p-3">
@@ -56,10 +90,12 @@
                                     <button class="btn btn-dark">Add to Cart</button>
                                 </div>
                             </div>
+                            
                         `;
 
                         // Append the product details to the container
                         productDetailContainer.innerHTML = productDetailHTML;
+                        getDiskusi(productId);
 
                         // Handle product not found
                         // productDetailContainer.innerHTML = `<p>Product not found.</p>`;
@@ -70,6 +106,62 @@
                     document.getElementById('product-detail').innerHTML = `<p>Error loading product details.</p>`;
                 });
         });
+
+        function getDiskusi(idBarang) {
+            fetch(`http://127.0.0.1:8000/api/diskusi/${idBarang}`)
+            .then(response => response.json())
+            .then(response => {
+                let diskusiItems = '';
+                const data = response.data;
+
+                if (data && data.length > 0) {
+                    data.forEach(item => {
+                        let namaPengirim = '';
+                        if(item.idPembeli){
+                            namaPengirim = item.pembeli ? item.pembeli.username : 'Pembeli tidak tersedia';
+                        }else if (item.idPegawai) {
+                            namaPengirim = item.pegawai ? item.pegawai.username : 'Pegawai tidak tersedia';
+                        }
+
+                        if (item.idPembeli) {
+                            diskusiItems += `
+                                <div class="diskusi-tanggal-pembeli">
+                                    <p class="text-success"><strong>${namaPengirim} | </strong></p>
+                                    <p><strong>${item.tanggalDiskusi}</strong></p>
+                                    <p><strong>${item.waktuMengirimDiskusi}</strong></p>
+                                </div>
+                                <p > ${item.pesandiskusi}</p>
+                            `;
+                        } else if (item.idPegawai) {
+                            diskusiItems += `
+                            <div class="diskusi-tanggal-pegawai">
+                                    <p class="text-success"><strong>${namaPengirim}  | </strong></p>
+                                    <p><strong>${item.tanggalDiskusi}</strong></p>
+                                    <p><strong>${item.waktuMengirimDiskusi}</strong></p>
+                                </div>
+                            <p class="diskusi-pegawai"> ${item.pesandiskusi}</p>
+                            `;
+                        }
+                        diskusiItems += `<hr/>`;
+                    });
+                }
+
+                const diskusiHTML = `
+                    <div class="col-md-8 mt-5">
+                        <h2><strong>Diskusi Produk</strong></h2>
+                        <ul>${diskusiItems}</ul>
+                    </div>
+                `;
+
+                document.getElementById('diskusi-container').innerHTML = diskusiHTML;
+            })
+            .catch(error => {
+                console.error("Error fetching diskusi data:", error);
+                document.getElementById('diskusi-container').innerHTML = `<p>Error loading diskusi.</p>`;
+            });
+    }
+
+            
     </script>
 </body>
 </html>

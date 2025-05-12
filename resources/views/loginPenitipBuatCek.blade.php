@@ -91,7 +91,6 @@
 
                 // Uncomment jika ingin redirect setelah login
                 setTimeout(() => {
-                    // href="{{url('/penitip/dashboard')}}"
                     window.location.href = "{{ url('/penitip/dashboard') }}";
                 }, 10);
             } else {

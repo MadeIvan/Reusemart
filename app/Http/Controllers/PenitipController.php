@@ -171,14 +171,49 @@ class PenitipController extends Controller
     {
         $penitip = auth('penitip')->user();
 
-        $penitipan = TransaksiPenitipan::with('transaksiPenitipan.barang')
+        $penitipan = TransaksiPenitipan::with('detailTransaksiPenitipan.barang.detailTransaksiPembelian.transaksiPembelian')
             ->where('idPenitip', $penitip->idPenitip)
             ->get();
+
+        // $penitipan = TransaksiPenitipan::with([
+        //     'detailTransaksiPenitipan.barang.detailTransaksiPembelian.transaksiPembelian'
+        // ])->where('idPenitip', auth('penitip')->user()->idPenitip)
+        // ->get();
+
 
         return response()->json([
             "status" => true,
             "message" => "Barang penitipan berhasil dimuat",
             "data" => $penitipan
+        ]);
+    }
+
+    public function changePassword(Request $request)
+    {
+         $penitip = auth('penitip')->user();
+         
+         $request->validate([
+            'password'=> 'required|string|max:255',
+            'password2'=> 'required|string|min:8',
+        ]);
+
+        if($request->password == $request->password2){
+            return reponse()->json([
+                "message" => "Password baru tidak boleh sama dengan password lama."
+            ]);
+        }
+
+        if($request->password != $request->password2){
+            return reponse()->json([
+                "message" => "Password tidak sama"
+            ]);
+        }
+
+        $penitip->password->update(['password'=>Hash::make($request->password)]);
+
+        return response()->json([
+            "status" => true,
+            "message" => "Berhasil",
         ]);
     }
 }

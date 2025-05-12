@@ -78,7 +78,7 @@ class PembeliController extends Controller
         }
 
         // Login success
-        $token = $pembeli->createToken('Personal Access Token')->plainTextToken;
+        $token = $pembeli->createToken('Personal Access Token',['pembeli'])->plainTextToken;
 
         return response()->json([
             "status" => true,

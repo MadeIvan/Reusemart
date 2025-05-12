@@ -5,15 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class DetailTransaksiPenitipan extends Model
+class DetailTransaksiPembelian extends Model
 {
     use HasFactory;
 
-    protected $table = 'detailtransaksipenitipan'; 
+    protected $table = 'detailtransaksipembelian'; 
     public $timestamps = false;   
 
     protected $fillable = [
-        'idTransaksiPenitipan',
+        'noNota',
         'idBarang',
     ];
 
@@ -21,8 +21,8 @@ class DetailTransaksiPenitipan extends Model
         return $this->belongsTo(Barang::class, 'idBarang', 'idBarang');
     }
 
-    public function transaksiPenitipan(){
-        return $this->belongsTo(TransaksiPenitipan::class, 'idTransaksiPenitipan', 'idTransaksiPenitipan');
+    public function transaksiPembelian(){
+        return $this->belongsTo(transaksiPembelian::class, 'noNota', 'noNota');
     }
 
 }

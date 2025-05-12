@@ -10,12 +10,14 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Alamat;
+use Illuminate\Contracts\Auth\CanResetPassword;
+use Illuminate\Auth\Passwords\CanResetPassword as CanResetPasswordTrait;
 
 
 
-class Pembeli extends Authenticatable
+class Pembeli extends Authenticatable implements CanResetPassword
 {
-    use HasFactory, Notifiable, SoftDeletes, HasApiTokens;
+    use HasFactory, Notifiable, SoftDeletes, HasApiTokens, CanResetPasswordTrait;
 
     protected $table = 'pembeli';
     protected $primaryKey = 'idPembeli';
@@ -34,5 +36,9 @@ class Pembeli extends Authenticatable
 
     public function alamat(){
         return $this->hasMany(Alamat::class, 'idPembeli', 'idPembeli');
+    }
+
+    public function diskusi(){
+        return $this->hasMany(Diskusi::class, 'idPembeli', 'idPembeli');
     }
 }

@@ -34,4 +34,8 @@ class Pegawai extends Model
     public function dompet(){
         return $this->belongsTo(Dompet::class, 'idDompet', 'idDompet');
     }
+
+    public function diskusi(){
+        return $this->hasMany(Diskusi::class, 'idPegawai', 'idPegawai');
+    }
 }
