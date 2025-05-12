@@ -11,8 +11,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\AlamatController;
 use App\Http\Middleware\PembeliMiddleware;
 use App\Http\Middleware\JabatanMiddleware;
-use App\Http\Controllers\PegawaiController;
-use App\Http\Controllers\PenitipController;
+
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\DiskusiController;
 

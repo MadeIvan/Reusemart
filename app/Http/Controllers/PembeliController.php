@@ -47,8 +47,7 @@ class PembeliController extends Controller
         ], 200);
     }
 
-    public function login(Request $request)
-    {
+    public function login(Request $request){
         $request->validate([
             'username' => 'required|string|max:255',
             'password'=> 'required|string|min:8',

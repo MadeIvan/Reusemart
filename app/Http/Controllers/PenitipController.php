@@ -152,199 +152,23 @@ class PenitipController extends Controller
 }
 
     ////////////////////[DELETE PENITIP ID]////////////////////
-    public function deletePenitip($id){
-        $penitip = Penitip::find($id);
+public function deletePenitip($id){
+    $penitip = Penitip::find($id);
 
-        if (!$penitip) {
-            return response()->json([
-                'message' => 'Penitip not found'
-            ], 404);
-        }
-
-        $penitip->deleted_at = now();
-        $penitip->save( );
-
+    if (!$penitip) {
         return response()->json([
-            'status' => 'success',
-            'message' => 'Penitip deleted successfully'
-
-
-class PenitipController extends Controller
-{
-    public function login(Request $request)
-    {
-        $request->validate([
-            'username' => 'required|string|max:255',
-            'password'=> 'required|string|min:8',
-        ]);
-
-        $penitip = Penitip::where('username', $request->username)->first();
-
-        if (!$penitip) {
-            return response()->json([
-                "status" => false,
-                "message" => "User not found",
-            ], 404);
-        }
-
-        if ($penitip->deleted_at) {
-            return response()->json([
-                "status" => false,
-                "message" => "Your account has been deactivated.",
-            ], 403);
-        }
-
-        if (!Hash::check($request->password, $penitip->password)) {
-            return response()->json([
-                "status" => false,
-                "message" => "Invalid credentials",
-            ], 401);
-        }
-
-        // Login success
-        $token = $penitip->createToken('Personal Access Token')->plainTextToken;
-
-        return response()->json([
-            "status" => true,
-            "message" => "Login successful",
-            "data" => [
-                "pembeli" => $penitip,
-                "token" => $token
-            ]
-        ], 200);
+            'message' => 'Penitip not found'
+        ], 404);
     }
 
+    $penitip->deleted_at = now();
+    $penitip->save();
 
-    public function register(Request $request){ //register
-        $request->validate([
-            'username'=> 'required|string|max:255',
-            'password'=> 'required|string|min:8',
-            'namaPenitip'=> 'required|string|max:255',
-            'nik'=> 'required|string|max:16',
-            'alamat'=> 'required|string|max:255',
-        ]);
-        $last = Penitip::orderBy('idPenitip', 'desc')->first();
-        $lastNumber = 0;
-
-        if ($last) {
-            $lastNumber = (int) str_replace('T', '', $last->idPenitip);
-        }
-
-        $newId = 'T' . ($lastNumber + 1);
-
-        while (Penitip::where('idPenitip', $newId)->withTrashed()->exists()) {
-            $lastNumber++;
-            $newId = 'T' . $lastNumber;
-        }
-
-        $dompet = (new DompetController)->createDompetPenitip(null);
-        $idDompet = (string) $dompet->idDompet;
-
-
-        $penitip = Penitip::create([
-            'idPenitip' => $newId,
-            'idTopeseller'=> null,
-            'idDompet'=> $idDompet,
-            'username'=>  $request->username,
-            'password'=>  Hash::make($request->password),
-            'namaPenitip'=> $request->namaPenitip,
-            'nik'=> $request->nik,
-            'alamat'=> $request->alamat
-        ]);
-
-        return response()->json([
-            "status" => true,
-            "message" => "Get successful",
-            "data" => $penitip
-        ], 200);
-    }
-
-    public function show($id){ //search
-        try{
-            $data = Penitip::find($id);
-            return response()->json([
-                "status" => true,
-                "message" => "Get successful",
-                "data" => $data
-            ], 200);
-        }catch(Exception $e){
-            return response()->json([
-                "status" => false,
-                "message" => $e->getMessage(),
-                "data" => null
-            ], 400);
-        }
-    }
-
-    public function checkNIK(Request $request)
-    {
-        $nikExists = Penitip::where('nik', $request->nik)->exists();
-
-        return response()->json([
-            'nikExists' => $nikExists,
-        ]);
-    }
-
-    public function myData(Request $request)
-    {
-        // $penitip = $request->user();
-         $penitip = auth('penitip')->user()->load('dompet');
-
-        return response()->json([
-            "status" => true,
-            "message" => "User retrieved successfully",
-            "data" => $penitip
-        ]);
-    }
-
-    public function loadBarang(Request $request)
-    {
-        $penitip = auth('penitip')->user();
-
-        $penitipan = TransaksiPenitipan::with('detailTransaksiPenitipan.barang.detailTransaksiPembelian.transaksiPembelian')
-            ->where('idPenitip', $penitip->idPenitip)
-            ->get();
-
-        // $penitipan = TransaksiPenitipan::with([
-        //     'detailTransaksiPenitipan.barang.detailTransaksiPembelian.transaksiPembelian'
-        // ])->where('idPenitip', auth('penitip')->user()->idPenitip)
-        // ->get();
-
-
-        return response()->json([
-            "status" => true,
-            "message" => "Barang penitipan berhasil dimuat",
-            "data" => $penitipan
-        ]);
-    }
-
-    public function changePassword(Request $request)
-    {
-         $penitip = auth('penitip')->user();
-         
-         $request->validate([
-            'password'=> 'required|string|max:255',
-            'password2'=> 'required|string|min:8',
-        ]);
-
-        if($request->password == $request->password2){
-            return reponse()->json([
-                "message" => "Password baru tidak boleh sama dengan password lama."
-            ]);
-        }
-
-        if($request->password != $request->password2){
-            return reponse()->json([
-                "message" => "Password tidak sama"
-            ]);
-        }
-
-        $penitip->password->update(['password'=>Hash::make($request->password)]);
-
-        return response()->json([
-            "status" => true,
-            "message" => "Berhasil",
-
-        ]);
-    }
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Penitip deleted successfully'
+    ]);
 }
+
+}
+

@@ -70,6 +70,7 @@
                                 <option value="" disabled selected>Select Status</option>
                                 <option value="penitip">Penitip</option>
                                 <option value="pembeli">Pembeli</option>
+                                <option value="organisasi">Pembeli</option>
                             </select>
                         </div>
 
@@ -112,11 +113,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert(resData.message || 'Login failed');
                 return;
             }
-            alert('Login successful!');
+            alert('Login successful! Lofin as ' + status);
             console.log('User:', resData.penitip);
 
-            localStorage.setItem('auth_token', resData.penitip.Token);
-
+            
+            if($status == 'penitip'){
+                localStorage.setItem('auth_token', resData.penitip.Token);
+            }(else if($status == 'pembeli'){
+                localStorage.setItem('auth_token', resData.token);
+            }(else if($status == 'organisasi'){
+                localStorage.setItem('auth_token', resData.token);
+            }
         } catch (error) {
             console.error('Error:', error);
             alert('An error occurred: ' + error.message);
