@@ -4,6 +4,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <title>Register Organisasi</title>
     <!-- Bootstrap CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
@@ -22,53 +24,67 @@
 
 </head>
 <body>
+    
     <!-- Main Content -->
     <div class="container vh-100 d-flex justify-content-center align-items-center">
-    <div class="row w-100 justify-content-center">
-        <div class="col-md-6 border p-4 rounded shadow">
-        <h2 class="text-center" style="color:rgb(24, 134, 4); font-weight: bold;">Registrasi Organisasi</h2>
-            <form>
-                <div class="mb-3">
-                    <label for="namaOrganisasi" class="form-label"><strong>Nama Organisasi</strong></label>
-                    <input type="text" class="form-control" id="namaOrganisasi">
+        <!-- Toast notification -->
+        <div class="toast-container">
+            <div class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true" id="successToast">
+                <div class="d-flex">
+                    <div class="toast-body" id="toastMessage">
+                        Action completed successfully!
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
-                <div class="mb-3">
-                    <label for="alamat" class="form-label"><strong>Alamat</strong></label>
-                    <input type="text" class="form-control" id="alamat">
-                </div>
-                <div class="mb-3">
-                    <label for="email" class="form-label"><strong>Email</strong></label>
-                    <input type="email" class="form-control" id="email">
-                </div>
-                <div class="mb-3">
-                    <label for="username" class="form-label"><strong>Username</strong></label>
-                    <input type="text" class="form-control" id="username">
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label"><strong>Password</strong></label>
-                    <input type="password" class="form-control" id="password">
-                </div>
-                <div class="d-flex justify-content-center register-button">
-                    <button type="submit" class="btn btn-success item-center">Submit</button>
-                </div>
-            </form>
+            </div>
+        </div> 
+        <div class="row w-100 justify-content-center">
+            
+            <div class="col-md-6 border p-4 rounded shadow">
+            <h2 class="text-center" style="color:rgb(24, 134, 4); font-weight: bold;">Registrasi Organisasi</h2>
+                <form id="registerForm">
+                    <div class="mb-3">
+                        <label for="namaOrganisasi" class="form-label"><strong>Nama Organisasi</strong></label>
+                        <input type="text" class="form-control" id="namaOrganisasi" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="alamat" class="form-label"><strong>Alamat</strong></label>
+                        <input type="text" class="form-control" id="alamat" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label"><strong>Email</strong></label>
+                        <input type="email" class="form-control" id="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="username" class="form-label"><strong>Username</strong></label>
+                        <input type="text" class="form-control" id="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label"><strong>Password</strong></label>
+                        <input type="password" class="form-control" id="password" required>
+                    </div>
+                    <div class="d-flex justify-content-center register-button">
+                        <button type="submit" class="btn btn-success">Submit</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
     <script>
+
     document.addEventListener("DOMContentLoaded", () => {
          const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         const registerButton = document.querySelector('.register-button button');
         registerButton.addEventListener('click', async function (e) {
             e.preventDefault();
             try {
+
                 const namaOrganisasi = document.getElementById('namaOrganisasi').value.trim();
                 const alamat = document.getElementById('alamat').value.trim();
                 const email = document.getElementById('email').value.trim();
                 const username = document.getElementById('username').value.trim();
                 const password = document.getElementById('password').value.trim();
-
                 if (!namaOrganisasi || !alamat || !email || !username || !password) {
                     Toastify({
                         text: "Mohon untuk mengisi seluruh form.",
@@ -174,7 +190,5 @@
         });
     });
 </script>
-
-
 </body>
 </html>

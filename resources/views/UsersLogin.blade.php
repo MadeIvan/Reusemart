@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <title>Login Page</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" 
@@ -76,13 +77,20 @@
 
                         <button type="submit" class="btn btn-primary w-100">Login</button>
                     </form>
+                    
                 </div>
+                <p class="text-center mt-3">
+                        Don't have an account for organization? 
+                        <a href="/organisasi/register" class="text-decoration-none">Click here!</a>
+                    </p>
             </div>
         </div>
     </div>
 
     <!-- Script to handle the form submission -->
     <script>
+<
+
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelector('#loginForm').addEventListener('submit', async function(event) {
         event.preventDefault(); // Prevent the default form submission
@@ -130,6 +138,8 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+
+
 
 
 </body>

@@ -56,12 +56,8 @@ document.addEventListener("DOMContentLoaded", function() {
 </head>
 
 <body>
-    <script>
-    if (!localStorage.getItem("auth_token")) {
-        window.location.href = "/pembeli/login";
 
-    }
-</script>
+
 
 
     <!-- ////////////////////INI MODAL DELETE///////////////////////////// -->
@@ -162,7 +158,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
     <script>
         document.addEventListener("DOMContentLoaded", function(){
+            const auth_token = localStorage.getItem('auth_token');
+            if (!localStorage.getItem("auth_token")) {
+            window.location.href = "/UsersLogin";
+            }
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token from meta tag
+
             const alamatContainer = document.getElementById("alamatContainer");
             const searchInput = document.getElementById("searchInput");
             let alamatData = [];

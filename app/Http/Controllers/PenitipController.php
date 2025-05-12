@@ -43,8 +43,9 @@ class PenitipController extends Controller
                 'namaPenitip' => $penitip->namaPenitip,
                 'idTopeSeller' => $penitip->idTopeSeller,
                 'idDompet' => $penitip->idDompet,
+                'token' => $token
             ],
-            'Token' => $token
+            
         ]);
     }
 
@@ -59,7 +60,6 @@ class PenitipController extends Controller
         ]);
     }
 
-    ///////////////////[REGISTER PENITIP]
     public function register(Request $request){
         $validator = Validator::make($request->all(), [
             'username' => 'required|string|unique:penitip,username|max:255',
@@ -98,7 +98,8 @@ class PenitipController extends Controller
             $dompet=(new DompetController)->updateDompet($penitip->idPenitip, $dompet->saldo, $idDompet);
             return response()->json([
                 'message' => 'Penitip registered successfully!',
-                'penitip' => $penitip
+                'penitip' => $penitip,
+                'status' => true
             ], 201);
 
         } catch (\Exception $e) {
@@ -108,6 +109,7 @@ class PenitipController extends Controller
             ], 500);
         }
     }
+    ///////////////////[REGISTER PENITIP]
     /////////////////[GET PENITIP ID]////////////////////
     public function getPenitipById($id)
     {

@@ -425,14 +425,14 @@
             // Register New Penitip
             document.getElementById("registerForm").addEventListener("submit", async function (e) {
                 e.preventDefault();
-
+                
                 const registerData = {
-                    username: document.getElementById("registerUsername").value,
-                    password: document.getElementById("registerPassword").value,
                     namaPenitip: document.getElementById("registerNamaPenitip").value,
                     nik: document.getElementById("registerNik").value,
+                    username: document.getElementById("registerUsername").value,
+                    password: document.getElementById("registerPassword").value,
                 };
-
+        
                 try {
                     const response = await fetch("http://127.0.0.1:8000/api/penitip/register", {
                         method: "POST",
@@ -444,7 +444,7 @@
                         body: JSON.stringify(registerData),
                     });
                     const result = await response.json();
-                    if (result.status === "success") {
+                    if (result.status === true) {
                         fetchPenitip(); // Re-fetch data after successful registration
                         showToast("Penitip registered successfully!", "bg-success");
                         
@@ -460,7 +460,7 @@
                         showToast("Failed to register penitip!", "bg-danger");
                     }
                 } catch (error) {
-                    console.error("Error during registration:", error);
+                    console.error("Error during registration: "+error, error);
                     showToast("An error occurred during registration.", "bg-danger");
                 }
             });
