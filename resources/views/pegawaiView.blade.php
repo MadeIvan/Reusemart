@@ -83,7 +83,7 @@
             <div class="row mb-3">
                 <div class="col-md-4">
                     <label for="idPegawai" class="form-label">ID Pegawai</label>
-                    <input type="text" class="form-control" id="idPegawai" required>
+                    <input type="text" class="form-control" id="idPegawai" disabled>
                 </div>
                 <div class="col-md-4">
                     <label for="namaPegawai" class="form-label">nama Pegawai</label>
@@ -108,6 +108,7 @@
                     <button type="submit" class="btn btn-success">Save</button>
                     <button type="button" class="btn btn-danger" id="deleteButton">Delete</button>
                     <button type="button" class="btn btn-primary" id="registerButton">Register Pegawai</button>
+                    <button type="button" class="btn btn-warning" id="resetButton">Reset Password</button>
                 </div>
             </div>
         </form>
@@ -164,7 +165,8 @@
                         <th>ID Pegawai</th>
                         <th>Nama Pegawai</th>
                         <th>Jabatan</th>
-                        <th>Username</th> 
+                        <th>Username</th>
+                        <!-- <th>Password</th>  -->
                     </tr>
                 </thead>
                 <tbody id="tableBody">
@@ -253,8 +255,9 @@
                     row.innerHTML = `
                         <td>${item.idPegawai}</td>
                         <td>${item.namaPegawai || '-'}</td>
+                        <td>${item.jabatan?.namaJabatan || '-'}</td>
                         <td>${item.username}</td>
-                        <td>${item.password}</td>
+                        
                     `;
                     row.addEventListener("click", () => populateForm(item));  // Add click event to the row
                     tableBody.appendChild(row);
