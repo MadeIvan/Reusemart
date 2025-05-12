@@ -175,7 +175,8 @@ class OrganisasiController extends Controller
         $data->delete();
 
         return response()->json([
-            'message' => 'Customer deleted successfully',
+            'status' => true,
+            'message' => 'Organisasi deleted successfully',
         ]);
     }
 

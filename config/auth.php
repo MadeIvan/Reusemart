@@ -55,7 +55,8 @@ return [
         'penitip' => [
             'driver' => 'sanctum',
             'provider' => 'penitip',
-        ]
+        ],
+        
 
     ],
     /*
