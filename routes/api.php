@@ -13,9 +13,13 @@ use App\Http\Controllers\BarangController;
 use App\Http\Controllers\DiskusiController;
 use App\Http\Controllers\DompetController;
 use App\Http\Controllers\PegawaiController;
+
 use App\Http\Controllers\JabatanController;
 use App\Http\Controllers\RequestDonasiController;
 use App\Http\Controllers\TransaksiDonasiController;
+
+use App\Http\Controllers\reqdonasiController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -124,6 +128,16 @@ Route::get('/transaksi-donasi', [TransaksiDonasiController::class, 'index']);
 Route::post('/transaksi-donasi', [TransaksiDonasiController::class, 'store']);
 Route::get('/transaksi-donasi/{id}', [TransaksiDonasiController::class, 'show']);
 Route::put('/transaksi-donasi/{id}', [TransaksiDonasiController::class, 'update']);
+
+Route::middleware('auth:organisasi')->group(function () {
+    Route::get('/reqdonasi', [reqdonasiController::class, 'index']);
+    Route::post('/create/reqdonasi', [reqdonasiController::class, 'store']);
+    Route::put('/reqdonasi/{id}', [reqDonasiController::class, 'update']);
+    
+    // DELETE - Delete a donation request
+    Route::delete('/reqdonasi/{id}', [reqDonasiController::class, 'destroy']);
+});
+
 
 Route::delete('/transaksi-donasi/{id}', [TransaksiDonasiController::class, 'destroy']);
 // Route::middleware('auth:sanctum')->post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store']);
