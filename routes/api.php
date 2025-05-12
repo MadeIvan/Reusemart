@@ -14,6 +14,7 @@ use App\Http\Controllers\DiskusiController;
 use App\Http\Controllers\DompetController;
 use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\JabatanController;
+use App\Http\Controllers\RequestDonasiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -116,7 +117,7 @@ Route::get('/getBarang',[BarangController::class, 'index']);
 Route::get('/getBarang/{id}', [BarangController::class, 'show']);
 Route::get('/diskusi/{id}',[DiskusiController::class, 'getByBarang']);
 
-
+Route::get('/donasi',[RequestDonasiController::class,'index']);
 // Route::middleware('auth:sanctum')->post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store']);
 // Route::post('/reset-password', [NewPasswordController::class, 'store']);
 // Route::middleware('auth:sanctum')->get('/email/verify-status', EmailVerificationPromptController::class);
