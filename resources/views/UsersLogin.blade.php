@@ -89,6 +89,7 @@
 
     <!-- Script to handle the form submission -->
     <script>
+<
 
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelector('#loginForm').addEventListener('submit', async function(event) {
@@ -137,6 +138,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+
 
 
 

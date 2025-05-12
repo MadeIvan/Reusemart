@@ -163,6 +163,7 @@ document.addEventListener("DOMContentLoaded", function() {
             window.location.href = "/UsersLogin";
             }
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token from meta tag
+
             const alamatContainer = document.getElementById("alamatContainer");
             const searchInput = document.getElementById("searchInput");
             let alamatData = [];

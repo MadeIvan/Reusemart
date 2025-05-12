@@ -97,15 +97,16 @@ Route::get('/OrganisasiMain', function () {
 });
 Route::post('/lupa-password', function (Request $request) {
     $request->validate(['email' => 'required|email']);
+
  
-    $status = Password::sendResetLink(
-        $request->only('email')
-    );
+//     $status = Password::sendResetLink(
+//         $request->only('email')
+//     );
  
-    return $status === Password::ResetLinkSent
-        ? back()->with(['status' => __($status)])
-        : back()->withErrors(['email' => __($status)]);
-})->middleware('guest')->name('password.email');
+//     return $status === Password::ResetLinkSent
+//         ? back()->with(['status' => __($status)])
+//         : back()->withErrors(['email' => __($status)]);
+// })->middleware('guest')->name('password.email');
 
 Route::get('/lupa-password/{token}', function (string $token) {
     return view('auth.reset-password', ['token' => $token]);

@@ -115,6 +115,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert('Login As Admin!');
                 localStorage.setItem('user_role', 'admin');
 
+
                 window.location.href = 'http://127.0.0.1:8000/organisasi';
 
             }else if(IdJabatan==3){

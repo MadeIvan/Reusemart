@@ -72,18 +72,19 @@
     </div>
 
     <script>
+
     document.addEventListener("DOMContentLoaded", () => {
          const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         const registerButton = document.querySelector('.register-button button');
         registerButton.addEventListener('click', async function (e) {
             e.preventDefault();
             try {
+
                 const namaOrganisasi = document.getElementById('namaOrganisasi').value.trim();
                 const alamat = document.getElementById('alamat').value.trim();
                 const email = document.getElementById('email').value.trim();
                 const username = document.getElementById('username').value.trim();
                 const password = document.getElementById('password').value.trim();
-
                 if (!namaOrganisasi || !alamat || !email || !username || !password) {
                     Toastify({
                         text: "Mohon untuk mengisi seluruh form.",
