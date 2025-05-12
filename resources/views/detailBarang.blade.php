@@ -163,53 +163,6 @@
             });
 
         }
-        
-        // function kirimDiskusi() {
-        //     const komentar = document.getElementById('exampleFormControlTextarea1').value.trim();
-        //     const idBarang = window.location.pathname.split('/').pop();
-        //     const token = localStorage.getItem('auth_token');
-        //     const btn = document.getElementById('kirimBtn');
-            
-        //     if (!token) {
-        //         alert("Silakan login terlebih dahulu untuk mengirim komentar.");
-        //         return;
-        //     }
-
-        //     if (!komentar) {
-        //         alert("Komentar tidak boleh kosong.");
-
-        //         return;
-        //     }
-        
-        //     btn.disabled = true;
-        //     btn.textContent = "Mengirim...";
-
-        //     fetch(`http://127.0.0.1:8000/api/buat-diskusi/${idBarang}`,{
-        //         method: 'POST',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //             'Accept': 'application/json',
-        //             'Authorization': `Bearer ${token}`,
-        //         },
-        //         body: JSON.stringify({
-        //             pesandiskusi: komentar
-        //         })
-        //     })
-        //     .then(response => response.json())
-        //     .then(response => {
-        //         alert("Komentar berhasil dikirim!");
-        //         document.getElementById('exampleFormControlTextarea1').value = ""; 
-        //         getDiskusi(idBarang); 
-        //     })
-        //     .catch(error => {
-            //         console.error("Error mengirim diskusi:", error);
-        //         alert("Terjadi kesalahan saat mengirim komentar.");
-        //     })
-        //     .finally(() => {
-            //         btn.disabled = false;
-            //         btn.textContent = "Kirim";
-        //     });
-        // }
 
         function kirimDiskusi() {
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token from meta tag
@@ -248,11 +201,11 @@
                 })
             })
             .then(response => {
-                console.log('Response Status:', response.status); // Cek status code
+                console.log('Response Status:', response.status);
                 return response.json();
             })
             .then(response => {
-                console.log('Response Data:', response); // Cek data respons
+                console.log('Response Data:', response);
                 alert("Komentar berhasil dikirim!");
                 document.getElementById('exampleFormControlTextarea1').value = ""; 
                 getDiskusi(idBarang);
