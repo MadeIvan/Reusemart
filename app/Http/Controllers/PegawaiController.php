@@ -101,11 +101,10 @@ class PegawaiController extends Controller
         $request->validate([
             'username' => 'required|string|max:255',
             'password'=> 'required|string|min:8',
-
         ]);
-
         
         $pegawai = Pegawai::where('username', $request->username)->first();
+        
         if($pegawai){
             if($pegawai->delete_at){
                 return response()->json([

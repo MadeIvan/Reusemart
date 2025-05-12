@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/login`, {
+            const response = await fetch(`http://127.0.0.1:8000/api/PegawaiLogin`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -105,6 +105,7 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('User:', resData.penitip);
 
             localStorage.setItem('auth_token', resData.penitip.Token);
+            window.location.href = "/organisasi";
 
         } catch (error) {
             console.error('Error:', error);

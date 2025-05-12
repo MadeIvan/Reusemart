@@ -115,7 +115,9 @@ document.addEventListener('DOMContentLoaded', function () {
             alert('Login successful!');
             console.log('User:', resData.penitip);
 
-            localStorage.setItem('auth_token', resData.penitip.Token);
+            localStorage.setItem('auth_token', resData.Token);
+            
+            window.location.href = "/penitip/dashboard";
 
         } catch (error) {
             console.error('Error:', error);

@@ -9,6 +9,7 @@ use App\Models\dompets;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator; 
 use App\Http\Controllers\DompetController;
+use App\Http\Controllers\TransaksiPenitipanController;
 use Illuminate\Support\Facades\DB;
 
 class PenitipController extends Controller
@@ -32,6 +33,7 @@ class PenitipController extends Controller
         }
 
         $token = $penitip->createToken('Personal Access Token')->plainTextToken;
+        
         return response()->json([
             'message' => 'Login successful',
             'penitip' => [
@@ -167,98 +169,10 @@ class PenitipController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Penitip deleted successfully'
-
-
-class PenitipController extends Controller
-{
-    public function login(Request $request)
-    {
-        $request->validate([
-            'username' => 'required|string|max:255',
-            'password'=> 'required|string|min:8',
         ]);
-
-        $penitip = Penitip::where('username', $request->username)->first();
-
-        if (!$penitip) {
-            return response()->json([
-                "status" => false,
-                "message" => "User not found",
-            ], 404);
-        }
-
-        if ($penitip->deleted_at) {
-            return response()->json([
-                "status" => false,
-                "message" => "Your account has been deactivated.",
-            ], 403);
-        }
-
-        if (!Hash::check($request->password, $penitip->password)) {
-            return response()->json([
-                "status" => false,
-                "message" => "Invalid credentials",
-            ], 401);
-        }
-
-        // Login success
-        $token = $penitip->createToken('Personal Access Token')->plainTextToken;
-
-        return response()->json([
-            "status" => true,
-            "message" => "Login successful",
-            "data" => [
-                "pembeli" => $penitip,
-                "token" => $token
-            ]
-        ], 200);
     }
 
-
-    public function register(Request $request){ //register
-        $request->validate([
-            'username'=> 'required|string|max:255',
-            'password'=> 'required|string|min:8',
-            'namaPenitip'=> 'required|string|max:255',
-            'nik'=> 'required|string|max:16',
-            'alamat'=> 'required|string|max:255',
-        ]);
-        $last = Penitip::orderBy('idPenitip', 'desc')->first();
-        $lastNumber = 0;
-
-        if ($last) {
-            $lastNumber = (int) str_replace('T', '', $last->idPenitip);
-        }
-
-        $newId = 'T' . ($lastNumber + 1);
-
-        while (Penitip::where('idPenitip', $newId)->withTrashed()->exists()) {
-            $lastNumber++;
-            $newId = 'T' . $lastNumber;
-        }
-
-        $dompet = (new DompetController)->createDompetPenitip(null);
-        $idDompet = (string) $dompet->idDompet;
-
-
-        $penitip = Penitip::create([
-            'idPenitip' => $newId,
-            'idTopeseller'=> null,
-            'idDompet'=> $idDompet,
-            'username'=>  $request->username,
-            'password'=>  Hash::make($request->password),
-            'namaPenitip'=> $request->namaPenitip,
-            'nik'=> $request->nik,
-            'alamat'=> $request->alamat
-        ]);
-
-        return response()->json([
-            "status" => true,
-            "message" => "Get successful",
-            "data" => $penitip
-        ], 200);
-    }
-
+    
     public function show($id){ //search
         try{
             $data = Penitip::find($id);

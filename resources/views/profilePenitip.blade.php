@@ -13,12 +13,6 @@
     <!-- Toastify JS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
-    <!-- <script>
-		const token = localStorage.getItem("token");
-			if (!token) {
-				window.location.href = "{{ url('/pembeli/login') }}";
-			}
-	</script> -->
 
     <style>
         body {
@@ -180,16 +174,22 @@
 
 
     <script>
+        const auth_token = localStorage.getItem("auth_token");
+        console.log("Token yang digunakan:", auth_token);
+			if (!auth_token) {
+				window.location.href = "{{ url('/UsersLogin') }}";
+			}
         /////////////////////buat profile/////////////////////
-        const token = localStorage.getItem('token');
+    // const auth_token = localStorage.getItem('auth_token');
 
     fetch('http://localhost:8000/api/penitip/profile', {
         method: 'GET',
         headers: {
-            "Authorization": `Bearer ${localStorage.getItem("token")}`,
+            "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
             "Accept": 'application/json',
         }
     })
+    
     .then(response => response.json())
     .then(data => {
         if (data.status) {
@@ -225,13 +225,13 @@
         document.getElementById('logoutLink').addEventListener('click', function (e) {
             e.preventDefault();
 
-            const token = localStorage.getItem('token');
+            const auth_token = localStorage.getItem('auth_token');
 
-            if (token) {
+            if (auth_token) {
                 fetch('http://localhost:8000/api/logout', {
                     method: 'POST',
                     headers: {
-                        'Authorization': 'Bearer ' + token,
+                        'Authorization': 'Bearer ' + auth_token,
                         'Accept': 'application/json'
                     }
                 })
@@ -244,7 +244,7 @@
                 })
                 .finally(() => {
                     // Bersihkan token & redirect ke halaman awal
-                    localStorage.removeItem('token');
+                    localStorage.removeItem('auth_token');
                     window.location.href = '/';
                 });
             } else {
