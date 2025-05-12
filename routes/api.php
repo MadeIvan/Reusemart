@@ -14,6 +14,8 @@ use App\Http\Controllers\DiskusiController;
 use App\Http\Controllers\DompetController;
 use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\reqdonasiController;
+use App\Http\Controllers\JabatanController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -58,6 +60,7 @@ Route::post('/organisasi/register', [OrganisasiController::class, 'register']);
 Route::post('/organisasi/login', [OrganisasiController::class, 'login']);
 Route::get('/check-email-username', [OrganisasiController::class, 'checkEmailUsername']);
 
+// routes/api.php
 Route::post('/pembeli/register', [PembeliController::class, 'register']);
 Route::post('/pembeli/login', [PembeliController::class, 'login']);
 Route::get('/check-email-username', [PembeliController::class, 'checkEmailUsername']);
@@ -68,6 +71,7 @@ Route::post('/pegawai/login', [PegawaiController::class, 'login']);
 Route::get('/pegawai', [PegawaiController::class, 'index']);
 Route::put('/pegawai/update/{id}', [PegawaiController::class, 'update']);
 Route::delete('/pegawai/{id}', [PegawaiController::class, 'softDelete']);
+Route::get('/jabatan', [JabatanController::class, 'index']);
 
 
 Route::post('/penitip/login', [PenitipController::class, 'login']);
@@ -97,7 +101,7 @@ Route::middleware(['auth:sanctum', 'auth.pembeli'])->group(function () {
     Route::put('/pembeli/alamat/update/{id}', [AlamatController::class, 'update']);
     Route::delete('/pembeli/alamat/delete/{id}', [AlamatController::class, 'delete']);
     Route::put('/pembeli/alamat/set-default/{id}', [AlamatController::class, 'setAsDefault']);
-    Route::post('/pembeli/buat-diskusi/{id}', [DiskusiController::class, 'store']);
+    Route::post('/buat-diskusi/{id}', [DiskusiController::class, 'store']);
 
 });
 

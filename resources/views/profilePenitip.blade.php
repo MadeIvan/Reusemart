@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reusemart</title>
@@ -174,6 +175,7 @@
 
 
     <script>
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token from meta tag
         const auth_token = localStorage.getItem("auth_token");
         console.log("Token yang digunakan:", auth_token);
 			if (!auth_token) {
@@ -186,7 +188,9 @@
         method: 'GET',
         headers: {
             "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
-            "Accept": 'application/json',
+            'Accept': 'application/json',
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": csrfToken,
         }
     })
     
@@ -231,8 +235,10 @@
                 fetch('http://localhost:8000/api/logout', {
                     method: 'POST',
                     headers: {
-                        'Authorization': 'Bearer ' + auth_token,
-                        'Accept': 'application/json'
+                        "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
+                        'Accept': 'application/json',
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": csrfToken,
                     }
                 })
                 .then(response => response.json())

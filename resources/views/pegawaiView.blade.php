@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Data Pegawai</title>
+    <title>Menu Perdonasian</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -83,7 +83,7 @@
             <div class="row mb-3">
                 <div class="col-md-4">
                     <label for="idPegawai" class="form-label">ID Pegawai</label>
-                    <input type="text" class="form-control" id="idPegawai" required>
+                    <input type="text" class="form-control" id="idPegawai" disabled>
                 </div>
                 <div class="col-md-4">
                     <label for="namaPegawai" class="form-label">nama Pegawai</label>
@@ -96,18 +96,19 @@
                 </div>
             </div>
 
-            <div class="row mb-3">
+            <!-- <div class="row mb-3">
                 <div class="col-md-4">
                     <label for="password" class="form-label">password</label>
                     <input type="text" class="form-control" id="password" disabled>
                 </div>
-            </div>
+            </div> -->
 
             <div class="row">
                 <div class="col-12 btn-container">
                     <button type="submit" class="btn btn-success">Save</button>
                     <button type="button" class="btn btn-danger" id="deleteButton">Delete</button>
                     <button type="button" class="btn btn-primary" id="registerButton">Register Pegawai</button>
+                    <button type="button" class="btn btn-warning" id="resetButton">Reset Password</button>
                 </div>
             </div>
         </form>
@@ -124,7 +125,9 @@
             </div>
             <div class="mb-3">
                 <label for="registerJabatan" class="form-label">Jabatan</label>
-                <input type="text" class="form-control" id="registerJabatan" required>
+                <select class="form-select" id="registerJabatan" required>
+                    <option value="">...</option>
+                </select>
             </div>
             <div class="mb-3">
                 <label for="registerUsername" class="form-label">Username</label>
@@ -164,7 +167,8 @@
                         <th>ID Pegawai</th>
                         <th>Nama Pegawai</th>
                         <th>Jabatan</th>
-                        <th>Username</th> 
+                        <th>Username</th>
+                        <!-- <th>Password</th>  -->
                     </tr>
                 </thead>
                 <tbody id="tableBody">
@@ -187,7 +191,7 @@
             const registerOverlay = document.getElementById("registerOverlay");
             let pegawaiData = [];
             let currentPegawaiId = null;
-
+            
             // Toast functionality
             function showToast(message, bgColor = 'bg-primary') {
                 const toast = document.getElementById('successToast');
@@ -230,6 +234,38 @@
                 }
             }
 
+            async function fetchJabatanOptions() {
+                try {
+                    const response = await fetch("http://127.0.0.1:8000/api/jabatan", {
+                        method: "GET",
+                        headers: {
+                            "Accept": "application/json",
+                            "Authorization": `Bearer ${localStorage.getItem('authToken')}`
+                        }
+                    });
+
+                    const result = await response.json();
+
+                    if (result.status === true) {
+                        const jabatanSelect = document.getElementById("registerJabatan");
+                        result.data
+                            .filter(j => j.namaJabatan !== 'Owner') // Exclude 'Owner'
+                            .forEach(jabatan => {
+                                const option = document.createElement("option");
+                                option.value = jabatan.idJabatan;
+                                option.text = jabatan.namaJabatan;
+                                jabatanSelect.appendChild(option);
+                            });
+                    } else {
+                        console.error("Failed to load jabatan:", result);
+                    }
+                } catch (error) {
+                    console.error("Error fetching jabatan:", error);
+                }
+            }
+            fetchJabatanOptions();
+
+
             // Render the table with fetched data
             function renderTable(data) {
                 tableBody.innerHTML = ""; // Clear the table before rendering new data
@@ -253,8 +289,9 @@
                     row.innerHTML = `
                         <td>${item.idPegawai}</td>
                         <td>${item.namaPegawai || '-'}</td>
+                        <td>${item.jabatan?.namaJabatan || '-'}</td>
                         <td>${item.username}</td>
-                        <td>${item.password}</td>
+                        
                     `;
                     row.addEventListener("click", () => populateForm(item));  // Add click event to the row
                     tableBody.appendChild(row);
@@ -268,7 +305,6 @@
                 document.getElementById("namaPegawai").value = item.namaPegawai || '';  // Set idTopSeller        // Set idDompet
                 document.getElementById("username").value = item.username || '';         // Set username
                 document.getElementById("password").value = item.password || '';   // Set namaPegawai
-                               
                 
                 // Store the current Pegawai ID
                 currentPegawaiId = item.idPegawai;
@@ -336,6 +372,7 @@
                         if (result.status === true) {
                             showToast("Pegawai updated successfully!", "bg-success");
                             fetchPegawai(); // Refresh the table data
+                            
                         } else {
                             showToast(`Failed to update pegawai: ${result.message || 'Unknown error'}`, "bg-danger");
                             console.error("Error updating pegawai:", result);

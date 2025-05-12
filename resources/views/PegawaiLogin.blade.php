@@ -114,6 +114,9 @@ document.addEventListener('DOMContentLoaded', function () {
             }else if(IdJabatan==2){
                 alert('Login As Admin!');
                 localStorage.setItem('user_role', 'admin');
+
+                window.location.href = 'http://127.0.0.1:8000/organisasi';
+
             }else if(IdJabatan==3){
                 alert('Login As Pegawai Gudang!');
                 localStorage.setItem('user_role', 'gudang');

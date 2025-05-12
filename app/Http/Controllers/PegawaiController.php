@@ -15,8 +15,9 @@ class PegawaiController extends Controller
 {
     public function index() //show
     {
+        // $pegawai = Pegawai::with('jabatan')->get();
         try{
-            $data = Pegawai::all();
+            $data = Pegawai::with('jabatan')->get();
             return response()->json([
                 "status" => true,
                 "message" => "Get successful",
