@@ -135,7 +135,7 @@ class PenitipController extends Controller
 
     // Validate the input data
     $validated = $request->validate([
-        'username' => 'nullable|string|unique:penitip,username,' . $penitip->idPenitip . '|max:255',
+        'username' => 'nullable|string|unique:penitip,username,' . $penitip->idPenitip . ',idPenitip|max:255',
         'namaPenitip' => 'nullable|string|max:255',
         'nik' => 'nullable|string|size:16',
     ]);
@@ -151,8 +151,7 @@ class PenitipController extends Controller
 }
 
     ////////////////////[DELETE PENITIP ID]////////////////////
-    public function deletePenitip($id)
-    {
+    public function deletePenitip($id){
         $penitip = Penitip::find($id);
 
         if (!$penitip) {
@@ -161,7 +160,8 @@ class PenitipController extends Controller
             ], 404);
         }
 
-        $penitip->delete();
+        $penitip->deleted_at = now();
+        $penitip->save( );
 
         return response()->json([
             'status' => 'success',

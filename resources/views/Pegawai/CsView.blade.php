@@ -251,6 +251,7 @@
                 }
 
                 sortedData.forEach(item => {
+                    if (item.deleted_at !== null) return;
                     const row = document.createElement("tr");
                     row.innerHTML = `
                         <td>${item.idPenitip}</td>
@@ -303,34 +304,13 @@
                     let response = await fetch(`http://127.0.0.1:8000/api/penitip/update/${currentPenitipId}`, {
                         method: "PUT",
                         headers: { 
-                            "Content-Type": "application/json",
                             "Accept": "application/json",
+                            "Content-Type": "application/json",
                             "Authorization": `Bearer ${localStorage.getItem('authToken')}`,
                             "X-CSRF-TOKEN": csrfToken
                         },
                         body: JSON.stringify(updatedData)
                     });
-                    
-                    // If PUT fails, try with POST and _method=PUT (for Laravel compatibility)
-                    if (!response.ok) {
-                        console.log("PUT request failed, trying with POST + _method=PUT");
-                        const formData = new FormData();
-                        formData.append('_method', 'PUT');
-                        formData.append('username', updatedData.username);
-                        formData.append('namaPenitip', updatedData.namaPenitip);
-                        formData.append('nik', updatedData.nik);
-                        
-                        response = await fetch(`http://127.0.0.1:8000/api/penitip/${currentPenitipId}`, {
-                            method: "POST",
-                            headers: {
-                                "Accept": "application/json",
-                                "Authorization": `Bearer ${localStorage.getItem('authToken')}`,
-                                "X-CSRF-TOKEN": csrfToken
-                            },
-                            body: formData
-                        });
-                    }
-                    
                     // Check if the request was successful
                     if (response.ok) {
                         const result = await response.json();
@@ -369,7 +349,7 @@
                 
                 if (confirm("Are you sure you want to delete this penitip?")) {
                     try {
-                        const response = await fetch(`http://127.0.0.1:8000/api/penitip/${currentPenitipId}`, {
+                        const response = await fetch(`http://127.0.0.1:8000/api/penitip/delete/${currentPenitipId}`, {
                             method: "DELETE",
                             headers: { 
                                 "Authorization": `Bearer ${localStorage.getItem('authToken')}`,
