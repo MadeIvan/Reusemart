@@ -2,34 +2,32 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Laravel\Sanctum\HasApiTokens;
-use App\Models\Dompet;
 
 class Penitip extends Authenticatable
 {
-    use HasFactory, Notifiable, SoftDeletes, HasApiTokens;
+    use HasFactory, HasApiTokens;
 
-    protected $table = 'penitip'; 
+    protected $table = 'penitip';
     protected $primaryKey = 'idPenitip';
-    protected $keyType = 'string'; 
-    public $timestamps = false;   
-    protected $dates = ['deleted_at'];
+    public $incrementing = true;
+    protected $keyType = 'string';
+    public $timestamps = false;
 
     protected $fillable = [
-        'idPenitip',
-        'idTopSeller',
+        'nik',
+        'idTopeseller',
         'idDompet',
         'username',
         'password',
         'namaPenitip',
-        'nik',
-        'alamat'
+        'idPenitip',
+    ];
+
+    protected $hidden = [
+        'password',
     ];
 
      public function dompet(){

@@ -101,6 +101,7 @@ class PegawaiController extends Controller
         $request->validate([
             'username' => 'required|string|max:255',
             'password'=> 'required|string|min:8',
+
         ]);
 
         
@@ -144,12 +145,15 @@ class PegawaiController extends Controller
         $validatedData = $request->validate([
             'namaPegawai'=> 'required',
             'username'=> 'required',
+
             // 'password'=> 'required',
         ]);
 
         $pegawai->namaPegawai = $validatedData['namaPegawai'];
         $pegawai->username = $validatedData['username'];
+
         // $pegawai->password = $validatedData['password'];
+
 
         $pegawai->update($validatedData);
 
@@ -226,3 +230,4 @@ class PegawaiController extends Controller
         ]);
     }
 }
+

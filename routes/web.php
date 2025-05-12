@@ -52,6 +52,18 @@ Route::get('/pembeli/register', function () {
 Route::get('/pembeli/login', function () {
     return view('loginPembeliBuatCekAja');
 });
+Route::get('/UsersLogin', function () {
+    return view('UsersLogin');
+});
+
+
+Route::get('/pegawai/PegawaiLogin', function () {
+    return view('PegawaiLogin');
+});
+Route::get('/pegawai/PenitipData', function () {
+    return view('Pegawai.CsView');
+});
+// Route::post('penitip/login', [PenitipLoginController::class, 'login']);
 
 Route::get('/pembeli/alamat', function () {
     return view('showAlamat');
@@ -102,4 +114,5 @@ Route::get('/lupa-password/{token}', function (string $token) {
 
 
 // Route::get('/products', [BarangController::class, 'index']);
+
 
