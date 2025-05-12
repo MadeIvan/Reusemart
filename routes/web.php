@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Password;
 */
 
 Route::get('/', function () {
-    return view('pegawaiView');
+    return view('home');
 });
 
 // routes/web.php

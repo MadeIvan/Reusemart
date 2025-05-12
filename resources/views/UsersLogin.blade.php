@@ -113,16 +113,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert(resData.message || 'Login failed');
                 return;
             }
-            alert('Login successful! Lofin as ' + status);
+            alert('Login successful! Login as ' + status);
             console.log('User:', resData.penitip);
 
 
             
         if (status == 'penitip') {
-        localStorage.setItem('auth_token', resData.penitip.Token);
+            localStorage.setItem('auth_token', resData.penitip.Token);
+
         } else if (status == 'pembeli') {
-        localStorage.setItem('auth_token', resData.token);
-        window.location.href = 'http://127.0.0.1:8000/pembeli/alamat';
+            if (resData.data && resData.data.token) {
+                localStorage.setItem('auth_token', resData.data.token);
+                window.location.href = 'http://127.0.0.1:8000/pembeli/alamat';
+            } else {
+                alert("Token tidak ditemukan dalam respons");
+                console.error("Data respons tidak sesuai:", resData);
+            }
 
         } else if (status == 'organisasi') {
             localStorage.setItem('auth_token', resData.token);

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reusemart</title>
@@ -118,12 +119,12 @@ document.addEventListener("DOMContentLoaded", function() {
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="kategoriAlamat" class="form-label"><strong>Kategori</strong></label>
-                        <input type="text" class="form-control" id="kategoriAlamatCreate" name="kategoriAlamat" required>
+                        <label for="kategoriAlamatCreate" class="form-label"><strong>Kategori</strong></label>
+                        <input type="text" class="form-control" id="kategoriAlamatCreate" name="kategoriAlamatCreate" required>
                     </div>
                     <div class="mb-3">
-                        <label for="alamat" class="form-label"><strong> Alamat</strong></label>
-                        <textarea class="form-control" id="alamatCreate" name="alamat" rows="3" required></textarea>
+                        <label for="alamatCreate" class="form-label"><strong> Alamat</strong></label>
+                        <textarea class="form-control" id="alamatCreate" name="alamatCreate" rows="3" required></textarea>
                     </div>
                     <div class="mb-3">
                         <input class="form-check-input" type="checkbox" id="isDefault" aria-label="Checkbox for Atur Sebagai Alamat Utama">
@@ -161,6 +162,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     <script>
         document.addEventListener("DOMContentLoaded", function(){
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token from meta tag
             const alamatContainer = document.getElementById("alamatContainer");
             const searchInput = document.getElementById("searchInput");
             let alamatData = [];
@@ -168,16 +170,18 @@ document.addEventListener("DOMContentLoaded", function() {
             let idToUpdate = null;
             let idToDefault = null;
             
+          
             fetchAlamat();
 
-            ////////////////////////SHOW ALAMAT///////////////////////////////////
+            ////////////////////////SHOW ALAMAT//////////////////////////////////;
+
             function fetchAlamat(){
                 const token = localStorage.getItem('auth_token');
                 if (!token) {
                     console.error("No auth token found. Please log in first.");
                     return;
                 }
-                fetch("http://127.0.0.1:8000/api/pembeli/alamat", {
+                fetch(`http://127.0.0.1:8000/api/pembeli/alamat`, {
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${token}`,
@@ -267,6 +271,10 @@ document.addEventListener("DOMContentLoaded", function() {
                 fetch(`http://127.0.0.1:8000/api/pembeli/alamat/search?q=${query}`, {
                     headers: { 
                         "Authorization": `Bearer ${localStorage.getItem('auth_token')}` },
+                        "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
+                        'Accept': 'application/json',
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": csrfToken,
                 })
                     .then(response => response.json())
                     .then(data => renderAlamat(data.data))
@@ -283,9 +291,11 @@ document.addEventListener("DOMContentLoaded", function() {
                     fetch(`http://127.0.0.1:8000/api/pembeli/alamat/update/${idToUpdate}`, {
                         method: 'PUT',
                         headers: {
-                            "Authorization": `Bearer ${localStorage.getItem('auth_token')}`,
-                            "Content-Type": "application/json"
-                        },
+                            "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
+                            'Accept': 'application/json',
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": csrfToken,
+                            },
                         body: JSON.stringify({
                             alamat,
                             kategori,
@@ -326,8 +336,10 @@ document.addEventListener("DOMContentLoaded", function() {
                     fetch(`http://127.0.0.1:8000/api/pembeli/alamat/delete/${idToDelete}`, {
                         method: 'DELETE',
                         headers: {
-                            "Authorization": `Bearer ${localStorage.getItem('auth_token')}`,
-                            "Content-Type": "application/json"
+                            "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
+                            'Accept': 'application/json',
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": csrfToken,
                         },
                     })
                     .then(response => response.json())
@@ -360,10 +372,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
             ////////////////////////TAMBAH ALAMAT///////////////////////////////////
-            document.getElementById("confirmCreate").addEventListener("click", function () {
+            document.getElementById("confirmCreate").addEventListener("click", () => {
                 const kategori = document.getElementById("kategoriAlamatCreate").value;
                 const alamat = document.getElementById("alamatCreate").value;
-                const isDefault = document.getElementById("isDefault").checked ? 1 : 0;
+                const isDefault = document.getElementById("isDefault").checked;
+
 
                 fetch("http://127.0.0.1:8000/api/pembeli/buat-alamat", {
                     method: "POST",
@@ -371,24 +384,31 @@ document.addEventListener("DOMContentLoaded", function() {
                         "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
                         'Accept': 'application/json',
                         "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": csrfToken,
                     },
-                    body: JSON.stringify({ 
+                    body: JSON.stringify({
                         kategori,
                         alamat,
-                        isDefault })
+                        isDefault
+                    })
                 })
                 .then(response => response.json())
                 .then(data => {
+                    console.log("Data berhasil ditambahkan:", data);
                     const modal = bootstrap.Modal.getInstance(document.getElementById("createAlamat"));
                     if (modal) modal.hide();
-
+    
                     Toastify({
                         text: "Berhasil Menambahkan Alamat",
                         duration: 3000,
                         gravity: "top",
                         position: "right",
-                        backgroundColor: "#8bc34a",
+                        style: {
+                            background: "#8bc34a"
+                        },
                     }).showToast();
+    
+    
                     fetchAlamat();
                 })
                 .catch(error => {
@@ -398,10 +418,13 @@ document.addEventListener("DOMContentLoaded", function() {
                         duration: 3000,
                         gravity: "top",
                         position: "right",
-                        backgroundColor: "rgb(221, 25, 25)",
+                        style: {
+                            background: "rgb(221, 25, 25)"
+                        },
+                        // backgroundColor: "rgb(221, 25, 25)",
                     }).showToast();
                 });
-            });
+            })
 
             ////////////////////////SET DEFAULT///////////////////////////////////
             document.addEventListener('click', function(event) {
@@ -409,8 +432,10 @@ document.addEventListener("DOMContentLoaded", function() {
                     fetch(`http://127.0.0.1:8000/api/pembeli/alamat/set-default/${idToDefault}`, {
                         method: 'PUT',
                         headers: {
-                            "Authorization": `Bearer ${localStorage.getItem('auth_token')}`,
-                            "Content-Type": "application/json"
+                            "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
+                            'Accept': 'application/json',
+                            "Content-Type": "application/json",
+                            "X-CSRF-TOKEN": csrfToken,
                         },
                     })
                     .then(response => response.json())
