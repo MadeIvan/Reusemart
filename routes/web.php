@@ -92,7 +92,9 @@ Route::get('/penitip/history', function () {
 Route::get('/lupa-password', function () {
     return view('forgotPassword');
 });
-
+Route::get('/OrganisasiMain', function () {
+    return view('OrganisasiView');
+});
 Route::post('/lupa-password', function (Request $request) {
     $request->validate(['email' => 'required|email']);
  

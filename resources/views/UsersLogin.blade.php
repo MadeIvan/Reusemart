@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <title>Login Page</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" 
@@ -76,66 +77,68 @@
 
                         <button type="submit" class="btn btn-primary w-100">Login</button>
                     </form>
+                    
                 </div>
+                <p class="text-center mt-3">
+                        Don't have an account for organization? 
+                        <a href="/organisasi/register" class="text-decoration-none">Click here!</a>
+                    </p>
             </div>
         </div>
     </div>
 
     <!-- Script to handle the form submission -->
     <script>
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelector('#loginForm').addEventListener('submit', async function(event) {
-        event.preventDefault(); // Prevent the default form submission
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelector('#loginForm').addEventListener('submit', async function(event) {
+                event.preventDefault(); // Prevent the default form submission
 
-        const username = document.getElementById('username').value.trim();
-        const password = document.getElementById('password').value.trim();
-        const status = document.getElementById('status').value;
+                const username = document.getElementById('username').value.trim();
+                const password = document.getElementById('password').value.trim();
+                const status = document.getElementById('status').value;
 
-        const data = { username, password };
-        const csrfToken = document.head.querySelector('meta[name="csrf-token"]').content;
+                const data = { username, password };
+                const csrfToken = document.head.querySelector('meta[name="csrf-token"]').content;
+                try {
+                    // Fixed the issue with the URL string
+                    const response = await fetch(`http://127.0.0.1:8000/api/${status}/login`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken,
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    const resData = await response.json();
+                    console.log(resData);
+                    if (!response.ok) {
+                        alert(resData.message || 'Login failed');
+                        return;
+                    }
+                    alert('Login successful! Login as ' + status);
 
+                    if (status == 'penitip') {
+                        localStorage.setItem('auth_token', resData.Token);
+                        localStorage.setItem('user_role', 'penitip');
+                        window.location.href = 'http://127.0.0.1:8000/OrganisasiMain';
+                    } else if (status == 'pembeli') {
+                        localStorage.setItem('user_role', 'pembeli');
+                        localStorage.setItem('auth_token', resData.data.token);
+                        window.location.href = 'http://127.0.0.1:8000/OrganisasiMain';
+                    } else if (status == 'organisasi') {
+                        localStorage.setItem('user_role', 'organisasi');
+                        localStorage.setItem('auth_token', resData.data.token);
+                        window.location.href = 'http://127.0.0.1:8000/OrganisasiMain'
+                    }
 
-        try {
-            const response = await fetch(`http://127.0.0.1:8000/api/${status}/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken,
-                },
-                body: JSON.stringify(data)
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('An error occurred: ' + error.message);
+                }
             });
-
-            const resData = await response.json();
-            
-            if (!response.ok) {
-                // Jika gagal login (401, 404, dsb)
-                alert(resData.message || 'Login failed');
-                return;
-            }
-            alert('Login successful! Lofin as ' + status);
-            console.log('User:', resData.penitip);
-
-
-            
-        if (status == 'penitip') {
-        localStorage.setItem('auth_token', resData.penitip.Token);
-        } else if (status == 'pembeli') {
-        localStorage.setItem('auth_token', resData.token);
-        window.location.href = 'http://127.0.0.1:8000/pembeli/alamat';
-
-        } else if (status == 'organisasi') {
-            localStorage.setItem('auth_token', resData.token);
-        }
-
-
-        } catch (error) {
-            console.error('Error:', error);
-            alert('An error occurred: ' + error.message);
-        }
-    });
-});
-</script>
+        });
+    </script>
 
 
 </body>

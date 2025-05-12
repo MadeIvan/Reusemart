@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value.trim();
-        const status = document.getElementById('status').value;
+        // const status = document.getElementById('status').value;
 
         const data = { username, password };
         const csrfToken = document.head.querySelector('meta[name="csrf-token"]').content;
@@ -102,12 +102,33 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Jika gagal login (401, 404, dsb)
                 alert(resData.message || 'Login failed');
                 return;
-            }
+            } 
             alert('Login successful!');
-            console.log('User:', resData.penitip);
+            console.log('Response Data:', resData.data.pegawai.idJabatan);
+            const IdJabatan = resData.data.pegawai.idJabatan;
+            localStorage.setItem('auth_token', resData.data.token);
+            console.log('IdJabatan:', IdJabatan);
+            if(IdJabatan==1){
+                alert('Login As Owner!');
+                localStorage.setItem('user_role', 'owner');
+            }else if(IdJabatan==2){
+                alert('Login As Admin!');
+                localStorage.setItem('user_role', 'admin');
+            }else if(IdJabatan==3){
+                alert('Login As Pegawai Gudang!');
+                localStorage.setItem('user_role', 'gudang');
+            }else if(IdJabatan==4){
+                alert('Login As Kurir!');
+                localStorage.setItem('user_role', 'kurir');
+            }else if(IdJabatan==5){
+                alert('Login As CS!');
+                localStorage.setItem('user_role', 'cs');
+            }else if(IdJabatan==6){
+                alert('Login As Hunter!');
+                localStorage.setItem('user_role', 'hunter');
+            }
 
-            localStorage.setItem('auth_token', resData.penitip.Token);
-            window.location.href = "/organisasi";
+
 
         } catch (error) {
             console.error('Error:', error);

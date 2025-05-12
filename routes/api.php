@@ -13,6 +13,7 @@ use App\Http\Controllers\BarangController;
 use App\Http\Controllers\DiskusiController;
 use App\Http\Controllers\DompetController;
 use App\Http\Controllers\PegawaiController;
+use App\Http\Controllers\reqdonasiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -114,6 +115,14 @@ Route::get('/getBarang',[BarangController::class, 'index']);
 Route::get('/getBarang/{id}', [BarangController::class, 'show']);
 Route::get('/diskusi/{id}',[DiskusiController::class, 'getByBarang']);
 
+Route::middleware('auth:organisasi')->group(function () {
+    Route::get('/reqdonasi', [reqdonasiController::class, 'index']);
+    Route::post('/create/reqdonasi', [reqdonasiController::class, 'store']);
+    Route::put('/reqdonasi/{id}', [reqDonasiController::class, 'update']);
+    
+    // DELETE - Delete a donation request
+    Route::delete('/reqdonasi/{id}', [reqDonasiController::class, 'destroy']);
+});
 
 // Route::middleware('auth:sanctum')->post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store']);
 // Route::post('/reset-password', [NewPasswordController::class, 'store']);

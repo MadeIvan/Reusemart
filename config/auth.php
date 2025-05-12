@@ -55,6 +55,10 @@ return [
         'penitip' => [
             'driver' => 'sanctum',
             'provider' => 'penitip',
+        ],
+        'organisasi' => [
+            'driver' => 'sanctum',
+            'provider' => 'organisasi',
         ]
 
     ],
@@ -93,7 +97,10 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\Penitip::class,
         ],
-
+        'organisasi' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Organisasi::class,
+        ]
         
         // 'users' => [
         //     'driver' => 'database',

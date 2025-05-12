@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Register Organisasi</title>
     <!-- Bootstrap CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
@@ -43,10 +44,10 @@
 </div>
 
     <script>
-         document.getElementById('loginButton').addEventListener('click', function () {
+        document.getElementById('loginButton').addEventListener('click', function () {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
         const username = document.getElementById('username').value.trim();
         const password = document.getElementById('password').value.trim();
-
         if (!username || !password) {
             Toastify({
                 text: "Mohon untuk mengisi username dan password.",
@@ -66,6 +67,7 @@
             },
             body: JSON.stringify({ username, password }),
         })
+
         .then(response => {
             console.log('Response Status:', response.status);
             if (!response.ok) {
@@ -78,7 +80,7 @@
 
             if (data.data.token) {
                 localStorage.setItem('token', data.data.token);
-
+                
                 Toastify({
                     text: "Login berhasil!",
                     duration: 3000,

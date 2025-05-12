@@ -104,8 +104,6 @@ public function login(Request $request){
         'username' => 'required|string|max:255',
         'password' => 'required|string|max:255',
     ]);
-
-
     // Include soft-deleted users in the query
     $pegawai = Pegawai::withTrashed()
         ->whereRaw('BINARY username = ?', [$request->username])
@@ -113,8 +111,6 @@ public function login(Request $request){
 
     if ($pegawai) {
         if ($pegawai->deleted_at !== null) {
-
-
             return response()->json([
                 "status" => false,
                 "message" => "Your account has been deactivated.",
@@ -134,8 +130,6 @@ public function login(Request $request){
             ], 200);
         }
     }
-
-
     // If user not found or password incorrect
     return response()->json([
         "status" => false,
