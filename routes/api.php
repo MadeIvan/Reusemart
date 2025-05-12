@@ -96,7 +96,7 @@ Route::middleware(['auth:sanctum', 'auth.pembeli'])->group(function () {
     Route::put('/pembeli/alamat/update/{id}', [AlamatController::class, 'update']);
     Route::delete('/pembeli/alamat/delete/{id}', [AlamatController::class, 'delete']);
     Route::put('/pembeli/alamat/set-default/{id}', [AlamatController::class, 'setAsDefault']);
-    Route::post('/pembeli/buat-diskusi/{id}', [DiskusiController::class, 'store']);
+    Route::post('/buat-diskusi/{id}', [DiskusiController::class, 'store']);
 
 });
 
