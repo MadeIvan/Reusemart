@@ -11,8 +11,12 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\AlamatController;
 use App\Http\Middleware\PembeliMiddleware;
 use App\Http\Middleware\JabatanMiddleware;
+use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\BarangController;
+
+
 use App\Http\Controllers\DiskusiController;
+
 
 
 /*
@@ -64,6 +68,8 @@ Route::get('/check-email-username', [PembeliController::class, 'checkEmailUserna
 
 
 Route::post('/pegawai/register', [PegawaiController::class, 'register']);
+
+Route::delete('/pegawai/{id}', [PegawaiController::class, 'softDelete']);
 Route::post('/PegawaiLogin', [PegawaiController::class, 'login']);
 Route::get('/pegawai', [PegawaiController::class, 'index']);
 Route::put('/pegawai/update/{id}', [PegawaiController::class, 'update']);
@@ -72,6 +78,7 @@ Route::post('/penitip/register', [PenitipController::class, 'register']);
 Route::get('/check-nik', [PenitipController::class, 'checkNIK']);
 Route::post('/pembeli/lupa-password', [ForgotPasswordPembeliController::class, 'sendResetLinkEmail']);
 Route::put('/ganti-password/{id}', [PenitipController::class, 'changePassword']);
+
 
 
 Route::middleware('auth:sanctum')->group(function () {

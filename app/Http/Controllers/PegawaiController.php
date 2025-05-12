@@ -7,7 +7,10 @@ use App\Models\Pegawai;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
-
+use Exception;
+use Illuminate\Support\Facades\Log;
+use Nette\Schema\ValidationException;
+use Carbon\Carbon;
 class PegawaiController extends Controller
 {
     public function index() //show
@@ -49,8 +52,11 @@ class PegawaiController extends Controller
  public function register(Request $request){ //register
         $request->validate([
             'idJabatan'=> 'required|string',
+
+            // 'idDompet'=> 'string|max:255',
+
             'namaPegawai'=> 'required|string|max:255',
-            'tanggalLahir'=> 'required|date',
+            // 'tanggalLahir'=> 'required|date',
             'username'=> 'required|string|max:255',
             'password'=> 'required|string|max:255',
         ]);
@@ -73,7 +79,7 @@ class PegawaiController extends Controller
         $dompet = (new DompetController)->createDompetPenitip(null);
         $idDompet = (string) $dompet->idDompet;
 
-        \Log::info("Created new dompet with ID: {$idDompet}");
+        // \Log::info("Created new dompet with ID: {$idDompet}");
 
         /////////////////CREATE PEGAWAI////////////////////////
         $pegawai = Pegawai::create([
@@ -81,7 +87,7 @@ class PegawaiController extends Controller
             'idJabatan'=> $request->idJabatan,
             'idDompet'=> $idDompet,
             'namaPegawai'=> $request->namaPegawai,
-            'tanggalLahir'=> $request->tanggalLahir,
+            // 'tanggalLahir'=> $request->tanggalLahir,
             'username'=> $request->username,
             'password'=> Hash::make($request->password),
         ]);
@@ -99,6 +105,7 @@ public function login(Request $request){
         'password' => 'required|string|max:255',
     ]);
 
+
     // Include soft-deleted users in the query
     $pegawai = Pegawai::withTrashed()
         ->whereRaw('BINARY username = ?', [$request->username])
@@ -106,6 +113,7 @@ public function login(Request $request){
 
     if ($pegawai) {
         if ($pegawai->deleted_at !== null) {
+
 
             return response()->json([
                 "status" => false,
@@ -127,6 +135,7 @@ public function login(Request $request){
         }
     }
 
+
     // If user not found or password incorrect
     return response()->json([
         "status" => false,
@@ -134,45 +143,86 @@ public function login(Request $request){
     ], 401);
 }
 
-    public function update(Request $request, $id){ //update
-        $pegawai = Pegawai::find($id);
-        
-        if(!$pegawai){
-            return response()->json([
-                "status" => false,
-                "message" => "Pegawai not found",
-                "data" => null
-            ], 404);
-        }
+    
 
+
+public function update(Request $request, $id)
+{
+    Log::info("Attempting to update Pegawai with ID: $id");
+
+    $pegawai = Pegawai::find($id);
+
+    if (!$pegawai) {
+        Log::warning("Pegawai not found for ID: $id");
+        return response()->json([
+            "status" => false,
+            "message" => "Pegawai not found",
+            "data" => null
+        ], 404);
+    }
+
+    Log::info("Request data received:", $request->all());
+
+    try {
         $validatedData = $request->validate([
-            'namaPegawai'=> 'required',
-            'username'=> 'required',
-            // 'password'=> 'required',
+
+            'namaPegawai' => 'required|string',
+            'username' => 'required|string',
         ]);
 
-        // $pegawai->namaPegawai = $validatedData['namaPegawai'];
-        // $pegawai->username = $validatedData['username'];
-        // $pegawai->password = $validatedData['password'];
+        Log::info("ValidatedData:", $validatedData);
+
 
         $pegawai->update($validatedData);
 
-        try{
-            $pegawai->update($validatedData);
-            return response()->json([
-                "status" => true,
-                "message" => "Update successfull",
-                "data" => $pegawai,
-            ], 200);
-        } catch (Exception $e) {
-            return response()->json([
-                "status" => false,
-                "message" => "Something went wrong",
-                "data" => $e->getMessage(),
-            ], 400);
-        }
+        Log::info("Pegawai updated successfully: ID $id");
+
+        return response()->json([
+            "status" => true,
+            "message" => "Update successful",
+            "data" => $pegawai,
+        ], 200);
+
+    } catch (ValidationException $e) {
+        // Log::error("Validation failed:", $e->errors());
+
+        return response()->json([
+            "status" => false,
+            "message" => "Validation failed",
+            // "errors" => $e->errors(),
+        ], 422);
+
+    } catch (\Exception $e) {
+        Log::error("Unexpected error on updating Pegawai ID $id: " . $e->getMessage());
+
+        return response()->json([
+            "status" => false,
+            "message" => "Something went wrong",
+            "error" => $e->getMessage(),
+        ], 400);
+    }
+}
+
+public function softDelete($id)
+{
+    $pegawai = Pegawai::find($id);
+
+    if (!$pegawai) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Pegawai not found.'
+        ], 404);
     }
 
+    // Assign current date to deleted_at
+    $pegawai->deleted_at = Carbon::now();
+    $pegawai->save();
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Pegawai soft deleted successfully.'
+    ], 200);
+}
     // public function destroy($id){
     //     try{
     //         $data = Organisasi::find($id);
@@ -229,5 +279,7 @@ public function login(Request $request){
             'message' => 'Berhasil',
         ]);
     }
+
 }
+
 

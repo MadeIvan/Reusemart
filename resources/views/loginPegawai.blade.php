@@ -34,7 +34,6 @@
                     <label for="password" class="form-label"><strong>Password</strong></label>
                     <input type="password" class="form-control" id="password">
                 </div>
-
                 <div class="d-flex justify-content-center login-button">
                     <button type="button" class="btn btn-success item-center" id="loginButton">Login</button>
                 </div>
@@ -51,7 +50,7 @@
         if (!username || !password) {
             Toastify({
                 text: "Mohon untuk mengisi username dan password.",
-                duration: 3000,
+                duration: 30000,
                 close: true,
                 gravity: "top",
                 position: "right",
