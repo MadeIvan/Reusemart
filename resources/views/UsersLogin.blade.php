@@ -116,6 +116,7 @@ document.addEventListener('DOMContentLoaded', function () {
             alert('Login successful! Lofin as ' + status);
             console.log('User:', resData.penitip);
 
+
             
             if($status == 'penitip'){
                 localStorage.setItem('auth_token', resData.penitip.Token);
@@ -124,6 +125,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }(else if($status == 'organisasi'){
                 localStorage.setItem('auth_token', resData.token);
             }
+
         } catch (error) {
             console.error('Error:', error);
             alert('An error occurred: ' + error.message);

@@ -9,6 +9,7 @@ use App\Models\dompets;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator; 
 use App\Http\Controllers\DompetController;
+use App\Http\Controllers\TransaksiPenitipanController;
 use Illuminate\Support\Facades\DB;
 
 class PenitipController extends Controller
@@ -32,6 +33,7 @@ class PenitipController extends Controller
         }
 
         $token = $penitip->createToken('Personal Access Token')->plainTextToken;
+        
         return response()->json([
             'message' => 'Login successful',
             'penitip' => [
@@ -152,8 +154,10 @@ class PenitipController extends Controller
 }
 
     ////////////////////[DELETE PENITIP ID]////////////////////
+
 public function deletePenitip($id){
     $penitip = Penitip::find($id);
+
 
     if (!$penitip) {
         return response()->json([
@@ -170,5 +174,7 @@ public function deletePenitip($id){
     ]);
 }
 
+
 }
+
 

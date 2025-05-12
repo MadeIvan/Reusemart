@@ -10,21 +10,21 @@
 <style>
     .diskusi-tanggal-pembeli{
         display: flex;
-        justify-content: right;
+        justify-content: left;
         gap: 10px;
     }
 
     .diskusi-tanggal-pegawai{
         display: flex;
-        justify-content: left;
-        gap: 10px;
-    }
-
-    .diskusi-pegawai{
-        display: flex;
         justify-content: right;
         gap: 10px;
     }
+
+    /* .diskusi-pegawai{
+        display: flex;
+        justify-content: left;
+        gap: 10px;
+    } */
 </style>
 
 <body>
@@ -47,7 +47,7 @@
             <textarea class="form-control " id="exampleFormControlTextarea1" rows="2" placeholder="Tulis Komentar"></textarea>
         </div>
         <div class="d-flex justify-content-end col-md-8 mt-3">
-            <button class="btn btn-dark">Kirim</button>
+            <button class="btn btn-dark" id="kirimBtn">Kirim</button>
         </div>
     </div>
 
@@ -63,6 +63,8 @@
             // Get the product ID from the URL query parameter
             const pathSegments = window.location.pathname.split('/');
             const productId = pathSegments[pathSegments.length - 1]; 
+            document.querySelector('.btn.btn-dark').addEventListener('click', kirimDiskusi);
+
 
             // Fetch the product data from the API
             fetch(`http://127.0.0.1:8000/api/getBarang/${productId}`)
@@ -159,7 +161,55 @@
                 console.error("Error fetching diskusi data:", error);
                 document.getElementById('diskusi-container').innerHTML = `<p>Error loading diskusi.</p>`;
             });
-    }
+
+        }
+        
+        function kirimDiskusi() {
+            const komentar = document.getElementById('exampleFormControlTextarea1').value.trim();
+            const idBarang = window.location.pathname.split('/').pop();
+            const token = localStorage.getItem('auth_token');
+            const btn = document.getElementById('kirimBtn');
+            
+            if (!token) {
+                alert("Silakan login terlebih dahulu untuk mengirim komentar.");
+                return;
+            }
+
+            if (!komentar) {
+                alert("Komentar tidak boleh kosong.");
+
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = "Mengirim...";
+
+            fetch(`http://127.0.0.1:8000/api/buat-diskusi/${idBarang}`,{
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    pesandiskusi: komentar
+                })
+            })
+            .then(response => response.json())
+            .then(response => {
+                alert("Komentar berhasil dikirim!");
+                document.getElementById('exampleFormControlTextarea1').value = ""; 
+                getDiskusi(idBarang); 
+            })
+            .catch(error => {
+                console.error("Error mengirim diskusi:", error);
+                alert("Terjadi kesalahan saat mengirim komentar.");
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.textContent = "Kirim";
+            });
+        }
 
             
     </script>

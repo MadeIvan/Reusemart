@@ -14,9 +14,9 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
     <script>
-		const token = localStorage.getItem("token");
+		const token = localStorage.getItem("auth_token");
 			if (!token) {
-				window.location.href = "{{ url('/pembeli/login') }}";
+				window.location.href = "{{ url('/UsersLogin') }}";
 			}
 	</script>
 
@@ -110,7 +110,7 @@
         document.getElementById('logoutLink').addEventListener('click', function (e) {
             e.preventDefault();
 
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('auth_token');
 
             if (token) {
                 fetch('http://localhost:8000/api/logout', {

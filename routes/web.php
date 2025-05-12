@@ -37,9 +37,9 @@ Route::get('/organisasi/register', function () {
     return view('registerorganisasi');
 });
 
-Route::get('/pegawai/login', function () {
-    return view('loginPegawai');
-});
+// Route::get('/pegawai/login', function () {
+//     return view('loginPegawai');
+// });
 
 Route::get('/organisasi', function () {
     return view('showOrganisasi');
@@ -57,7 +57,7 @@ Route::get('/UsersLogin', function () {
 });
 
 
-Route::get('/pegawai/PegawaiLogin', function () {
+Route::get('/PegawaiLogin', function () {
     return view('PegawaiLogin');
 });
 Route::get('/pegawai/PenitipData', function () {

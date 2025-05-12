@@ -82,7 +82,7 @@
             console.log('Response Data:', data);
 
             if (data.data.token) {
-                localStorage.setItem('token', data.data.token);
+                localStorage.setItem('token', data.token);
 
                 Toastify({
                     text: "Login berhasil!",
@@ -122,6 +122,5 @@
     });
 
     </script>
-
 </body>
 </html>

@@ -13,13 +13,6 @@
     <!-- Toastify JS -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
-    <!-- <script>
-		const token = localStorage.getItem("token");
-			if (!token) {
-				window.location.href = "{{ url('/pembeli/login') }}";
-			}
-	</script> -->
-
     <style>
         body {
             background-color: #f4f6f9;
@@ -181,6 +174,12 @@
     <div id="barangContainer" class="row g-3 px-5"></div>
 
     <script>
+        const auth_token = localStorage.getItem("auth_token");
+        console.log("Token yang digunakan:", auth_token);
+			if (!auth_token) {
+				window.location.href = "{{ url('/UsersLogin') }}";
+			}
+
         document.addEventListener("DOMContentLoaded", function(){
             const barangContainer = document.getElementById("barangContainer");   
             let idDetail = null;         
@@ -191,7 +190,7 @@
                 fetch("http://127.0.0.1:8000/api/penitip/history", {
                     method: "GET",
                     headers: {
-                        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                        "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
                         "Content-Type": "application/json",
                     },
                 })
@@ -293,12 +292,12 @@
             });
 
         /////////////////////buat profile/////////////////////
-        const token = localStorage.getItem('token');
+        const auth_token = localStorage.getItem('auth_token');
 
     fetch('http://localhost:8000/api/penitip/profile', {
         method: 'GET',
         headers: {
-            "Authorization": `Bearer ${localStorage.getItem("token")}`,
+            "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
             "Accept": 'application/json',
         }
     })
@@ -337,13 +336,13 @@
         document.getElementById('logoutLink').addEventListener('click', function (e) {
             e.preventDefault();
 
-            const token = localStorage.getItem('token');
+            const auth_token = localStorage.getItem('auth_token');
 
-            if (token) {
+            if (auth_token) {
                 fetch('http://localhost:8000/api/logout', {
                     method: 'POST',
                     headers: {
-                        'Authorization': 'Bearer ' + token,
+                        'Authorization': 'Bearer ' + auth_token,
                         'Accept': 'application/json'
                     }
                 })

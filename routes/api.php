@@ -11,7 +11,6 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\AlamatController;
 use App\Http\Middleware\PembeliMiddleware;
 use App\Http\Middleware\JabatanMiddleware;
-
 use App\Http\Controllers\BarangController;
 use App\Http\Controllers\DiskusiController;
 
@@ -65,12 +64,10 @@ Route::get('/check-email-username', [PembeliController::class, 'checkEmailUserna
 
 
 Route::post('/pegawai/register', [PegawaiController::class, 'register']);
-Route::post('/pegawai/login', [PegawaiController::class, 'login']);
+Route::post('/PegawaiLogin', [PegawaiController::class, 'login']);
 Route::get('/pegawai', [PegawaiController::class, 'index']);
 Route::put('/pegawai/update/{id}', [PegawaiController::class, 'update']);
 
-
-Route::post('/penitip/login', [PenitipController::class, 'login']);
 Route::post('/penitip/register', [PenitipController::class, 'register']);
 Route::get('/check-nik', [PenitipController::class, 'checkNIK']);
 Route::post('/pembeli/lupa-password', [ForgotPasswordPembeliController::class, 'sendResetLinkEmail']);
@@ -87,7 +84,6 @@ Route::middleware(['auth:pegawai','role:2'])->group(function () {
     Route::put('/organisasi/update/{id}', [OrganisasiController::class, 'update']);
     Route::delete('/organisasi/delete/{id}', [OrganisasiController::class, 'destroy']);
     Route::put('/pegawai/reset-password/{id}', [PegawaiController::class, 'resetPassword']);
-    // Route::get('/organisasi', [PegawaiController::class, 'index']);
 });
 
 Route::middleware(['auth:sanctum', 'auth.pembeli'])->group(function () {
@@ -98,7 +94,6 @@ Route::middleware(['auth:sanctum', 'auth.pembeli'])->group(function () {
     Route::delete('/pembeli/alamat/delete/{id}', [AlamatController::class, 'delete']);
     Route::put('/pembeli/alamat/set-default/{id}', [AlamatController::class, 'setAsDefault']);
     Route::post('/pembeli/buat-diskusi/{id}', [DiskusiController::class, 'store']);
-
 });
 
 Route::middleware(['auth:penitip'])->group(function () {
@@ -109,7 +104,6 @@ Route::middleware(['auth:penitip'])->group(function () {
 // 
 });
 
-// Route::get('/pembeli/alamat', [AlamatController::class, 'index'])->middleware(['pembeli']);
 
 Route::get('/getBarang',[BarangController::class, 'index']);
 Route::get('/getBarang/{id}', [BarangController::class, 'show']);

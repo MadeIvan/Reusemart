@@ -106,6 +106,7 @@ public function login(Request $request){
 
     if ($pegawai) {
         if ($pegawai->deleted_at !== null) {
+
             return response()->json([
                 "status" => false,
                 "message" => "Your account has been deactivated.",
