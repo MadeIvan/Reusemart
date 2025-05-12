@@ -29,4 +29,9 @@ class Penitip extends Authenticatable
     protected $hidden = [
         'password',
     ];
+
+     public function dompet(){
+        return $this->belongsTo(Dompet::class, 'idDompet', 'idDompet');
+    }
+
 }
