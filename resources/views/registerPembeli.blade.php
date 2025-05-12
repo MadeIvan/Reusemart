@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <meta name="csrf-token" content="{{ csrf_token() }}"> -->
     <title>Employee Page</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" 
@@ -84,7 +84,7 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             const registerButton = document.querySelector('.register-button button');
             registerButton.addEventListener('click', async function (e) {
                 e.preventDefault();
@@ -110,6 +110,7 @@
                         method: "GET",
                         headers: {
                             "Content-Type": "application/json",
+                            'X-CSRF-TOKEN': csrfToken,
                         }
                     })
 
@@ -154,6 +155,7 @@
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
+                            'X-CSRF-TOKEN': csrfToken,
                         },
                         body: JSON.stringify(data),
                     });
