@@ -376,7 +376,7 @@
                         
                         const result = await response.json();
                         
-                        if (result.status === "success") {
+                        if (result.status === true) {
                             showToast("Pegawai deleted successfully!", "bg-success");
                             
                             // Clear the form
@@ -393,6 +393,7 @@
                         } else {
                             showToast("Failed to delete pegawai!", "bg-danger");
                             console.error("Error deleting pegawai:", result);
+                            fetchPegawai(); 
                         }
                     } catch (error) {
                         console.error("Error deleting pegawai:", error);
@@ -447,7 +448,7 @@
                     username: document.getElementById("registerUsername").value,
                     password: document.getElementById("registerPassword").value,
                     namaPegawai: document.getElementById("registerNamaPegawai").value,
-                    jabatan: document.getElementById("registerJabatan").value,
+                    idJabatan: document.getElementById("registerJabatan").value,
                 };
 
                 try {
@@ -461,8 +462,8 @@
                         body: JSON.stringify(registerData),
                     });
                     const result = await response.json();
-                    if (result.status === "success") {
-                        fetchPegawai(); // Re-fetch data after successful registration
+                    if (result.status === true) {
+                        fetchPegawai(); // Re-fetch     data after successful registration
                         showToast("Pegawai registered successfully!", "bg-success");
                         
                         // Clear form fields

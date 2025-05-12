@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Session;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Nette\Schema\ValidationException;
+use Carbon\Carbon;
 class PegawaiController extends Controller
 {
     public function index() //show
@@ -79,7 +80,7 @@ class PegawaiController extends Controller
         $dompet = (new DompetController)->createDompetPenitip(null);
         $idDompet = (string) $dompet->idDompet;
 
-        \Log::info("Created new dompet with ID: {$idDompet}");
+        // \Log::info("Created new dompet with ID: {$idDompet}");
 
         /////////////////CREATE PEGAWAI////////////////////////
         $pegawai = Pegawai::create([
@@ -171,12 +172,12 @@ public function update(Request $request, $id)
         ], 200);
 
     } catch (ValidationException $e) {
-        Log::error("Validation failed:", $e->errors());
+        // Log::error("Validation failed:", $e->errors());
 
         return response()->json([
             "status" => false,
             "message" => "Validation failed",
-            "errors" => $e->errors(),
+            // "errors" => $e->errors(),
         ], 422);
 
     } catch (\Exception $e) {
@@ -190,7 +191,26 @@ public function update(Request $request, $id)
     }
 }
 
+public function softDelete($id)
+{
+    $pegawai = Pegawai::find($id);
 
+    if (!$pegawai) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Pegawai not found.'
+        ], 404);
+    }
+
+    // Assign current date to deleted_at
+    $pegawai->deleted_at = Carbon::now();
+    $pegawai->save();
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Pegawai soft deleted successfully.'
+    ], 200);
+}
     // public function destroy($id){
     //     try{
     //         $data = Organisasi::find($id);

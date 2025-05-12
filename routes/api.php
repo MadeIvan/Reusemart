@@ -50,6 +50,7 @@ Route::post('/pegawai/register', [PegawaiController::class, 'register']);
 Route::post('/pegawai/login', [PegawaiController::class, 'login']);
 Route::put('/pegawai/update/{id}', [PegawaiController::class, 'update']);
 Route::get('/pegawai', [PegawaiController::class, 'index']);
+Route::delete('/pegawai/{id}', [PegawaiController::class, 'softDelete']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout']);
