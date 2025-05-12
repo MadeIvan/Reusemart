@@ -13,6 +13,7 @@ use App\Http\Controllers\BarangController;
 use App\Http\Controllers\DiskusiController;
 use App\Http\Controllers\DompetController;
 use App\Http\Controllers\PegawaiController;
+use App\Http\Controllers\JabatanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -67,6 +68,7 @@ Route::post('/pegawai/login', [PegawaiController::class, 'login']);
 Route::get('/pegawai', [PegawaiController::class, 'index']);
 Route::put('/pegawai/update/{id}', [PegawaiController::class, 'update']);
 Route::delete('/pegawai/{id}', [PegawaiController::class, 'softDelete']);
+Route::get('/jabatan', [JabatanController::class, 'index']);
 
 
 Route::post('/penitip/login', [PenitipController::class, 'login']);

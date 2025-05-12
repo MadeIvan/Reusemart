@@ -96,12 +96,12 @@
                 </div>
             </div>
 
-            <div class="row mb-3">
+            <!-- <div class="row mb-3">
                 <div class="col-md-4">
                     <label for="password" class="form-label">password</label>
                     <input type="text" class="form-control" id="password" disabled>
                 </div>
-            </div>
+            </div> -->
 
             <div class="row">
                 <div class="col-12 btn-container">
@@ -125,7 +125,9 @@
             </div>
             <div class="mb-3">
                 <label for="registerJabatan" class="form-label">Jabatan</label>
-                <input type="text" class="form-control" id="registerJabatan" required>
+                <select class="form-select" id="registerJabatan" required>
+                    <option value="">...</option>
+                </select>
             </div>
             <div class="mb-3">
                 <label for="registerUsername" class="form-label">Username</label>
@@ -189,7 +191,7 @@
             const registerOverlay = document.getElementById("registerOverlay");
             let pegawaiData = [];
             let currentPegawaiId = null;
-
+            
             // Toast functionality
             function showToast(message, bgColor = 'bg-primary') {
                 const toast = document.getElementById('successToast');
@@ -232,6 +234,38 @@
                 }
             }
 
+            async function fetchJabatanOptions() {
+                try {
+                    const response = await fetch("http://127.0.0.1:8000/api/jabatan", {
+                        method: "GET",
+                        headers: {
+                            "Accept": "application/json",
+                            "Authorization": `Bearer ${localStorage.getItem('authToken')}`
+                        }
+                    });
+
+                    const result = await response.json();
+
+                    if (result.status === true) {
+                        const jabatanSelect = document.getElementById("registerJabatan");
+                        result.data
+                            .filter(j => j.namaJabatan !== 'Owner') // Exclude 'Owner'
+                            .forEach(jabatan => {
+                                const option = document.createElement("option");
+                                option.value = jabatan.idJabatan;
+                                option.text = jabatan.namaJabatan;
+                                jabatanSelect.appendChild(option);
+                            });
+                    } else {
+                        console.error("Failed to load jabatan:", result);
+                    }
+                } catch (error) {
+                    console.error("Error fetching jabatan:", error);
+                }
+            }
+            fetchJabatanOptions();
+
+
             // Render the table with fetched data
             function renderTable(data) {
                 tableBody.innerHTML = ""; // Clear the table before rendering new data
@@ -271,7 +305,6 @@
                 document.getElementById("namaPegawai").value = item.namaPegawai || '';  // Set idTopSeller        // Set idDompet
                 document.getElementById("username").value = item.username || '';         // Set username
                 document.getElementById("password").value = item.password || '';   // Set namaPegawai
-                               
                 
                 // Store the current Pegawai ID
                 currentPegawaiId = item.idPegawai;
@@ -339,6 +372,7 @@
                         if (result.status === true) {
                             showToast("Pegawai updated successfully!", "bg-success");
                             fetchPegawai(); // Refresh the table data
+                            
                         } else {
                             showToast(`Failed to update pegawai: ${result.message || 'Unknown error'}`, "bg-danger");
                             console.error("Error updating pegawai:", result);
