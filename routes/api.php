@@ -58,6 +58,7 @@ Route::post('/organisasi/register', [OrganisasiController::class, 'register']);
 Route::post('/organisasi/login', [OrganisasiController::class, 'login']);
 Route::get('/check-email-username', [OrganisasiController::class, 'checkEmailUsername']);
 
+// routes/api.php
 Route::post('/pembeli/register', [PembeliController::class, 'register']);
 Route::post('/pembeli/login', [PembeliController::class, 'login']);
 Route::get('/check-email-username', [PembeliController::class, 'checkEmailUsername']);

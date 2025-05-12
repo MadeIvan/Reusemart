@@ -91,14 +91,18 @@ class PembeliController extends Controller
 
     public function checkEmailUsername(Request $request)
     {
-        $emailExists = Pembeli::where('email', $request->email)->exists();
-        $usernameExists = Pembeli::where('username', $request->username)->exists();
+        $email = $request->query('email');
+        $username = $request->query('username');
+
+        $emailExists = Pembeli::where('email', $email)->exists();
+        $usernameExists = Pembeli::where('username', $username)->exists();
 
         return response()->json([
             'emailExists' => $emailExists,
             'usernameExists' => $usernameExists
         ]);
     }
+
 
     public function logout (Request $request){
         if (Auth::check()) {
