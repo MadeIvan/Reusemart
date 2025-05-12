@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Barang;  
 use Illuminate\Support\Facades\Validator;
+use App\Models\TransaksiDonasi;
 
 
 class BarangController extends Controller
@@ -154,4 +155,17 @@ class BarangController extends Controller
 
         return response()->json(['message' => 'Barang updated successfully', 'data' => $barang]);
     }
+
+    public function getAvailableBarang()
+{
+    // Fetch barang where status = 'tersedia' and idBarang not in transaksiDonasi
+    $availableBarang = Barang::where('statusBarang', 'tersedia')
+                             ->whereNotIn('idBarang', TransaksiDonasi::pluck('idBarang'))
+                             ->get(['idBarang', 'namaBarang']);
+
+    return response()->json([
+        'status' => true,
+        'data' => $availableBarang
+    ]);
+}
 }

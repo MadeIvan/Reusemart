@@ -92,9 +92,18 @@
                 </div>
                 
                 <div class="col-md-4">
-                    <label for="username" class="form-label">Barang</label>
-                    <input type="text" class="form-control" id="username" required>
+                    <label for="idBarang" class="form-label">Barang</label>
+                    <select class="form-select" id="idBarang" required>
+                        <option value="">-- Select Barang --</option>
+                        <!-- Options will be dynamically populated here -->
+                    </select>
                 </div>
+
+                <div class="col-md-4">
+                    <label for="penerimaDonasi" class="form-label">Penerima</label>
+                    <input type="text" class="form-control" id="penerimaDonasi" >
+                </div>
+
             </div>
 
             <!-- <div class="row mb-3">
@@ -106,8 +115,8 @@
 
             <div class="row">
                 <div class="col-12 btn-container">
-                    <button type="submit" class="btn btn-success" id="donasiButton">Donasi Barang</button>
-                    <button type="button" class="btn btn-danger" id="deleteDonasiButton">Delete Request</button>
+                    <button type="submit" class="btn btn-success" id="donasiButton">Simpan</button>
+                    <!-- <button type="button" class="btn btn-danger" id="deleteDonasiButton">Delete Request</button> -->
                 </div>
             </div>
         </form>
@@ -133,76 +142,8 @@
         
 
 
-    <div class="container mt-4">
-        <h2>Data Pegawai</h2>
-
-        <!-- Form for Pegawai data -->
-        <form id="PegawaiForm">
-            <input type="hidden" id="currentPegawaiId">
-            <div class="row mb-3">
-                <div class="col-md-4">
-                    <label for="idPegawai" class="form-label">ID Pegawai</label>
-                    <input type="text" class="form-control" id="idPegawai" disabled>
-                </div>
-                <div class="col-md-4">
-                    <label for="namaPegawai" class="form-label">nama Pegawai</label>
-                    <input type="text" class="form-control" id="namaPegawai" required>
-                </div>
-                
-                <div class="col-md-4">
-                    <label for="username" class="form-label">Username</label>
-                    <input type="text" class="form-control" id="username" required>
-                </div>
-            </div>
-
-            <!-- <div class="row mb-3">
-                <div class="col-md-4">
-                    <label for="password" class="form-label">password</label>
-                    <input type="text" class="form-control" id="password" disabled>
-                </div>
-            </div> -->
-
-            <div class="row">
-                <div class="col-12 btn-container">
-                    <button type="submit" class="btn btn-success">Save</button>
-                    <button type="button" class="btn btn-danger" id="deleteButton">Delete</button>
-                    <button type="button" class="btn btn-primary" id="registerButton">Register Pegawai</button>
-                    <button type="button" class="btn btn-warning" id="resetButton">Reset Password</button>
-                </div>
-            </div>
-        </form>
-    </div>
-
-    <!-- Floating Register Form -->
-    <div id="registerOverlay" class="overlay"></div>
-    <div class="register-form-container" id="registerFormContainer">
-        <h4>Register Pegawai</h4>
-        <form id="registerForm">
-            <div class="mb-3">
-                <label for="registerNamaPegawai" class="form-label">Nama Pegawai</label>
-                <input type="text" class="form-control" id="registerNamaPegawai" required>
-            </div>
-            <div class="mb-3">
-                <label for="registerJabatan" class="form-label">Jabatan</label>
-                <select class="form-select" id="registerJabatan" required>
-                    <option value="">...</option>
-                </select>
-            </div>
-            <div class="mb-3">
-                <label for="registerUsername" class="form-label">Username</label>
-                <input type="text" class="form-control" id="registerUsername" required>
-            </div>
-            <div class="mb-3">
-                <label for="registerPassword" class="form-label">Password</label>
-                <input type="password" class="form-control" id="registerPassword" required>
-            </div>
-            <div class="mb-3">
-                <button type="submit" class="btn btn-success">Register</button>
-                <button type="button" class="btn btn-secondary" id="closeRegisterForm">Close</button>
-            </div>
-        </form>
-    </div>
-
+    
+    
     <!-- Toast notification -->
     <div class="toast-container">
         <div class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true" id="successToast">
@@ -215,41 +156,12 @@
         </div>
     </div>
 
-    <div class="container mt-4">
-        <h3>Pegawai Data</h3>
-        <input type="text" id="searchInput" class="form-control mb-3" placeholder="Search by username or name">
-
-        <div id="pegawaiTableContainer">
-            <table class="table table-bordered" id="pegawaiTable">
-                <thead>
-                    <tr>
-                        <th>ID Pegawai</th>
-                        <th>Nama Pegawai</th>
-                        <th>Jabatan</th>
-                        <th>Username</th>
-                        <!-- <th>Password</th>  -->
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    <!-- Data will be populated here from the server -->
-                </tbody>
-            </table>
-        </div>
-    </div>
+    
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token from meta tag
 
-            const tableBody = document.getElementById("tableBody");
-            const searchInput = document.getElementById("searchInput");
-            // const form = document.getElementById("PegawaiForm");
-            const registerButton = document.getElementById("registerButton");
-            // const closeRegisterForm = document.getElementById("closeRegisterForm");
-            const registerFormContainer = document.getElementById("registerFormContainer");
-            const registerOverlay = document.getElementById("registerOverlay");
-            let pegawaiData = [];
-            let currentPegawaiId = null;
 
             ///Owner Part
             const tableDonasiBody = document.getElementById("tableDonasiBody");
@@ -261,9 +173,66 @@
             // const registerOverlay = document.getElementById("registerOverlay");
             let DonasiData = [];
             let currentDonasiiId = null;
+            const selectedBarangId = document.getElementById("idBarang").value;
+
 
             ///Owner Part
-            
+            document.getElementById("donasiButton").addEventListener("click", async function(e) {
+    e.preventDefault();  // Prevent form submission
+
+    // Get values from the form
+    const idBarang = document.getElementById("idBarang").value;
+    const penerimaDonasi = document.getElementById("penerimaDonasi").value;
+    const idDonasi = document.getElementById("idDonasi").value;
+    const statusDonasi = document.getElementById("statusDonasi").value;
+
+    // Validate inputs (e.g., ensure fields are not empty)
+    if (!idBarang || !penerimaDonasi || !statusDonasi) {
+        alert("Please fill in all fields.");
+        return;
+    }
+
+    // Prepare the data to be sent
+    const donasiData = {
+        idBarang: idBarang,
+        idRequest: idDonasi, 
+        namaPenerima: penerimaDonasi, // Assuming you want to link the idDonasi to idRequest
+        statusDonasi: 'Diterima',
+        tanggalDonasi : new Date().toISOString(),
+    };
+
+   try {
+    const response = await fetch("http://127.0.0.1:8000/api/transaksi-donasi", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Accept" : "application/json",
+            "Authorization": `Bearer ${localStorage.getItem('authToken')}`,
+            "X-CSRF-TOKEN": csrfToken
+        },
+        body: JSON.stringify(donasiData),
+    });
+
+   
+    const responseText = await response.text();
+    console.log("Response Text:", responseText);
+
+    const result = JSON.parse(responseText); // This might throw an error if the response is HTML instead of JSON
+    if (response.ok) {
+        alert("Transaksi Donasi created successfully!");
+        console.log(result);  
+        fetchDonasi();// Check the result of the API request
+    } else {
+        alert("Failed to create Transaksi Donasi.");
+        console.error(result.message || "Unknown error");
+    }
+} catch (error) {
+    console.error("Error creating transaksi donasi:", error);
+    alert("An error occurred while creating the transaksi donasi.");
+}
+
+});
+
             // Toast functionality
             function showToast(message, bgColor = 'bg-primary') {
                 const toast = document.getElementById('successToast');
@@ -336,61 +305,42 @@
             }
 
             // Fetch Pegawai Data
-            async function fetchPegawai() {
-                try {
-                    const response = await fetch("http://127.0.0.1:8000/api/pegawai", {
-                        method: "GET",
-                        headers: { "Authorization": `Bearer ${localStorage.getItem('authToken')}` },
-                    });
-                    
-                    const data = await response.json();
-                    console.log("Raw response:", response);
-                    console.log("Response JSON:", data);    
-                    console.log("Token:", localStorage.getItem('authToken'));
-
-                    if (data.status === true && data.data.length > 0) {
-                        pegawaiData = data.data;
-                        renderTable(pegawaiData);
-                    } else {
-                        alert("Gagal memuat data pegawai.");
-                        console.error("Error loading data:", data);
-                    }
-                } catch (error) {
-                    console.error("Error fetching pegawai data:", error);
-                    alert("An error occurred while fetching data. Check the console for details.");
-                }
+            
+            async function fetchBarangOptions() {
+    try {
+        const response = await fetch("http://127.0.0.1:8000/api/barang/available", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem('authToken')}`,
+                "Accept": "application/json"
             }
+        });
 
-            async function fetchJabatanOptions() {
-                try {
-                    const response = await fetch("http://127.0.0.1:8000/api/jabatan", {
-                        method: "GET",
-                        headers: {
-                            "Accept": "application/json",
-                            "Authorization": `Bearer ${localStorage.getItem('authToken')}`
-                        }
-                    });
+        const result = await response.json();
 
-                    const result = await response.json();
+        if (result.status === true) {
+            const barangSelect = document.getElementById("idBarang");
 
-                    if (result.status === true) {
-                        const jabatanSelect = document.getElementById("registerJabatan");
-                        result.data
-                            .filter(j => j.namaJabatan !== 'Owner') // Exclude 'Owner'
-                            .forEach(jabatan => {
-                                const option = document.createElement("option");
-                                option.value = jabatan.idJabatan;
-                                option.text = jabatan.namaJabatan;
-                                jabatanSelect.appendChild(option);
-                            });
-                    } else {
-                        console.error("Failed to load jabatan:", result);
-                    }
-                } catch (error) {
-                    console.error("Error fetching jabatan:", error);
-                }
-            }
-            fetchJabatanOptions();
+            // Clear the existing options
+            barangSelect.innerHTML = '<option value="">-- Select Barang --</option>';
+
+            // Add options to the select dropdown
+            
+            result.data.forEach(barang => {
+                const option = document.createElement("option");
+                option.value = barang.idBarang;
+                option.textContent = barang.namaBarang;
+                barangSelect.appendChild(option);
+            });
+        } else {
+            console.error("Failed to load available barang:", result);
+        }
+    } catch (error) {
+        console.error("Error fetching barang options:", error);
+    }
+}
+
+            
 
             searchInputDonasi.addEventListener("input", function() {
                 const searchTerm = this.value.toLowerCase();
@@ -411,265 +361,37 @@
                 
                 renderTableDonasi(filteredData);
             });
-            //renderTableDonasi
+        
            
-            // Render the table with fetched data
-            function renderTable(data) {
-                tableBody.innerHTML = ""; // Clear the table before rendering new data
-
-                // Prioritize pegawais with idTopSeller first
-                // const sortedData = data.sort((a, b) => {
-                //     return (b.idTopSeller ? 1 : 0) - (a.idTopSeller ? 1 : 0);  // 1st priority: have idTopSeller
-                // });
-
-                if (!data || data.length === 0) {
-                    const row = tableBody.insertRow();
-                    const cell = row.insertCell(0);
-                    cell.colSpan = 4;
-                    cell.classList.add("no-data-message"); // Add a class for empty state
-                    cell.innerText = "No pegawai data available.";
-                    return;
-                }
-
-                data.forEach(item => {
-                    const row = document.createElement("tr");
-                    row.innerHTML = `
-                        <td>${item.idPegawai}</td>
-                        <td>${item.namaPegawai || '-'}</td>
-                        <td>${item.jabatan?.namaJabatan || '-'}</td>
-                        <td>${item.username}</td>
-                        
-                    `;
-                    row.addEventListener("click", () => populateForm(item));  // Add click event to the row
-                    tableBody.appendChild(row);
-                });
-            }
-
+            
             // Populate the form when a row is clicked
             function populateForm(item) {
-                // document.getElementById("")
+                console.log(item);  // Log to check the structure of 'item'
+
                 document.getElementById("idDonasi").value = item.idRequest;
-                document.getElementById("statusDonasi").value = item.status || '';  // Set idTopSeller        // Set idDompet
-                // document.getElementById("username").value = item.username || '';         // Set username
-                // document.getElementById("password").value = item.password || '';   // Set namaPegawai
+                document.getElementById("statusDonasi").value = item.status || '';
                 
-                // Store the current Pegawai ID
+                // Safely access 'namaPenerima' inside 'transaksidonasi'
+                document.getElementById("penerimaDonasi").value = item.transaksi_donasi?.namaPenerima || 'No recipient';  // Fallback if undefined
+
+                // Store the current Donasi ID
                 currentDonasiId = item.idDonasi;
             }
 
             // Save updated Pegawai data
-            form.addEventListener("submit", async function(e) {
-                e.preventDefault();
-                
-                // Check if a pegawai is selected
-                if (!currentPegawaiId) {
-                    alert("Please select a pegawai from the table first.");
-                    return;
-                }
-                
-                const updatedData = {
-                    // idPegawai: currentPegawaiId,
-                    namaPegawai: document.getElementById("namaPegawai").value,
-                    username: document.getElementById("username").value,
-                    
-                    // nik: document.getElementById("nik").value
-                };
-                
-                try {
-                    console.log("Updating pegawai with ID:", currentPegawaiId);
-                    console.log("Update data:", updatedData);
-                    
-                    // First try with PUT method
-                    let response = await fetch(`http://127.0.0.1:8000/api/pegawai/update/${currentPegawaiId}`, {
-                        method: "PUT",
-                        headers: { 
-                            "Content-Type": "application/json",
-                            "Accept": "application/json",
-                            "Authorization": `Bearer ${localStorage.getItem('authToken')}`,
-                            "X-CSRF-TOKEN": csrfToken
-                        },
-                        body: JSON.stringify(updatedData)
-                    });
-                    
-                    // If PUT fails, try with POST and _method=PUT (for Laravel compatibility)
-                    if (!response.ok) {
-                        console.log("PUT request failed, trying with POST + _method=PUT");
-                        const formData = new FormData();
-                        formData.append('_method', 'PUT');
-                        formData.append('username', updatedData.username);
-                        formData.append('namaPegawai', updatedData.namaPegawai);
-                        // formData.append('nik', updatedData.nik);
-                        
-                        response = await fetch(`http://127.0.0.1:8000/api/pegawai/${currentPegawaiId}`, {
-                            method: "POST",
-                            headers: {
-                                "Accept": "application/json",
-                                "Authorization": `Bearer ${localStorage.getItem('authToken')}`,
-                                "X-CSRF-TOKEN": csrfToken
-                            },
-                            body: formData
-                        });
-                    }
-                    
-                    // Check if the request was successful
-                    if (response.ok) {
-                        const result = await response.json();
-                        console.log("Response:", result);
-                        
-                        if (result.status === true) {
-                            showToast("Pegawai updated successfully!", "bg-success");
-                            fetchPegawai(); // Refresh the table data
-                            
-                        } else {
-                            showToast(`Failed to update pegawai: ${result.message || 'Unknown error'}`, "bg-danger");
-                            console.error("Error updating pegawai:", result);
-                        }
-                    } else {
-                        // Log detailed error information
-                        console.error("Server error:", response.status, response.statusText);
-                        try {
-                            const errorText = await response.text();
-                            console.error("Error response:", errorText);
-                            showToast(`Server error (${response.status}): ${errorText.substring(0, 100)}...`, "bg-danger");
-                        } catch (parseError) {
-                            showToast(`Server error (${response.status})`, "bg-danger");
-                        }
-                    }
-                } catch (error) {
-                    console.error("Client error updating pegawai:", error);
-                    showToast(`An error occurred while updating: ${error.message}`, "bg-danger");
-                }
-            });
+            
 
-            // Delete Pegawai
-            document.getElementById("deleteButton").addEventListener("click", async function() {
-                if (!currentPegawaiId) {
-                    alert("Please select a pegawai from the table first.");
-                    return;
-                }
-                
-                if (confirm("Are you sure you want to delete this pegawai?")) {
-                    try {
-                        const response = await fetch(`http://127.0.0.1:8000/api/pegawai/${currentPegawaiId}`, {
-                            method: "DELETE",
-                            headers: { 
-                                "Authorization": `Bearer ${localStorage.getItem('authToken')}`,
-                                "X-CSRF-TOKEN": csrfToken
-                            }
-                        });
-                        
-                        const result = await response.json();
-                        
-                        if (result.status === true) {
-                            showToast("Pegawai deleted successfully!", "bg-success");
-                            
-                            // Clear the form
-                            document.getElementById("currentPegawaiId").value = "";
-                            // document.getElementById("idTopSeller").value = "";
-                            document.getElementById("namaPegawai").value = "";
-                            document.getElementById("username").value = "";
-                            document.getElementById("password").value = "";
-                            // document.getElementById("nik").value = "";
-                            
-                            currentPegawaiId = null;
-                            
-                            fetchPegawai(); // Refresh the table data
-                        } else {
-                            showToast("Failed to delete pegawai!", "bg-danger");
-                            console.error("Error deleting pegawai:", result);
-                            fetchPegawai(); 
-                        }
-                    } catch (error) {
-                        console.error("Error deleting pegawai:", error);
-                        showToast("An error occurred while deleting.", "bg-danger");
-                    }
-                }
-            });
+           
 
-            // Search functionality
-            searchInput.addEventListener("input", function() {
-                const searchTerm = this.value.toLowerCase();
-                
-                if (searchTerm === "") {
-                    renderTable(pegawaiData); // Show all data if search is empty
-                    return;
-                }
-                
-                // Filter the data based on search term
-                const filteredData = pegawaiData.filter(item => {
-                    return (
-                        (item.username && item.username.toLowerCase().includes(searchTerm)) ||
-                        (item.namaPegawai && item.namaPegawai.toLowerCase().includes(searchTerm))
-                    );
-                });
-                
-                renderTable(filteredData);
-            });
+            
 
-            // Open Register Form
-            registerButton.addEventListener("click", function () {
-                registerFormContainer.style.display = "block"; // Show the form
-                registerOverlay.style.display = "block"; // Show the overlay
-            });
-
-            // Close Register Form
-            closeRegisterForm.addEventListener("click", function () {
-                registerFormContainer.style.display = "none"; // Hide the form
-                registerOverlay.style.display = "none"; // Hide the overlay
-            });
-
-            // Close Register Form if clicked outside of it
-            registerOverlay.addEventListener("click", function () {
-                registerFormContainer.style.display = "none"; // Hide the form
-                registerOverlay.style.display = "none"; // Hide the overlay
-            });
-
-            // Register New Pegawai
-            document.getElementById("registerForm").addEventListener("submit", async function (e) {
-                e.preventDefault();
-
-                const registerData = {
-                    username: document.getElementById("registerUsername").value,
-                    password: document.getElementById("registerPassword").value,
-                    namaPegawai: document.getElementById("registerNamaPegawai").value,
-                    idJabatan: document.getElementById("registerJabatan").value,
-                };
-
-                try {
-                    const response = await fetch("http://127.0.0.1:8000/api/pegawai/register", {
-                        method: "POST",
-                        headers: { 
-                            "Content-Type": "application/json", 
-                            'Accept': 'application/json',
-                            'X-CSRF-TOKEN': csrfToken 
-                        },
-                        body: JSON.stringify(registerData),
-                    });
-                    const result = await response.json();
-                    if (result.status === true) {
-                        fetchPegawai(); // Re-fetch     data after successful registration
-                        showToast("Pegawai registered successfully!", "bg-success");
-                        
-                        // Clear form fields
-                        document.getElementById("registerUsername").value = "";
-                        document.getElementById("registerPassword").value = "";
-                        document.getElementById("registerNamaPegawai").value = "";
-                        document.getElementById("registerJabatan").value = "";
-                        
-                        registerFormContainer.style.display = "none"; // Close the form
-                        registerOverlay.style.display = "none"; // Hide the overlay
-                    } else {
-                        showToast("Failed to register pegawai!", "bg-danger");
-                    }
-                } catch (error) {
-                    console.error("Error during registration:", error);
-                    showToast("An error occurred during registration.", "bg-danger");
-                }
-            });
-
+            
+            
+            
             // Initial fetch when the page loads
-            fetchPegawai();
+            
             fetchDonasi();
+            fetchBarangOptions();
         });
     </script>
 

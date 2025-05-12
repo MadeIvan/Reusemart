@@ -28,6 +28,12 @@ class RequestDonasi extends Model
         'status',
     ];
 
+    public function transaksidonasi()
+    {
+        return $this->belongsTo(TransaksiDonasi::class, 'idRequest', 'idRequest');
+    }
+
+    // Define the relationship to the Organisasi model
     public function organisasi()
     {
         return $this->belongsTo(Organisasi::class, 'idOrganisasi', 'idOrganisasi');

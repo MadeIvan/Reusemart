@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\RequestDonasi;
+use App\Models\TransaksiDonasi;
 use Exception;
 use Illuminate\Http\Request;
 
@@ -11,7 +12,7 @@ class RequestDonasiController extends Controller
     // Show all request donasi
     public function index(){
         try{
-            $data=RequestDonasi::with('Organisasi')->get();
+            $data=RequestDonasi::with(['Organisasi','TransaksiDonasi'])->get();
             return response()->json([
                 "status" => true,
                 "message" => "Get successful",
