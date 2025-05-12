@@ -40,8 +40,24 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
-    ],
+        'api' => [
+            'driver' => 'sanctum',
+            'provider' => 'users',
+        ],
+        'pembeli' => [
+            'driver' => 'sanctum',
+            'provider' => 'pembeli',
+        ],
+        'pegawai' => [
+            'driver' => 'sanctum',
+            'provider' => 'pegawai',
+        ],
+        'penitip' => [
+            'driver' => 'sanctum',
+            'provider' => 'penitip',
+        ]
 
+    ],
     /*
     |--------------------------------------------------------------------------
     | User Providers
@@ -59,12 +75,26 @@ return [
     |
     */
 
+    
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => App\Models\User::class,
+            'model' => env('AUTH_MODEL', App\Models\User::class),
+        ],
+        'pembeli' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Pembeli::class,
+        ],
+        'pegawai' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Pegawai::class,
+        ],
+        'penitip' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Penitip::class,
         ],
 
+        
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',

@@ -217,4 +217,16 @@ public function login(Request $request){
     //         'usernameExists' => $usernameExists
     //     ]);
     // }
+
+    function resetPassword($id){
+        $pegawai = Pegawai::find($id);
+
+        $pegawai->password =  Hash::make($pegawai->tanggalLahir);
+        $pegawai->update();
+
+        return response()->json([
+            'message' => 'Berhasil',
+        ]);
+    }
 }
+

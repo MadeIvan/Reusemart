@@ -3,21 +3,25 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\dompets;
+use App\Models\Dompet;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log; // Import the Log facade at the top
+use Illuminate\Support\Facades\Log;
+
 
 class DompetController extends Controller
 {
     public function getAllDompet()
     {
-        $dompet = dompets::all();
+
+        $dompet = Dompet::all();
         return response()->json($dompet);
     }
 
     public function getDompetById($id)
     {
-        $dompet = dompets::find($id);
+
+        $dompet = Dompet::find($id);
+
         if ($dompet) {
             return response()->json($dompet);
         } else {
@@ -30,7 +34,9 @@ class DompetController extends Controller
         $lastDompet = DB::select("SELECT MAX(CAST(idDompet AS UNSIGNED)) AS last_id FROM dompet");
         $lastDompet = $lastDompet[0]->last_id;
         $newId = $lastDompet ? (intval($lastDompet) + 1) : 1; 
-        $dompet = dompets::create([
+
+        $dompet = Dompet::create([
+
             'idDompet' => $newId, 
             'idPegawai' => null, 
             'idPenitip' => $idPenitip ?? null, 
@@ -43,7 +49,9 @@ class DompetController extends Controller
     public function updateDompet($idPenitip, $saldo, $idDompet)
     {
 
-        $dompet = dompets::find($idDompet);
+
+        $dompet = Dompet::find($idDompet);
+
 
         // Check if dompet exists
         if (!$dompet) {
