@@ -93,8 +93,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const data = { username, password };
         const csrfToken = document.head.querySelector('meta[name="csrf-token"]').content;
-
-
         try {
             const response = await fetch(`http://127.0.0.1:8000/api/${status}/login`, {
                 method: 'POST',
@@ -105,33 +103,23 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 body: JSON.stringify(data)
             });
-
             const resData = await response.json();
-            
+            console.log(resData);
             if (!response.ok) {
-                // Jika gagal login (401, 404, dsb)
                 alert(resData.message || 'Login failed');
                 return;
             }
-            alert('Login successful! Login as ' + status);
-            console.log('User:', resData.penitip);
+        alert('Login successful! Login as ' + status);
 
-
-            
         if (status == 'penitip') {
-            localStorage.setItem('auth_token', resData.penitip.Token);
-
+            localStorage.setItem('auth_token', resData.Token);
+            window.location.href = 'http://127.0.0.1:8000/penitip/dashboard';
         } else if (status == 'pembeli') {
-            if (resData.data && resData.data.token) {
-                localStorage.setItem('auth_token', resData.data.token);
-                window.location.href = 'http://127.0.0.1:8000/pembeli/alamat';
-            } else {
-                alert("Token tidak ditemukan dalam respons");
-                console.error("Data respons tidak sesuai:", resData);
-            }
-
+            localStorage.setItem('auth_token', resData.data.token);
+            window.location.href = 'http://127.0.0.1:8000/pembeli/alamat';
         } else if (status == 'organisasi') {
-            localStorage.setItem('auth_token', resData.token);
+            localStorage.setItem('auth_token', resData.data.token);
+            window.location.href = 'http://127.0.0.1:8000/OrganisasiMain'
         }
 
 

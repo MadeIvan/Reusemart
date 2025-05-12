@@ -270,11 +270,11 @@ document.addEventListener("DOMContentLoaded", function() {
                 const query = searchInput.value.toLowerCase();
                 fetch(`http://127.0.0.1:8000/api/pembeli/alamat/search?q=${query}`, {
                     headers: { 
-                        "Authorization": `Bearer ${localStorage.getItem('auth_token')}` },
                         "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
                         'Accept': 'application/json',
                         "Content-Type": "application/json",
                         "X-CSRF-TOKEN": csrfToken,
+                    }
                 })
                     .then(response => response.json())
                     .then(data => renderAlamat(data.data))

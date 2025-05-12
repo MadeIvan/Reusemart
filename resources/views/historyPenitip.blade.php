@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reusemart</title>
@@ -174,9 +175,10 @@
     <div id="barangContainer" class="row g-3 px-5"></div>
 
     <script>
-        const auth_token = localStorage.getItem("auth_token");
-        console.log("Token yang digunakan:", auth_token);
-			if (!auth_token) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token from meta tag
+        const token = localStorage.getItem("auth_token");
+        console.log("Token yang digunakan:", token);
+			if (!token) {
 				window.location.href = "{{ url('/UsersLogin') }}";
 			}
 
@@ -191,13 +193,20 @@
                     method: "GET",
                     headers: {
                         "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
+                        'Accept': 'application/json',
                         "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": csrfToken,
                     },
                 })
                 .then(response => response.json())
                 .then(data => {
-                    barangData = data.data;
-                    renderBarang(data.data);
+                    // barangData = data.data;
+                    // renderBarang(data.data);
+                    if (data.status && Array.isArray(data.data)) {
+                        renderBarang(data.data);
+                    } else {
+                        console.error("Respon tidak valid atau kosong:", data);
+                    }
                 })
                 .catch(error => console.error("Error fetching barang:", error));
             }
@@ -206,7 +215,7 @@
             function renderBarang(data){
                 barangContainer.innerHTML = "";
                 data.forEach(item => {
-                    item.transaksi_penitipan.forEach(transaksi => {
+                    item.detail_transaksi_penitipan.forEach(transaksi => {
                         const barang = transaksi.barang;
                         let statusClass = "";
                         switch (barang.statusBarang.toLowerCase()) {
@@ -224,7 +233,7 @@
                         }
                         const card = `
                         <div class="col-md-3 p-2">
-                            <div class="card ">
+                            <div class="card">
                                 <img src="/img/${barang.image}" class="card-img-top" alt="Foto Produk">
                                 <div class="card-body position-relative">
                                     <div class="d-flex align-items-center gap-2">
@@ -232,17 +241,16 @@
                                     </div>
                                     <div class="d-flex justify-content-between align-items-center mt-2">
                                         <p class="card-subtitle ${statusClass} mt-2 ">${barang.statusBarang}</p>
-                                        <button type = "button" class="btn btn-detail btn-outline-primary mt-3 " 
+                                        <button type="button" class="btn btn-detail btn-outline-primary mt-3" 
                                             data-id="${barang.idBarang}" 
                                             data-namaBarang="${barang.namaBarang}"
                                             data-beratBarang="${barang.beratBarang}"
-                                            data-harga="${barang.hargaBarang}"
+                                            data-hargaBarang="${barang.hargaBarang}"
                                             data-kategori="${barang.kategori}"
                                             data-tanggalPenitipan="${barang.tanggalPenitipan}"
-                                            data-tanggalPenitipanSelesai="${barang.tanggalPenitipanSelesai}"
+                                            data-tangfgalPenitipanSelesai="${barang.tanggalPenitipanSelesai}"
                                             data-statusBarang="${barang.statusBarang}"
-                                            data-bs-toggle="modal" data-bs-target="#detailBarang"
-                                            ">
+                                            data-bs-toggle="modal" data-bs-target="#detailBarang">
                                             Lihat Detail
                                         </button>
                                     </div>
@@ -272,7 +280,7 @@
             idDetail = button.getAttribute("data-id");
             const namaBarang = button.getAttribute("data-namaBarang");
             const beratBarang = button.getAttribute("data-beratBarang");
-            const hargaBarang = button.getAttribute("data-hargaBarang");
+            const hargaBarang = button.getAttribute("data-harga");
             const kategori = button.getAttribute("data-kategori");
             const tanggalPenitipan = button.getAttribute("data-tanggalPenitipan");
             const tanggalPenitipanSelesai = button.getAttribute("data-tanggalPenitipanSelesai");
@@ -292,13 +300,15 @@
             });
 
         /////////////////////buat profile/////////////////////
-        const auth_token = localStorage.getItem('auth_token');
+        // const auth_token = localStorage.getItem('auth_token');
 
     fetch('http://localhost:8000/api/penitip/profile', {
         method: 'GET',
         headers: {
             "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
-            "Accept": 'application/json',
+            'Accept': 'application/json',
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": csrfToken,
         }
     })
     .then(response => response.json())
