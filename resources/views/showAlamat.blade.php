@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 <body>
     <script>
-    if (!localStorage.getItem("token")) {
+    if (!localStorage.getItem("auth_token")) {
         window.location.href = "/pembeli/login";
 
     }
@@ -172,10 +172,16 @@ document.addEventListener("DOMContentLoaded", function() {
 
             ////////////////////////SHOW ALAMAT///////////////////////////////////
             function fetchAlamat(){
+                const token = localStorage.getItem('auth_token');
+                if (!token) {
+                    console.error("No auth token found. Please log in first.");
+                    return;
+                }
                 fetch("http://127.0.0.1:8000/api/pembeli/alamat", {
                     method: "GET",
                     headers: {
-                        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                        "Authorization": `Bearer ${token}`,
+                        'Accept': 'application/json',
                         "Content-Type": "application/json",
                     },
                 })
@@ -260,7 +266,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 const query = searchInput.value.toLowerCase();
                 fetch(`http://127.0.0.1:8000/api/pembeli/alamat/search?q=${query}`, {
                     headers: { 
-                        "Authorization": `Bearer ${localStorage.getItem('token')}` },
+                        "Authorization": `Bearer ${localStorage.getItem('auth_token')}` },
                 })
                     .then(response => response.json())
                     .then(data => renderAlamat(data.data))
@@ -277,7 +283,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     fetch(`http://127.0.0.1:8000/api/pembeli/alamat/update/${idToUpdate}`, {
                         method: 'PUT',
                         headers: {
-                            "Authorization": `Bearer ${localStorage.getItem('token')}`,
+                            "Authorization": `Bearer ${localStorage.getItem('auth_token')}`,
                             "Content-Type": "application/json"
                         },
                         body: JSON.stringify({
@@ -320,7 +326,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     fetch(`http://127.0.0.1:8000/api/pembeli/alamat/delete/${idToDelete}`, {
                         method: 'DELETE',
                         headers: {
-                            "Authorization": `Bearer ${localStorage.getItem('token')}`,
+                            "Authorization": `Bearer ${localStorage.getItem('auth_token')}`,
                             "Content-Type": "application/json"
                         },
                     })
@@ -362,7 +368,8 @@ document.addEventListener("DOMContentLoaded", function() {
                 fetch("http://127.0.0.1:8000/api/pembeli/buat-alamat", {
                     method: "POST",
                     headers: {
-                        "Authorization": `Bearer ${localStorage.getItem("token")}`,
+                        "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
+                        'Accept': 'application/json',
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({ 
@@ -402,7 +409,7 @@ document.addEventListener("DOMContentLoaded", function() {
                     fetch(`http://127.0.0.1:8000/api/pembeli/alamat/set-default/${idToDefault}`, {
                         method: 'PUT',
                         headers: {
-                            "Authorization": `Bearer ${localStorage.getItem('token')}`,
+                            "Authorization": `Bearer ${localStorage.getItem('auth_token')}`,
                             "Content-Type": "application/json"
                         },
                     })

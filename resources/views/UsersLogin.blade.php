@@ -118,12 +118,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
             
-            if ($status == 'penitip') {
+        if (status == 'penitip') {
         localStorage.setItem('auth_token', resData.penitip.Token);
-        } else if ($status == 'pembeli') {
+        } else if (status == 'pembeli') {
         localStorage.setItem('auth_token', resData.token);
-        window.location.href = 'http:http://127.0.0.1:8000/pembeli/alamat';
-        } else if ($status == 'organisasi') {
+        window.location.href = 'http://127.0.0.1:8000/pembeli/alamat';
+
+        } else if (status == 'organisasi') {
             localStorage.setItem('auth_token', resData.token);
         }
 
