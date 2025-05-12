@@ -25,6 +25,7 @@ class Pegawai extends Model
         'tanggalLahir',
         'username',
         'password',
+        'deleted_at'
     ];
 
     public function jabatan(){

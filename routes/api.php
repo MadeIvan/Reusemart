@@ -10,6 +10,7 @@ use App\Http\Controllers\AlamatController;
 use App\Http\Middleware\PembeliMiddleware;
 use App\Http\Middleware\JabatanMiddleware;
 use App\Http\Controllers\PegawaiController;
+use App\Http\Controllers\BarangController;
 
 
 /*
@@ -47,6 +48,7 @@ Route::get('/check-email-username', [PembeliController::class, 'checkEmailUserna
 
 Route::post('/pegawai/register', [PegawaiController::class, 'register']);
 Route::post('/pegawai/login', [PegawaiController::class, 'login']);
+Route::put('/pegawai/update/{id}', [PegawaiController::class, 'update']);
 Route::get('/pegawai', [PegawaiController::class, 'index']);
 
 Route::middleware('auth:sanctum')->group(function () {

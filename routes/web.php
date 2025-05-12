@@ -20,7 +20,7 @@ use App\Http\Controllers\BarangController;
 */
 
 Route::get('/', function () {
-    return view('home');
+    return view('pegawaiView');
 });
 
 // routes/web.php

@@ -2,21 +2,36 @@
 
 namespace App\Models;
 
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Laravel\Sanctum\HasApiTokens;
 
-class Penitip extends Model
+class Penitip extends Authenticatable
 {
-    use HasFactory;
-    protected $table = 'penitip'; 
-    public $timestamps = false;   
+    use HasFactory, HasApiTokens;
+
+    protected $table = 'penitip';
+    protected $primaryKey = 'idPenitip';
+    public $incrementing = true;
+    protected $keyType = 'string';
+    public $timestamps = false;
 
     protected $fillable = [
-        'idPenitip',
+        'nik',
         'idTopeseller',
         'idDompet',
-        'usernama',
+        'username',
         'password',
-        'namaPenitip'
+        'namaPenitip',
+        'idPenitip',
     ];
+
+    protected $hidden = [
+        'password',
+    ];
+
+     public function dompet(){
+        return $this->belongsTo(Dompet::class, 'idDompet', 'idDompet');
+    }
+
 }

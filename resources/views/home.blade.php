@@ -57,7 +57,7 @@
                                             <h5 class="card-title">${product.namaBarang}</h5>
                                             <p class="card-text text-success">Rp. ${formattedPrice}</p>
                                         </div>
-                                        <a href="api/getBarang/${product.idBarang}" class="btn btn-dark align-self-end">Lihat Barang</a>
+                                        <a href="/getBarang/${product.idBarang}" class="btn btn-dark align-self-end">Lihat Barang</a>
                                     </div>
                                 </div>
                             </div>
