@@ -35,6 +35,8 @@ Route::post('penitip/login', [PenitipController::class, 'login']);
 Route::get('/penitip', [PenitipController::class, 'getAllPenitip']);
 Route::post('/penitip/register', [PenitipController::class, 'register']);
 Route::put('/penitip/update/{id}', [PenitipController::class, 'updatePenitip']);
+Route::delete('/penitip/delete/{id}', [PenitipController::class, 'deletePenitip']);
+
 
 Route::get('/dompet', [DompetController::class, 'getAllDompet']); 
 Route::get('/dompet/{id}', [DompetController::class, 'getDompetById']);
@@ -64,6 +66,7 @@ Route::get('/check-email-username', [PembeliController::class, 'checkEmailUserna
 Route::post('/pegawai/register', [PegawaiController::class, 'register']);
 Route::post('/PegawaiLogin', [PegawaiController::class, 'login']);
 Route::get('/pegawai', [PegawaiController::class, 'index']);
+Route::put('/pegawai/update/{id}', [PegawaiController::class, 'update']);
 
 Route::post('/penitip/register', [PenitipController::class, 'register']);
 Route::get('/check-nik', [PenitipController::class, 'checkNIK']);

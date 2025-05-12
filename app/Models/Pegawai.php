@@ -15,6 +15,7 @@ class Pegawai extends Model
     protected $primaryKey = 'idPegawai';
     protected $keyType = 'string'; 
     public $timestamps = false;
+    public $incrementing = false; 
     protected $dates = ['deleted_at'];
 
     protected $fillable = [

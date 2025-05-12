@@ -45,10 +45,10 @@ class PegawaiController extends Controller
         }
     }
 
-    public function register(Request $request){ //register
+
+ public function register(Request $request){ //register
         $request->validate([
             'idJabatan'=> 'required|string',
-            'idDompet'=> 'string|max:255',
             'namaPegawai'=> 'required|string|max:255',
             'tanggalLahir'=> 'required|date',
             'username'=> 'required|string|max:255',
@@ -60,14 +60,10 @@ class PegawaiController extends Controller
         $lastNumber = 0;
 
         if ($last) {
-            // Ambil angka dari ID terakhir, misalnya 'ORG12' -> 12
             $lastNumber = (int) str_replace('P', '', $last->idPegawai);
         }
-
-        // Generate ID baru dengan menambahkan angka terakhir + 1
         $newId = 'P' . ($lastNumber + 1);
 
-        // Cek apakah ID baru sudah ada, baik yang aktif maupun yang sudah dihapus (soft delete)
         while (Pegawai::where('idPegawai', $newId)->withTrashed()->exists()) {
             $lastNumber++;  // Increment angka ID
             $newId = 'P' . $lastNumber;  // Update ID baru
@@ -96,39 +92,47 @@ class PegawaiController extends Controller
             "data" => $pegawai
         ], 200);
     }
+    /////////////////////////[ LOGIN PEGAWAI ]////////////////////////
+public function login(Request $request){
+    $request->validate([
+        'username' => 'required|string|max:255',
+        'password' => 'required|string|max:255',
+    ]);
 
-    public function login(Request $request){ //login
-        $request->validate([
-            'username' => 'required|string|max:255',
-            'password'=> 'required|string|min:8',
-        ]);
-        
-        $pegawai = Pegawai::where('username', $request->username)->first();
-        
-        if($pegawai){
-            if($pegawai->delete_at){
-                return response()->json([
-                    "status" => false,
-                    "message" => "Your account has been deactivated.",
-                ], 403);
-            }else if(Hash::check($request->password, $pegawai->password)){
-                $token = $pegawai->createToken('Personal Access Token')->plainTextToken;
+    // Include soft-deleted users in the query
+    $pegawai = Pegawai::withTrashed()
+        ->whereRaw('BINARY username = ?', [$request->username])
+        ->first();
 
-                return response()->json([
-                    "status" => true,
-                    "message" => "Get successful",
-                    "data" => [
-                        "pegawai" => $pegawai,
-                        "token" => $token
-                    ]
-                ], 200);
-            }
+    if ($pegawai) {
+        if ($pegawai->deleted_at !== null) {
+
             return response()->json([
                 "status" => false,
-                "message" => "Invalid credentials",
-            ], 401);
+                "message" => "Your account has been deactivated.",
+            ], 403);
+        }
+        if (Hash::check($request->password, $pegawai->password)) {
+            $token = $pegawai->createToken('Personal Access Token')->plainTextToken;
+
+            return response()->json([
+                "status" => true,
+                "message" => "Login successful",
+                "data" => [
+                    "pegawai" => $pegawai,
+                    "token" => $token,
+                ],
+                
+            ], 200);
         }
     }
+
+    // If user not found or password incorrect
+    return response()->json([
+        "status" => false,
+        "message" => "Invalid credentials",
+    ], 401);
+}
 
     public function update(Request $request, $id){ //update
         $pegawai = Pegawai::find($id);
@@ -144,15 +148,12 @@ class PegawaiController extends Controller
         $validatedData = $request->validate([
             'namaPegawai'=> 'required',
             'username'=> 'required',
-
             // 'password'=> 'required',
         ]);
 
-        $pegawai->namaPegawai = $validatedData['namaPegawai'];
-        $pegawai->username = $validatedData['username'];
-
+        // $pegawai->namaPegawai = $validatedData['namaPegawai'];
+        // $pegawai->username = $validatedData['username'];
         // $pegawai->password = $validatedData['password'];
-
 
         $pegawai->update($validatedData);
 
