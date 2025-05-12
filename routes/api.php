@@ -13,12 +13,13 @@ use App\Http\Controllers\BarangController;
 use App\Http\Controllers\DiskusiController;
 use App\Http\Controllers\DompetController;
 use App\Http\Controllers\PegawaiController;
-
+use App\Http\Controllers\reqdonasiController;
 use App\Http\Controllers\JabatanController;
 use App\Http\Controllers\RequestDonasiController;
 use App\Http\Controllers\TransaksiDonasiController;
 
 use App\Http\Controllers\reqdonasiController;
+
 
 
 /*
@@ -63,6 +64,7 @@ Route::post('/organisasi/register', [OrganisasiController::class, 'register']);
 Route::post('/organisasi/login', [OrganisasiController::class, 'login']);
 Route::get('/check-email-username', [OrganisasiController::class, 'checkEmailUsername']);
 
+// routes/api.php
 Route::post('/pembeli/register', [PembeliController::class, 'register']);
 Route::post('/pembeli/login', [PembeliController::class, 'login']);
 Route::get('/check-email-username', [PembeliController::class, 'checkEmailUsername']);
@@ -103,7 +105,7 @@ Route::middleware(['auth:sanctum', 'auth.pembeli'])->group(function () {
     Route::put('/pembeli/alamat/update/{id}', [AlamatController::class, 'update']);
     Route::delete('/pembeli/alamat/delete/{id}', [AlamatController::class, 'delete']);
     Route::put('/pembeli/alamat/set-default/{id}', [AlamatController::class, 'setAsDefault']);
-    Route::post('/pembeli/buat-diskusi/{id}', [DiskusiController::class, 'store']);
+    Route::post('/buat-diskusi/{id}', [DiskusiController::class, 'store']);
 
 });
 
@@ -121,6 +123,7 @@ Route::get('/getBarang',[BarangController::class, 'index']);
 Route::get('/getBarang/{id}', [BarangController::class, 'show']);
 Route::get('/diskusi/{id}',[DiskusiController::class, 'getByBarang']);
 
+
 Route::get('/donasi',[RequestDonasiController::class,'index']);
 Route::get('/barang/available',[BarangController::class,'getAvailableBarang']);
 Route::post('/transaksi-donasi', [TransaksiDonasiController::class, 'store']);
@@ -128,7 +131,7 @@ Route::get('/transaksi-donasi', [TransaksiDonasiController::class, 'index']);
 Route::post('/transaksi-donasi', [TransaksiDonasiController::class, 'store']);
 Route::get('/transaksi-donasi/{id}', [TransaksiDonasiController::class, 'show']);
 Route::put('/transaksi-donasi/{id}', [TransaksiDonasiController::class, 'update']);
-
+  
 Route::middleware('auth:organisasi')->group(function () {
     Route::get('/reqdonasi', [reqdonasiController::class, 'index']);
     Route::post('/create/reqdonasi', [reqdonasiController::class, 'store']);

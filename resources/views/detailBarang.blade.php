@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Detail</title>
@@ -60,12 +61,11 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Get the product ID from the URL query parameter
             const pathSegments = window.location.pathname.split('/');
             const productId = pathSegments[pathSegments.length - 1]; 
             document.querySelector('.btn.btn-dark').addEventListener('click', kirimDiskusi);
-
-
+            
+            
             // Fetch the product data from the API
             fetch(`http://127.0.0.1:8000/api/getBarang/${productId}`)
                 .then(response => response.json())
@@ -127,9 +127,9 @@
 
                         if (item.idPembeli) {
                             diskusiItems += `
-                                <div class="diskusi-tanggal-pembeli">
-                                    <p class="text-success"><strong>${namaPengirim} | </strong></p>
-                                    <p><strong>${item.tanggalDiskusi}</strong></p>
+                            <div class="diskusi-tanggal-pembeli">
+                            <p class="text-success"><strong>${namaPengirim} | </strong></p>
+                            <p><strong>${item.tanggalDiskusi}</strong></p>
                                     <p><strong>${item.waktuMengirimDiskusi}</strong></p>
                                 </div>
                                 <p > ${item.pesandiskusi}</p>
@@ -163,12 +163,17 @@
             });
 
         }
-        
+
         function kirimDiskusi() {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token from meta tag
             const komentar = document.getElementById('exampleFormControlTextarea1').value.trim();
             const idBarang = window.location.pathname.split('/').pop();
             const token = localStorage.getItem('auth_token');
             const btn = document.getElementById('kirimBtn');
+            
+            console.log('Token:', token); // Periksa token
+            console.log('ID Barang:', idBarang); // Periksa ID Barang
+            console.log('Komentar:', komentar); // Periksa komentar
             
             if (!token) {
                 alert("Silakan login terlebih dahulu untuk mengirim komentar.");
@@ -177,7 +182,6 @@
 
             if (!komentar) {
                 alert("Komentar tidak boleh kosong.");
-
                 return;
             }
 
@@ -187,19 +191,24 @@
             fetch(`http://127.0.0.1:8000/api/buat-diskusi/${idBarang}`,{
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
                     'Accept': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": csrfToken,
+                    },
                 body: JSON.stringify({
                     pesandiskusi: komentar
                 })
             })
-            .then(response => response.json())
             .then(response => {
+                console.log('Response Status:', response.status);
+                return response.json();
+            })
+            .then(response => {
+                console.log('Response Data:', response);
                 alert("Komentar berhasil dikirim!");
                 document.getElementById('exampleFormControlTextarea1').value = ""; 
-                getDiskusi(idBarang); 
+                getDiskusi(idBarang);
             })
             .catch(error => {
                 console.error("Error mengirim diskusi:", error);

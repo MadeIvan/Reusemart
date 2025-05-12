@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -71,102 +72,123 @@
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            function showToast(message, bgColor = 'bg-primary') {
-                const toast = document.getElementById('successToast');
-                const toastMessage = document.getElementById('toastMessage');
-                
-                // Set message
-                toastMessage.textContent = message;
-                
-                // Update background color
-                toast.className = `toast align-items-center text-white border-0 ${bgColor}`;
-                
-                // Show toast using Bootstrap's toast API
-                const bsToast = new bootstrap.Toast(toast);
-                bsToast.show();
-            }
 
-            const registerForm = document.getElementById('registerForm');
-            registerForm.addEventListener('submit', async function(e) {
-                e.preventDefault();  // Prevent the default form submission
+    document.addEventListener("DOMContentLoaded", () => {
+         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        const registerButton = document.querySelector('.register-button button');
+        registerButton.addEventListener('click', async function (e) {
+            e.preventDefault();
+            try {
 
                 const namaOrganisasi = document.getElementById('namaOrganisasi').value.trim();
                 const alamat = document.getElementById('alamat').value.trim();
                 const email = document.getElementById('email').value.trim();
                 const username = document.getElementById('username').value.trim();
                 const password = document.getElementById('password').value.trim();
-
-                // Check if all fields are filled
                 if (!namaOrganisasi || !alamat || !email || !username || !password) {
-                    showToast("Mohon untuk mengisi seluruh form", "bg-danger");
+                    Toastify({
+                        text: "Mohon untuk mengisi seluruh form.",
+                        duration: 3000,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "rgb(214, 10, 10)", // Red background
+                    }).showToast();
                     return;
                 }
 
-                // Check if email and username already exist
-                try {
-                    const checkResponse = await fetch(`http://127.0.0.1:8000/api/check-email-username?email=${encodeURIComponent(email)}&username=${encodeURIComponent(username)}`, {
-                        method: "GET",
-                    });
+                // Cek email dan username sebelum melakukan registrasi
+                const checkResponse = await fetch(`http://127.0.0.1:8000/api/check-email-username?email=${encodeURIComponent(email)}&username=${encodeURIComponent(username)}`, {
+                    method: "GET",
+                });
 
-                    if (!checkResponse.ok) {
-                        const errorData = await checkResponse.json();
-                        console.error('Error in checking email/username:', errorData);
-                        throw errorData;  // Error handling if check fails
-                    }
-
-                    const checkResult = await checkResponse.json();
-
-                    // Display toast if email or username already exists
-                    if (checkResult.emailExists) {
-                        showToast("Email telah digunakan. Mohon untuk menggunakan Email lain.", "bg-danger");
-                        return;
-                    }
-
-                    if (checkResult.usernameExists) {
-                        showToast("Username telah digunakan. Mohon untuk menggunakan username lain.", "bg-danger");
-                        return;
-                    }
-
-                    // Send the registration data
-                    const data = {
-                        namaOrganisasi,
-                        alamat,
-                        email,
-                        username,
-                        password,
-                    };
-
-                    const registerResponse = await fetch("http://127.0.0.1:8000/api/organisasi/register", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "Accept": "application/json",
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        },
-                        body: JSON.stringify(data),
-                    });
-
-                    if (!registerResponse.ok) {
-                        const errorData = await registerResponse.json();
-                        console.error('Error in registration:', errorData);
-                        throw errorData;
-                    }
-
-                    const registerResult = await registerResponse.json();
-                    console.log('Registration successful:', registerResult);
-                    showToast("Organisasi Berhasil teregister!", "bg-success");
-
-                    setTimeout(() => {
-                        window.location.href = "{{ url('/UsersLogin') }}"; // Redirect to login page after 3 seconds
-                    }, 3000);
-
-                } catch (error) {
-                    console.error('Failed to register:', error);
-                    showToast(`Gagal mendaftar: ${error.message}`, "bg-danger");  // Show error toast
+                if (!checkResponse.ok) {
+                    const errorData = await checkResponse.json();
+                    throw errorData;
                 }
-            });
+
+                const checkResult = await checkResponse.json();
+                if (checkResult.emailExists) {
+                    Toastify({
+                        text: "Email telah digunakan. Mohon untuk menggunakan Email lain.",
+                        duration: 3000,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "rgb(214, 10, 10)",
+                    }).showToast();
+                    return;
+                }
+
+                if (checkResult.usernameExists) {
+                    Toastify({
+                        text: "Username telah digunakan. Mohon untuk menggunakan Username lain.",
+                        duration: 3000,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "rgb(214, 10, 10)",
+                    }).showToast();
+                    return;
+                }
+
+                const data = {
+                    namaOrganisasi,
+                    alamat,
+                    email,
+                    username,
+                    password,
+                };
+
+                // Registrasi Organisasi
+                const registerResponse = await fetch("http://127.0.0.1:8000/api/organisasi/register", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                if (!registerResponse.ok) {
+                    const errorData = await registerResponse.json();
+                    throw errorData;
+                }
+
+                // Ambil data dari response setelah registrasi
+                const registerResult = await registerResponse.json();
+
+                if (registerResult.status) {
+                    Toastify({
+                        text: "Registrasi berhasil! Silahkan melakukan login.",
+                        duration: 3000,
+                        close: true,
+                        gravity: "top",
+                        position: "right",
+                        backgroundColor: "rgb(95, 211, 99)", // Green background
+                    }).showToast();
+
+                    // Kamu bisa menambahkan pengalihan halaman setelah sukses jika perlu
+                    // setTimeout(() => {
+                    //     window.location.href = "{{ url('/Login') }}";
+                    // }, 3000);
+                } else {
+                    throw new Error(registerResult.message || 'Terjadi kesalahan saat registrasi');
+                }
+
+            } catch (error) {
+                console.log(error);
+                Toastify({
+                    text: error.message || "Terjadi kesalahan saat registrasi. Silakan coba lagi.",
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "rgb(214, 10, 10)", // Red background
+                }).showToast();
+            }
         });
-    </script>
+    });
+</script>
 </body>
 </html>

@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Password;
 */
 
 Route::get('/', function () {
-    return view('ownerView');
+    return view('home');
 });
 
 // routes/web.php
@@ -92,7 +92,6 @@ Route::get('/penitip/history', function () {
 Route::get('/lupa-password', function () {
     return view('forgotPassword');
 });
-
 Route::get('/OrganisasiMain', function () {
     return view('OrganisasiView');
 });

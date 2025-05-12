@@ -89,56 +89,57 @@
 
     <!-- Script to handle the form submission -->
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelector('#loginForm').addEventListener('submit', async function(event) {
-                event.preventDefault(); // Prevent the default form submission
+<
 
-                const username = document.getElementById('username').value.trim();
-                const password = document.getElementById('password').value.trim();
-                const status = document.getElementById('status').value;
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelector('#loginForm').addEventListener('submit', async function(event) {
+        event.preventDefault(); // Prevent the default form submission
 
-                const data = { username, password };
-                const csrfToken = document.head.querySelector('meta[name="csrf-token"]').content;
-                try {
-                    // Fixed the issue with the URL string
-                    const response = await fetch(`http://127.0.0.1:8000/api/${status}/login`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                            'X-CSRF-TOKEN': csrfToken,
-                        },
-                        body: JSON.stringify(data)
-                    });
-                    const resData = await response.json();
-                    console.log(resData);
-                    if (!response.ok) {
-                        alert(resData.message || 'Login failed');
-                        return;
-                    }
-                    alert('Login successful! Login as ' + status);
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const status = document.getElementById('status').value;
 
-                    if (status == 'penitip') {
-                        localStorage.setItem('auth_token', resData.Token);
-                        localStorage.setItem('user_role', 'penitip');
-                        window.location.href = 'http://127.0.0.1:8000/OrganisasiMain';
-                    } else if (status == 'pembeli') {
-                        localStorage.setItem('user_role', 'pembeli');
-                        localStorage.setItem('auth_token', resData.data.token);
-                        window.location.href = 'http://127.0.0.1:8000/OrganisasiMain';
-                    } else if (status == 'organisasi') {
-                        localStorage.setItem('user_role', 'organisasi');
-                        localStorage.setItem('auth_token', resData.data.token);
-                        window.location.href = 'http://127.0.0.1:8000/OrganisasiMain'
-                    }
-
-                } catch (error) {
-                    console.error('Error:', error);
-                    alert('An error occurred: ' + error.message);
-                }
+        const data = { username, password };
+        const csrfToken = document.head.querySelector('meta[name="csrf-token"]').content;
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/api/${status}/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+                body: JSON.stringify(data)
             });
-        });
-    </script>
+            const resData = await response.json();
+            console.log(resData);
+            if (!response.ok) {
+                alert(resData.message || 'Login failed');
+                return;
+            }
+        alert('Login successful! Login as ' + status);
+
+        if (status == 'penitip') {
+            localStorage.setItem('auth_token', resData.Token);
+            window.location.href = 'http://127.0.0.1:8000/penitip/dashboard';
+        } else if (status == 'pembeli') {
+            localStorage.setItem('auth_token', resData.data.token);
+            window.location.href = 'http://127.0.0.1:8000/pembeli/alamat';
+        } else if (status == 'organisasi') {
+            localStorage.setItem('auth_token', resData.data.token);
+            window.location.href = 'http://127.0.0.1:8000/OrganisasiMain'
+        }
+
+
+        } catch (error) {
+            console.error('Error:', error);
+            alert('An error occurred: ' + error.message);
+        }
+    });
+});
+</script>
+
+
 
 
 </body>

@@ -6,10 +6,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Penitip;
 use App\Models\dompets;
+use App\Models\TransaksiPenitipan;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator; 
 use App\Http\Controllers\DompetController;
-use App\Http\Controllers\TransaksiPenitipanController;
+// use App\Http\Models\TransaksiPenitipan;
 use Illuminate\Support\Facades\DB;
 
 class PenitipController extends Controller
@@ -175,6 +176,39 @@ public function deletePenitip($id){
         'message' => 'Penitip deleted successfully'
     ]);
 }
+
+    public function myData(Request $request)    
+    {
+        // $penitip = $request->user();
+         $penitip = auth('penitip')->user()->load('dompet');
+
+        return response()->json([
+            "status" => true,
+            "message" => "User retrieved successfully",
+            "data" => $penitip
+        ]);
+    }
+
+    public function loadBarang(Request $request)
+    {
+        $penitip = auth('penitip')->user();
+
+        $penitipan = TransaksiPenitipan::with('detailTransaksiPenitipan.barang.detailTransaksiPembelian.transaksiPembelian')
+            ->where('idPenitip', $penitip->idPenitip)
+            ->get();
+
+        // $penitipan = TransaksiPenitipan::with([
+        //     'detailTransaksiPenitipan.barang.detailTransaksiPembelian.transaksiPembelian'
+        // ])->where('idPenitip', auth('penitip')->user()->idPenitip)
+        // ->get();
+
+
+        return response()->json([
+            "status" => true,
+            "message" => "Barang penitipan berhasil dimuat",
+            "data" => $penitipan
+        ]);
+    }
 
 
 }
