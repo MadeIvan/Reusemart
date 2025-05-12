@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PenitipLoginController;
+// use App\Http\Controllers\PenitipLoginController;
 use App\Http\Controllers\BarangController;
 use Illuminate\Support\Facades\Password;
 
@@ -31,7 +31,7 @@ Route::get('/getBarang/{id}', function () {
 });
 
 
-Route::post('penitip/login', [PenitipLoginController::class, 'login']);
+// Route::post('penitip/login', [PenitipLoginController::class, 'login']);
 
 Route::get('/organisasi/register', function () {
     return view('registerorganisasi');

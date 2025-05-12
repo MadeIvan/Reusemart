@@ -70,7 +70,7 @@
                                 <option value="" disabled selected>Select Status</option>
                                 <option value="penitip">Penitip</option>
                                 <option value="pembeli">Pembeli</option>
-                                <option value="organisasi">Pembeli</option>
+                                <option value="organisasi">Organisasi</option>
                             </select>
                         </div>
 
@@ -118,13 +118,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
             
-            if($status == 'penitip'){
-                localStorage.setItem('auth_token', resData.penitip.Token);
-            }(else if($status == 'pembeli'){
-                localStorage.setItem('auth_token', resData.token);
-            }(else if($status == 'organisasi'){
-                localStorage.setItem('auth_token', resData.token);
-            }
+            if ($status == 'penitip') {
+        localStorage.setItem('auth_token', resData.penitip.Token);
+        } else if ($status == 'pembeli') {
+        localStorage.setItem('auth_token', resData.token);
+        window.location.href = 'http:http://127.0.0.1:8000/pembeli/alamat';
+        } else if ($status == 'organisasi') {
+            localStorage.setItem('auth_token', resData.token);
+        }
+
 
         } catch (error) {
             console.error('Error:', error);
