@@ -377,6 +377,18 @@ document.addEventListener("DOMContentLoaded", function() {
                 const kategori = document.getElementById("kategoriAlamatCreate").value;
                 const alamat = document.getElementById("alamatCreate").value;
                 const isDefault = document.getElementById("isDefault").checked;
+                if(!kategori || !alamat || !isDefault) {
+                    Toastify({
+                        text: "Semua field harus diisi",
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            background: "#8bc34a"
+                        },
+                    }).showToast();
+                    return;
+                };
 
 
                 fetch("http://127.0.0.1:8000/api/pembeli/buat-alamat", {

@@ -17,11 +17,6 @@ use App\Http\Controllers\reqdonasiController;
 use App\Http\Controllers\JabatanController;
 use App\Http\Controllers\RequestDonasiController;
 use App\Http\Controllers\TransaksiDonasiController;
-
-use App\Http\Controllers\reqdonasiController;
-
-
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -34,7 +29,7 @@ use App\Http\Controllers\reqdonasiController;
 */
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return response()->json($request->user());  // Return authenticated user in JSON format
+     return response()->json($request->user());
 });
 
 Route::post('penitip/login', [PenitipController::class, 'login']);
@@ -95,6 +90,8 @@ Route::middleware(['auth:pegawai','role:2'])->group(function () {
     Route::put('/organisasi/update/{id}', [OrganisasiController::class, 'update']);
     Route::delete('/organisasi/delete/{id}', [OrganisasiController::class, 'destroy']);
     Route::put('/pegawai/reset-password/{id}', [PegawaiController::class, 'resetPassword']);
+    Route::post('/buat-diskusi/{id}', [DiskusiController::class, 'store']);
+
     // Route::get('/organisasi', [PegawaiController::class, 'index']);
 });
 
@@ -123,7 +120,6 @@ Route::get('/getBarang',[BarangController::class, 'index']);
 Route::get('/getBarang/{id}', [BarangController::class, 'show']);
 Route::get('/diskusi/{id}',[DiskusiController::class, 'getByBarang']);
 
-
 Route::get('/donasi',[RequestDonasiController::class,'index']);
 Route::get('/barang/available',[BarangController::class,'getAvailableBarang']);
 Route::post('/transaksi-donasi', [TransaksiDonasiController::class, 'store']);
@@ -141,8 +137,8 @@ Route::middleware('auth:organisasi')->group(function () {
     Route::delete('/reqdonasi/{id}', [reqDonasiController::class, 'destroy']);
 });
 
-
 Route::delete('/transaksi-donasi/{id}', [TransaksiDonasiController::class, 'destroy']);
+
 // Route::middleware('auth:sanctum')->post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store']);
 // Route::post('/reset-password', [NewPasswordController::class, 'store']);
 // Route::middleware('auth:sanctum')->get('/email/verify-status', EmailVerificationPromptController::class);

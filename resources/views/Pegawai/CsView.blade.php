@@ -461,6 +461,7 @@
                     }
                 } catch (error) {
                     console.error("Error during registration: "+error, error);
+
                     showToast("An error occurred during registration.", "bg-danger");
                 }
             });

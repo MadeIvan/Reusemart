@@ -73,9 +73,9 @@ Route::get('/penitip/dashboard', function () {
     return view('dashboardPenitip');
 });
 
-Route::get('/penitip/profile', function () {
-    return view('profilePenitip');
-});
+// Route::get('/penitip/profile', function () {
+//     return view('profilePenitip');
+// });
 
 Route::get('/penitip/register', function () {
     return view('registerPenitip');
@@ -97,7 +97,7 @@ Route::get('/OrganisasiMain', function () {
 });
 Route::post('/lupa-password', function (Request $request) {
     $request->validate(['email' => 'required|email']);
-
+});
  
 //     $status = Password::sendResetLink(
 //         $request->only('email')
@@ -111,6 +111,18 @@ Route::post('/lupa-password', function (Request $request) {
 Route::get('/lupa-password/{token}', function (string $token) {
     return view('auth.reset-password', ['token' => $token]);
 })->middleware('guest')->name('password.reset');
+
+// Route::get('/pegawaiView', function () {
+//     return view('pegawaiView');
+// });
+
+// Route::get('/penitip/profile', function () {
+//     return view('newCode');
+// });
+
+Route::get('/OrganisasiMain', function () {
+    return view('OrganisasiView');
+});
 
 // routes/web.php
 // Route::get('/getBarang/{id}', [BarangController::class, 'show'])->name('product.show');

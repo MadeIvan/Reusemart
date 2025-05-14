@@ -213,13 +213,13 @@
                 try {
                     const response = await fetch("http://127.0.0.1:8000/api/pegawai", {
                         method: "GET",
-                        headers: { "Authorization": `Bearer ${localStorage.getItem('authToken')}` },
+                        headers: { "Authorization": `Bearer ${localStorage.getItem('auth_token')}` },
                     });
                     
                     const data = await response.json();
                     console.log("Raw response:", response);
                     console.log("Response JSON:", data);    
-                    console.log("Token:", localStorage.getItem('authToken'));
+                    console.log("Token:", localStorage.getItem('auth_token'));
 
                     if (data.status === true && data.data.length > 0) {
                         pegawaiData = data.data;
@@ -240,7 +240,7 @@
                         method: "GET",
                         headers: {
                             "Accept": "application/json",
-                            "Authorization": `Bearer ${localStorage.getItem('authToken')}`
+                            "Authorization": `Bearer ${localStorage.getItem('auth_token')}`
                         }
                     });
 
@@ -338,7 +338,7 @@
                         headers: { 
                             "Content-Type": "application/json",
                             "Accept": "application/json",
-                            "Authorization": `Bearer ${localStorage.getItem('authToken')}`,
+                            "Authorization": `Bearer ${localStorage.getItem('auth_token')}`,
                             "X-CSRF-TOKEN": csrfToken
                         },
                         body: JSON.stringify(updatedData)
@@ -357,7 +357,7 @@
                             method: "POST",
                             headers: {
                                 "Accept": "application/json",
-                                "Authorization": `Bearer ${localStorage.getItem('authToken')}`,
+                                "Authorization": `Bearer ${localStorage.getItem('auth_token')}`,
                                 "X-CSRF-TOKEN": csrfToken
                             },
                             body: formData
@@ -406,7 +406,7 @@
                         const response = await fetch(`http://127.0.0.1:8000/api/pegawai/${currentPegawaiId}`, {
                             method: "DELETE",
                             headers: { 
-                                "Authorization": `Bearer ${localStorage.getItem('authToken')}`,
+                                "Authorization": `Bearer ${localStorage.getItem('auth_token')}`,
                                 "X-CSRF-TOKEN": csrfToken
                             }
                         });
@@ -415,6 +415,51 @@
                         
                         if (result.status === true) {
                             showToast("Pegawai deleted successfully!", "bg-success");
+                            
+                            // Clear the form
+                            document.getElementById("currentPegawaiId").value = "";
+                            // document.getElementById("idTopSeller").value = "";
+                            document.getElementById("namaPegawai").value = "";
+                            document.getElementById("username").value = "";
+                            document.getElementById("password").value = "";
+                            // document.getElementById("nik").value = "";
+                            
+                            currentPegawaiId = null;
+                            
+                            fetchPegawai(); // Refresh the table data
+                        } else {
+                            showToast("Failed to delete pegawai!", "bg-danger");
+                            console.error("Error deleting pegawai:", result);
+                            fetchPegawai(); 
+                        }
+                    } catch (error) {
+                        console.error("Error deleting pegawai:", error);
+                        showToast("An error occurred while deleting.", "bg-danger");
+                    }
+                }
+            });
+
+             // Delete Pegawai
+            document.getElementById("resetButton").addEventListener("click", async function() {
+                if (!currentPegawaiId) {
+                    alert("Please select a pegawai from the table first.");
+                    return;
+                }
+                
+                if (confirm("Are you sure you want to delete this pegawai?")) {
+                    try {
+                        const response = await fetch(`http://127.0.0.1:8000/api/pegawai/reset-password/${currentPegawaiId}`, {
+                            method: "PUT",
+                            headers: { 
+                                "Authorization": `Bearer ${localStorage.getItem('authToken')}`,
+                                "X-CSRF-TOKEN": csrfToken
+                            }
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (result.status === true) {
+                            showToast("Pegawai reset successfully!", "bg-success");
                             
                             // Clear the form
                             document.getElementById("currentPegawaiId").value = "";

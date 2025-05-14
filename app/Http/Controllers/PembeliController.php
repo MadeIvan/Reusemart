@@ -97,6 +97,11 @@ class PembeliController extends Controller
         $emailExists = Pembeli::where('email', $email)->exists();
         $usernameExists = Pembeli::where('username', $username)->exists();
 
+        // $emailExists = Pembeli::where('email', $request->email)->exists();
+        // $emailExists = Pembeli::where('email', $email)->exists();
+        // $usernameExists = Pembeli::where('username', $request->username)->exists();
+        // $usernameExists = Pembeli::where('username', $username)->exists();
+
         return response()->json([
             'emailExists' => $emailExists,
             'usernameExists' => $usernameExists

@@ -28,10 +28,8 @@ class reqDonasiController extends Controller
                 'message' => 'Unauthenticated'
             ], 401);
         }
-
         // Fetch the ReqDonasi data that belongs to the authenticated user’s idOrganisasi
         $reqDonasi = ReqDonasi::where('idOrganisasi', $user->idOrganisasi)->get();
-
         return response()->json([
             'status' => 'success',
             'data' => $reqDonasi
@@ -40,54 +38,54 @@ class reqDonasiController extends Controller
 
     // Store a new ReqDonasi entry
    public function store(Request $request)
-{
-    // Ensure the user is authenticated
-    $user = Auth::user();
-    if (!$user) {
+    {
+        // Ensure the user is authenticated
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Unauthenticated'
+            ], 401);
+        }
+
+        // Validate the incoming request data
+        $validated = $request->validate([
+            'barangRequest' => 'required|string', // Only 'barangRequest' is required from the user
+        ]);
+
+        // Generate idRequest based on the largest idRequest in the table
+        $lastId = ReqDonasi::orderByDesc('idRequest')->first(); // Get the record with the largest idRequest
+        $lastIdNumber = $lastId ? (int) $lastId->idRequest : 0; // Extract the numeric part and convert to integer
+        $newId = $lastIdNumber + 1; // Increment the numeric part by 1
+
+        // Check if the new ID is already taken
+        while (ReqDonasi::where('idRequest', $newId)->exists()) {
+            $newId++; // Increment until we find a unique ID
+        }
+
+        // Instantiate a new ReqDonasi model
+        $reqDonasi = new ReqDonasi();
+
+        // Set the attributes with default values
+        $reqDonasi->idRequest = $newId;  // Set the newly generated idRequest (as a number)
+        $reqDonasi->idTransaksiDonasi = null;  // idTransaksiDonasi is set to null
+        $reqDonasi->idOrganisasi = $user->idOrganisasi;  // Set idOrganisasi from the authenticated user
+        $reqDonasi->tanggalRequest = now();  // Set the current timestamp as tanggalRequest
+        $reqDonasi->status = 'Pending';  // Set status to 'Pending'
+
+        // Set the 'barangRequest' field from the validated input
+        $reqDonasi->barangRequest = $validated['barangRequest'];
+
+        // Save the new ReqDonasi
+        $reqDonasi->save();
+
+        // Return a success response
         return response()->json([
-            'status' => 'error',
-            'message' => 'Unauthenticated'
-        ], 401);
+            'status' => 'success',
+            'message' => 'Request for donation successfully created!',
+            'data' => $reqDonasi
+        ], 201);
     }
-
-    // Validate the incoming request data
-    $validated = $request->validate([
-        'barangRequest' => 'required|string', // Only 'barangRequest' is required from the user
-    ]);
-
-    // Generate idRequest based on the largest idRequest in the table
-    $lastId = ReqDonasi::orderByDesc('idRequest')->first(); // Get the record with the largest idRequest
-    $lastIdNumber = $lastId ? (int) $lastId->idRequest : 0; // Extract the numeric part and convert to integer
-    $newId = $lastIdNumber + 1; // Increment the numeric part by 1
-
-    // Check if the new ID is already taken
-    while (ReqDonasi::where('idRequest', $newId)->exists()) {
-        $newId++; // Increment until we find a unique ID
-    }
-
-    // Instantiate a new ReqDonasi model
-    $reqDonasi = new ReqDonasi();
-
-    // Set the attributes with default values
-    $reqDonasi->idRequest = $newId;  // Set the newly generated idRequest (as a number)
-    $reqDonasi->idTransaksiDonasi = null;  // idTransaksiDonasi is set to null
-    $reqDonasi->idOrganisasi = $user->idOrganisasi;  // Set idOrganisasi from the authenticated user
-    $reqDonasi->tanggalRequest = now();  // Set the current timestamp as tanggalRequest
-    $reqDonasi->status = 'Pending';  // Set status to 'Pending'
-
-    // Set the 'barangRequest' field from the validated input
-    $reqDonasi->barangRequest = $validated['barangRequest'];
-
-    // Save the new ReqDonasi
-    $reqDonasi->save();
-
-    // Return a success response
-    return response()->json([
-        'status' => 'success',
-        'message' => 'Request for donation successfully created!',
-        'data' => $reqDonasi
-    ], 201);
-}
 
     // Update the 'barangRequest' field only
     public function update(Request $request, $id)

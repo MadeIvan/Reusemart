@@ -125,14 +125,14 @@
 
     <div class="container mt-4">
         <h3>Organisasi Data</h3>
-        <input type="text" id="searchInput" class="form-control mb-3" placeholder="Search by username or name">
+        <input type="text" id="searchInput" class="form-control mb-3" placeholder="Cari Organisasi">
 
         <div id="OrganisasiTableContainer">
             <table class="table table-bordered" id="OrganisasiTable">
                 <thead>
                     <tr>
                         <th>ID Organisasi</th>
-                        <th>Name Organisasi</th>
+                        <th>Nama Organisasi</th>
                         <th>Username</th>
                         <th>Email</th>
                         <th>Alamat</th>
@@ -178,9 +178,9 @@
                         method: "GET",
                         headers: {
                             "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
-                            'Accept': 'application/json',
-                            "Content-Type": "application/json",
-                            "X-CSRF-TOKEN": csrfToken,
+                            // 'Accept': 'application/json',
+                            // "Content-Type": "application/json",
+                            // "X-CSRF-TOKEN": csrfToken,
                         },
                     })
                     const data = await response.json();
@@ -360,7 +360,9 @@
                 const filteredData = organisasiData.filter(item => {
                     return (
                         (item.username && item.username.toLowerCase().includes(searchTerm)) ||
-                        (item.namaOrganisasi && item.namaOrganisasi.toLowerCase().includes(searchTerm))
+                        (item.namaOrganisasi && item.namaOrganisasi.toLowerCase().includes(searchTerm))||
+                        (item.alamat && item.alamat.toLowerCase().includes(searchTerm)) ||
+                        (item.email && item.email.toLowerCase().includes(searchTerm))
                     );
                 });
                 

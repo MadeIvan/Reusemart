@@ -79,11 +79,11 @@
                     </form>
                     
                 </div>
-                <p class="text-center mt-3">
-                        Don't have an account for organization? 
+                    <p class="text-center mt-3">
+                        Don't have an account for organization?
                         <a href="/organisasi/register" class="text-decoration-none">Click here!</a>
                     </p>
-            </div>
+            </div>          
         </div>
     </div>
 
@@ -119,18 +119,16 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         alert('Login successful! Login as ' + status);
 
-        if (status == 'penitip') {
-            localStorage.setItem('auth_token', resData.Token);
-            window.location.href = 'http://127.0.0.1:8000/penitip/dashboard';
-        } else if (status == 'pembeli') {
-            localStorage.setItem('auth_token', resData.data.token);
-            window.location.href = 'http://127.0.0.1:8000/pembeli/alamat';
-        } else if (status == 'organisasi') {
-            localStorage.setItem('auth_token', resData.data.token);
-            window.location.href = 'http://127.0.0.1:8000/OrganisasiMain'
-        }
-
-
+            if (status == 'penitip') {
+                localStorage.setItem('auth_token', resData.Token);
+                window.location.href = 'http://127.0.0.1:8000/penitip/dashboard';
+            } else if (status == 'pembeli') {
+                localStorage.setItem('auth_token', resData.data.token);
+                window.location.href = 'http://127.0.0.1:8000/pembeli/alamat';
+            } else if (status == 'organisasi') {
+                localStorage.setItem('auth_token', resData.data.token);
+                window.location.href = 'http://127.0.0.1:8000/OrganisasiMain'
+            }
         } catch (error) {
             console.error('Error:', error);
             alert('An error occurred: ' + error.message);

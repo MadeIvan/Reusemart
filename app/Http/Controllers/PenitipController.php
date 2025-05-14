@@ -45,7 +45,6 @@ class PenitipController extends Controller
                 'idDompet' => $penitip->idDompet,
                 'token' => $token
             ],
-            
         ]);
     }
 

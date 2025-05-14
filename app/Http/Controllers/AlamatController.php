@@ -41,6 +41,8 @@ class AlamatController extends Controller
                 $lastNumber++;
                 $newId = 'A' . $lastNumber;
             }
+
+         
             
             /////////CREATE ALAMAT /////////
             $alamat = Alamat::create([

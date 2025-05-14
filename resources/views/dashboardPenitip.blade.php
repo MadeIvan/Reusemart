@@ -75,32 +75,7 @@
     <div class="container vh-100 d-flex justify-content-center align-items-center">
     <div class="row w-100 justify-content-center">
         <div class="col-md-6 border p-4 rounded shadow">
-        <h2 class="text-center" style="color:rgb(24, 134, 4); font-weight: bold;">Registrasi Organisasi</h2>
-            <form>
-                <div class="mb-3">
-                    <label for="namaOrganisasi" class="form-label"><strong>Nama Organisasi</strong></label>
-                    <input type="text" class="form-control" id="namaOrganisasi">
-                </div>
-                <div class="mb-3">
-                    <label for="alamat" class="form-label"><strong>Alamat</strong></label>
-                    <input type="text" class="form-control" id="alamat">
-                </div>
-                <div class="mb-3">
-                    <label for="email" class="form-label"><strong>Email</strong></label>
-                    <input type="email" class="form-control" id="email">
-                </div>
-                <div class="mb-3">
-                    <label for="username" class="form-label"><strong>Username</strong></label>
-                    <input type="text" class="form-control" id="username">
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label"><strong>Password</strong></label>
-                    <input type="password" class="form-control" id="password">
-                </div>
-                <div class="d-flex justify-content-center register-button">
-                    <button type="submit" class="btn btn-success item-center">Submit</button>
-                </div>
-            </form>
+        
         </div>
     </div>
 </div>
