@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BarangController;
 use Illuminate\Support\Facades\Password;
 
-
+use App\Http\Controllers\NavBarController;
 
 
 /*
@@ -63,8 +63,8 @@ Route::get('/UsersLogin', function () {
 Route::get('/PegawaiLogin', function () {
     return view('PegawaiLogin');
 });
-Route::get('/pegawai/PenitipData', function () {
-    return view('Pegawai.CsView');
+Route::get('/pegawai/CS', function () {
+    return view('Pegawai.ViewCS.MainNavbarCS');
 });
 // Route::post('penitip/login', [PenitipLoginController::class, 'login']);
 
@@ -132,5 +132,9 @@ Route::get('/OrganisasiMain', function () {
 
 
 // Route::get('/products', [BarangController::class, 'index']);
+
+
+Route::get('/cs/{page}', [NavBarController::class, 'CSRouting'])->name('cs.page');
+
 
 

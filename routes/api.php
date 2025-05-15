@@ -120,7 +120,7 @@ Route::get('/getBarang',[BarangController::class, 'index']);
 Route::get('/getBarang/{id}', [BarangController::class, 'show']);
 Route::get('/diskusi/{id}',[DiskusiController::class, 'getByBarang']);
 
-Route::get('/donasi',[RequestDonasiController::class,'index']);
+Route::get('/donasi',[reqDonasiController::class,'index']);
 Route::get('/barang/available',[BarangController::class,'getAvailableBarang']);
 Route::post('/transaksi-donasi', [TransaksiDonasiController::class, 'store']);
 Route::get('/transaksi-donasi', [TransaksiDonasiController::class, 'index']);

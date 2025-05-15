@@ -32,7 +32,7 @@ class Penitip extends Authenticatable
         'password',
     ];
 
-     public function dompet(){
+    public function dompet(){
         return $this->belongsTo(Dompet::class, 'idDompet', 'idDompet');
     }
 
