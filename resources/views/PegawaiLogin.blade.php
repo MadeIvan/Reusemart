@@ -110,25 +110,28 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('IdJabatan:', IdJabatan);
             if(IdJabatan==1){
                 alert('Login As Owner!');
+                localStorage.setItem('auth_token', resData.data.token);
                 localStorage.setItem('user_role', 'owner');
             }else if(IdJabatan==2){
                 alert('Login As Admin!');
+                localStorage.setItem('auth_token', resData.data.token);
                 localStorage.setItem('user_role', 'admin');
-
-
                 window.location.href = 'http://127.0.0.1:8000/organisasi';
-
             }else if(IdJabatan==3){
                 alert('Login As Pegawai Gudang!');
+                localStorage.setItem('auth_token', resData.data.token);
                 localStorage.setItem('user_role', 'gudang');
             }else if(IdJabatan==4){
                 alert('Login As Kurir!');
+                localStorage.setItem('auth_token', resData.data.token);
                 localStorage.setItem('user_role', 'kurir');
             }else if(IdJabatan==5){
                 alert('Login As CS!');
+                localStorage.setItem('auth_token', resData.data.token);
                 localStorage.setItem('user_role', 'cs');
             }else if(IdJabatan==6){
                 alert('Login As Hunter!');
+                localStorage.setItem('auth_token', resData.data.token);
                 localStorage.setItem('user_role', 'hunter');
             }
 

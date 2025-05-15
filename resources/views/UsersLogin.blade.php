@@ -38,19 +38,44 @@
 
 </head>
 <body>
-
-    <!-- Video Background -->
-    <div class="position-relative" style="height: 100vh;">
+    <!-- //////////////////ini background video///////////////////// -->
+    <div class="position-relative" style="height: 100vh; overflow: hidden;">
         <video autoplay muted loop id="video-bg">
-            <source src="{{ asset('storage/essentials/ReUseMartVid.mp4') }}" type="video/mp4">
+            <source src="{{ asset('ReUseMartVid.mp4') }}" type="video/mp4">
             Your browser does not support the video tag.
         </video>
 
+        <!-- /////////////////////////////////////ini navbar////////////////////////// -->
+        <nav class="navbar navbar-expand-lg navbar-light shadow-sm fixed-top" style="background-color: rgba(255, 255, 255, 0.0); backdrop-filter: blur(5px);">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <!-- Nav-bar kiri -->
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item d-flex align-items-center">
+                            <a class="nav-link active text-black" href="{{url('/')}}" >
+                                <!-- <strong>Home</strong> -->
+                                <img src="{{ asset('logoReUseMart.png') }}" alt="Logo Reusemart" style="width:50px;">
+                            </a>
+                        </li>
+                        <li class="nav-item d-flex align-items-center">
+                            <a class="nav-link text-white" href="{{url('/home')}}">
+                                <strong>Produk</strong>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
         <!-- Overlay for readability, with adjusted opacity -->
         <div class="position-absolute w-100 h-100 bg-dark" style="opacity: 0.4; z-index: -1;"></div>
 
         <!-- Login Form -->
-        <div class="container d-flex justify-content-center align-items-center h-100">
+        <div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh; padding-top: 100px;">
             <div class="row w-100">
                 <div class="col-12 col-md-6 col-lg-4 mx-auto bg-light p-4 rounded-3 shadow" style="z-index: 1;">
                     <h3 class="text-center mb-4">Login to Your Account</h3>
@@ -77,19 +102,18 @@
 
                         <button type="submit" class="btn btn-primary w-100">Login</button>
                     </form>
-                    
-                </div>
                     <p class="text-center mt-3">
                         Don't have an account for organization?
                         <a href="/organisasi/register" class="text-decoration-none">Click here!</a>
                     </p>
+                </div>
             </div>          
         </div>
-    </div>
+    <!-- </div> -->
 
     <!-- Script to handle the form submission -->
     <script>
-<
+
 
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelector('#loginForm').addEventListener('submit', async function(event) {
@@ -119,14 +143,17 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         alert('Login successful! Login as ' + status);
 
-            if (status == 'penitip') {
-                localStorage.setItem('auth_token', resData.Token);
+            if (status == 'penitip'  && resData.penitip) {
+                localStorage.setItem('auth_token', resData.penitip.token);
+                localStorage.setItem('user_role', 'penitip');
                 window.location.href = 'http://127.0.0.1:8000/penitip/dashboard';
             } else if (status == 'pembeli') {
                 localStorage.setItem('auth_token', resData.data.token);
+                localStorage.setItem('user_role', 'pembeli');
                 window.location.href = 'http://127.0.0.1:8000/pembeli/alamat';
             } else if (status == 'organisasi') {
                 localStorage.setItem('auth_token', resData.data.token);
+                localStorage.setItem('user_role', 'organisasi');
                 window.location.href = 'http://127.0.0.1:8000/OrganisasiMain'
             }
         } catch (error) {

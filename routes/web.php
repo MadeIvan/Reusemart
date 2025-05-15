@@ -20,6 +20,9 @@ use Illuminate\Support\Facades\Password;
 */
 
 Route::get('/', function () {
+    return view('utama');
+});
+Route::get('/home', function () {
     return view('home');
 });
 
@@ -116,9 +119,9 @@ Route::get('/lupa-password/{token}', function (string $token) {
 //     return view('pegawaiView');
 // });
 
-// Route::get('/penitip/profile', function () {
-//     return view('newCode');
-// });
+Route::get('/penitip/profile', function () {
+    return view('profilePenitip');
+});
 
 Route::get('/OrganisasiMain', function () {
     return view('OrganisasiView');

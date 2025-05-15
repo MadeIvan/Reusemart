@@ -29,31 +29,35 @@
 
 </head>
 <body>
+    @include('layouts.navbar')
     <!-- Navbar dengan container -->
-    <nav class="navbar navbar-expand-lg navbar-light" style="background-color:rgb(255, 255, 255);">
+     <!-- <nav class="navbar navbar-expand-lg navbar-light bg-lightshadow-sm">
         <div class="container-fluid">
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="collapse navbar-collapse" id="navbarNav"> -->
                 <!-- Nav-bar kiri -->
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active text-black" href="{{url('/penitip/dashboard')}}" >
+                <!-- <ul class="navbar-nav me-auto">
+                    <li class="nav-item d-flex align-items-center">
+                        <img src="{{ asset('logoReUseMart.png') }}" alt="Logo Reusemart" style="width:50px;">
+                    </li>
+                    <li class="nav-item d-flex align-items-center">
+                        <a class="nav-link text-black" href="{{url('/penitip/dashboard')}}">
                             <strong>Home</strong>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item d-flex align-items-center">
                         <a class="nav-link text-black" href="{{url('/penitip/history')}}">
                             <strong>History Transaksi</strong>
                         </a>
                     </li>
-                </ul>
+                </ul> -->
 
                 <!-- Nav-bar kanan -->
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 profile-menu"> 
+                <!-- <ul class="navbar-nav ms-auto mb-2 mb-lg-0 profile-menu"> 
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <div class="profile-pic d-inline">
@@ -69,7 +73,8 @@
                 </ul>
             </div>
         </div>
-    </nav>
+    </nav> -->
+
     <hr style="margin: 0; border: 2px solid #dee2e6;"/>
     <!-- Main Content -->
     <div class="container vh-100 d-flex justify-content-center align-items-center">

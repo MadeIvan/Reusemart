@@ -125,7 +125,7 @@
 </div>
 
     <!-- Navbar dengan container -->
-    <nav class="navbar navbar-expand-lg navbar-light" style="background-color:rgb(255, 255, 255);">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
         <div class="container-fluid">
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -135,12 +135,15 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <!-- Nav-bar kiri -->
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active text-black" href="{{url('/penitip/dashboard')}}" >
+                    <li class="nav-item d-flex align-items-center">
+                        <img src="{{ asset('logoReUseMart.png') }}" alt="Logo Reusemart" style="width:50px;">
+                    </li>
+                    <li class="nav-item d-flex align-items-center">
+                        <a class="nav-link text-black" href="{{url('/penitip/dashboard')}}">
                             <strong>Home</strong>
                         </a>
                     </li>
-                    <li class="nav-item">
+                    <li class="nav-item d-flex align-items-center">
                         <a class="nav-link text-black" href="{{url('/penitip/history')}}">
                             <strong>History Transaksi</strong>
                         </a>
@@ -158,7 +161,7 @@
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="{{url('/penitip/profile')}}"><i class="fas fa-sliders-h fa-fw"></i> Profile</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item"  id="logoutLink"><i class="fas fa-sign-out-alt fa-fw"></i> Log Out</a></li>
+                            <li><a class="dropdown-item" id="logoutLink"><i class="fas fa-sign-out-alt fa-fw" ></i> Log Out</a></li>
                         </ul>
                     </li>
                 </ul>
