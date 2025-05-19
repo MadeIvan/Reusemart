@@ -37,7 +37,7 @@ Route::get('/getBarang/{id}', function () {
 // Route::post('penitip/login', [PenitipLoginController::class, 'login']);
 
 Route::get('/organisasi/register', function () {
-    return view('registerorganisasi');
+    return view('Register.registerorganisasi');
 });
 
 // Route::get('/pegawai/login', function () {
@@ -49,31 +49,27 @@ Route::get('/organisasi', function () {
 });
 
 Route::get('/pembeli/register', function () {
-    return view('registerPembeli');
+    return view('Register.registerPembeli');
 });
 
-Route::get('/pembeli/login', function () {
-    return view('loginPembeliBuatCekAja');
-});
 Route::get('/UsersLogin', function () {
-    return view('UsersLogin');
+    return view('Login.UsersLogin');
 });
 
 
 Route::get('/PegawaiLogin', function () {
-    return view('PegawaiLogin');
+    return view('Login.PegawaiLogin');
 });
 Route::get('/pegawai/PenitipData', function () {
     return view('Pegawai.CsView');
 });
-// Route::post('penitip/login', [PenitipLoginController::class, 'login']);
 
 Route::get('/pembeli/alamat', function () {
-    return view('showAlamat');
+    return view('Pembeli.showAlamat');
 });
 
 Route::get('/penitip/dashboard', function () {
-    return view('dashboardPenitip');
+    return view('Penitip.dashboardPenitip');
 });
 
 // Route::get('/penitip/profile', function () {
@@ -81,15 +77,12 @@ Route::get('/penitip/dashboard', function () {
 // });
 
 Route::get('/penitip/register', function () {
-    return view('registerPenitip');
+    return view('Register.registerPenitip');
 });
 
-Route::get('/penitip/login', function () {
-    return view('loginPenitipBuatCek');
-});
 
 Route::get('/penitip/history', function () {
-    return view('historyPenitip');
+    return view('Penitip.historyPenitip');
 });
 
 Route::get('/lupa-password', function () {
@@ -120,7 +113,7 @@ Route::get('/lupa-password/{token}', function (string $token) {
 // });
 
 Route::get('/penitip/profile', function () {
-    return view('profilePenitip');
+    return view('Penitip.profilePenitip');
 });
 
 Route::get('/OrganisasiMain', function () {
