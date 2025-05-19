@@ -6,15 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reusemart</title>
 
-    <!-- <script>
+    <script>
 // Cek token saat halaman dimuat
-document.addEventListener("DOMContentLoaded", function() {
-    if (!localStorage.getItem("token")) {
-        // Jika token tidak ada, redirect ke halaman login
-        window.location.href = "{{ url('/pembeli/login') }}";
-    }
-});
-</script> -->
+        document.addEventListener("DOMContentLoaded", function() {
+            if (!localStorage.getItem("auth_token")) {
+                // Jika token tidak ada, redirect ke halaman login
+                window.location.href = "{{ url('/UsersLogin') }}";
+            }
+        });
+</script>
 
 	<!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -116,8 +116,30 @@ document.addEventListener("DOMContentLoaded", function() {
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="kategoriAlamatCreate" class="form-label"><strong>Kategori</strong></label>
-                        <input type="text" class="form-control" id="kategoriAlamatCreate" name="kategoriAlamatCreate" required>
+                        <select class="form-control" id="kategoriAlamatCreate" name="kategoriAlamatCreate" required>
+                            <option value="" disabled selected>Pilih kategori</option>
+                            <option value="Rumah">Rumah</option>
+                            <option value="Kantor">Kantor</option>
+                        </select>
                     </div>
+                    <!-- <div class="mb-3">
+                        <label for="kategoriAlamatCreate" class="form-label"><strong>Kota</strong></label>
+                        <select class="form-control" id="kotaAlamatCreate" name="kotaAlamatCreate" required>
+                            <option value="" disabled selected>Pilih Kota</option>
+                            <option value="bantul">Kab. Bantul</option>
+                            <option value="sleman">Kab. Sleman</option>
+                            <option value="kulprog">Kab. Kulon Progo</option>
+                            <option value="gunkid">Kab. Gunung Kidul</option>
+                            <option value="yk">Kota Yogyakarta</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="kategoriAlamatCreate" class="form-label"><strong>Kecamatan</strong></label>
+                        <select class="form-control" id="kotaAlamatCreate" name="kotaAlamatCreate" required>
+                            <option value="" disabled selected>Pilih Kecamatan</option>
+                            
+                        </select>
+                    </div> -->
                     <div class="mb-3">
                         <label for="alamatCreate" class="form-label"><strong> Alamat</strong></label>
                         <textarea class="form-control" id="alamatCreate" name="alamatCreate" rows="3" required></textarea>
@@ -136,6 +158,50 @@ document.addEventListener("DOMContentLoaded", function() {
             </div>
         </div>
     </div>
+
+     <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Nav-bar kiri -->
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item d-flex align-items-center">
+                        <img src="{{ asset('logoReUseMart.png') }}" alt="Logo Reusemart" style="width:50px;">
+                    </li>
+                    <li class="nav-item d-flex align-items-center">
+                        <a class="nav-link text-black" href="{{url('/home')}}">
+                            <strong>Produk</strong>
+                        </a>
+                    </li>
+                    <li class="nav-item d-flex align-items-center">
+                        <a class="nav-link text-black" href="{{url('/pembeli/alamat')}}">
+                            <strong>Alamat</strong>
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Nav-bar kanan -->
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 profile-menu"> 
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="profile-pic d-inline">
+                                <img src="{{ asset('img/pp.png') }}" alt="Profile Picture" style="width:35px;" class="rounded-circle">
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li><a class="dropdown-item" id="logoutLink"><i class="fas fa-sign-out-alt fa-fw" ></i> Log Out</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <hr style="margin: 0; border: 2px solid #dee2e6;"/>
+
 
     <!-- ////////////////////INI ISI///////////////////////////// -->
     <div class="container py-4">
@@ -377,7 +443,7 @@ document.addEventListener("DOMContentLoaded", function() {
                 const kategori = document.getElementById("kategoriAlamatCreate").value;
                 const alamat = document.getElementById("alamatCreate").value;
                 const isDefault = document.getElementById("isDefault").checked;
-                if(!kategori || !alamat || !isDefault) {
+                if(!kategori || !alamat ) {
                     Toastify({
                         text: "Semua field harus diisi",
                         duration: 3000,
