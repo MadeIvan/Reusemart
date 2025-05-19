@@ -125,16 +125,16 @@
 </div>
 
     <!-- Navbar dengan container -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+    <!-- <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
         <div class="container-fluid">
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
-            <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="collapse navbar-collapse" id="navbarNav"> -->
                 <!-- Nav-bar kiri -->
-                <ul class="navbar-nav me-auto">
+                <!-- <ul class="navbar-nav me-auto">
                     <li class="nav-item d-flex align-items-center">
                         <img src="{{ asset('logoReUseMart.png') }}" alt="Logo Reusemart" style="width:50px;">
                     </li>
@@ -148,10 +148,10 @@
                             <strong>History Transaksi</strong>
                         </a>
                     </li>
-                </ul>
+                </ul> -->
 
                 <!-- Nav-bar kanan -->
-                <ul class="navbar-nav ms-auto mb-2 mb-lg-0 profile-menu"> 
+                <!-- <ul class="navbar-nav ms-auto mb-2 mb-lg-0 profile-menu"> 
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <div class="profile-pic d-inline">
@@ -168,7 +168,8 @@
             </div>
         </div>
     </nav>
-    <hr style="margin: 0; border: 2px solid #dee2e6;"/>
+    <hr style="margin: 0; border: 2px solid #dee2e6;"/> -->
+    @include('layouts.navbar')
 
     <!--//////////////////////////////////////////// Main Content//////////////////////////////////// -->
     <h3 class="text-center mb-4 mt-4" style="color:rgb(0, 138, 57); font-family: 'Bagel Fat One', system-ui;">

@@ -64,7 +64,7 @@
                         </li>
                         <li class="nav-item d-flex align-items-center">
                             <a class="nav-link text-white" href="{{url('/home')}}">
-                                <strong>Produk</strong>
+                                Produk
                             </a>
                         </li>
                     </ul>

@@ -1,35 +1,31 @@
-<!-- <style>
-    .navbar-nav .nav-item .nav-link:hover {
-        background-color: #6c757d; /* abu-abu */
-        color: white !important;   /* teks jadi putih */
-    }
-</style> -->
-
-
-<nav class="navbar navbar-expand-lg navbar-light bg-light  shadow-sm">
+<nav class="navbar navbar-expand-lg navbar-light shadow-sm fixed-top" style="background-color: rgba(255, 255, 255, 0.0); backdrop-filter: blur(5px);">
     <div class="container-fluid">
-
-        <!-- Logo -->
-            <a class="navbar-brand" id="logoLink" href="{{ url('/') }}">
-                <img src="{{ asset('logoReUseMart.png') }}" alt="Logo Reusemart" style="width:50px;">
-            </a>
-
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
             aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarNav">
-            <!-- Bagian kiri navbar -->
+            <!-- Nav-bar kiri -->
             <ul class="navbar-nav me-auto" id="left-menu">
-                <li class="nav-item" id="produkMenu">
-                    <a class="nav-link text-black" href="{{ url('/home') }}">Produk</a>
+                <li class="nav-item d-flex align-items-center">
+                    <a class="nav-link active text-black" id="logoLink" href="{{url('/')}}" >
+                        <img src="{{ asset('logoReUseMart.png') }}" alt="Logo Reusemart" style="width:50px;">
+                    </a>
+                </li>
+                <li class="nav-item d-flex align-items-center" id="produkMenu">
+                    <a class="nav-link text-white" href="{{url('/home')}}">
+                        Produk
+                    </a>
                 </li>
             </ul>
-            <!-- Bagian kanan navbar -->
-            <ul class="navbar-nav ms-auto" id="right-menu">
-                <li class="nav-item" id="loginMenu">
-                    <a class="nav-link text-black" href="{{ url('/UsersLogin') }}">Masuk</a>
+
+            <!-- Nav-bar kanan -->
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 profile-menu" id="right-menu"> 
+                <li class="nav-item d-flex align-items-center" id="loginMenu">
+                    <a class="nav-link text-white" href="{{url('/UsersLogin')}}">
+                        Masuk
+                    </a>
                 </li>
             </ul>
         </div>
@@ -46,13 +42,12 @@
         const loginMenu = document.getElementById("loginMenu");
         const produkMenu = document.getElementById("produkMenu");
 
-
-        // Fungsi buat item menu
+       // Fungsi buat item menu
         const createItem = (href, text, isIcon = false) => {
             const li = document.createElement("li");
-            li.className = "nav-item";
+            li.className = "nav-item d-flex align-items-center";
             const link = document.createElement("a");
-            link.className = "nav-link text-black";
+            link.className = "nav-link text-white";
             link.href = href;
 
             if (isIcon) {
@@ -67,7 +62,8 @@
             return li;
         };
 
-        // Fungsi Logout
+
+       // Fungsi Logout
         const createLogout = () => {
             const li = document.createElement("li");
             li.className = "nav-item d-flex align-items-center";
@@ -92,42 +88,27 @@
             return li;
         };
 
+
+        // Jika user sudah login
         if (token && role) {
-            // if (loginMenu){
-                loginMenu.remove(); // sembunyikan tombol masuk
-                produkMenu.remove();
-            // }     
+            // Sembunyikan menu login dan produk default
+            if (loginMenu) loginMenu.remove();
+            if (produkMenu) produkMenu.remove();
 
-            // Default logo: disable link jika bukan pembeli
-            if (role !== "pembeli") logoLink.removeAttribute("href");
+            // Disable logoLink jika bukan pembeli
+            if (role !== "pembeli" && logoLink) logoLink.removeAttribute("href");
 
-            // Isi menu berdasarkan role
+            // Tambah menu sesuai role
             if (role === "pembeli") {
-                leftMenu.appendChild(createItem("#", "Home"));
+                leftMenu.appendChild(createItem("/penitip/dashboard", "Home"));
                 leftMenu.appendChild(createItem("/home", "Produk"));
                 leftMenu.appendChild(createItem("/pembeli/alamat", "Alamat"));
 
                 const cartItem = createItem("/pembeli/keranjang", "Keranjang", true);
                 cartItem.style.marginRight = "15px";  // kasih jarak kanan
                 rightMenu.appendChild(cartItem);
-
-                rightMenu.appendChild(createLogout());          
-            }
-
-            else if (role === "penitip") {
-                leftMenu.appendChild(createItem("/penitip/dashboard", "Home"));
-                leftMenu.appendChild(createItem("/penitip/history", "History Penitip"));
-                leftMenu.appendChild(createItem("/penitip/profile", "Profile"));
-                rightMenu.appendChild(createLogout());            
-            }
-
-            else if (role === "organisasi") {
-                leftMenu.appendChild(createItem("/organisasi/history-request", "History Request Donasi"));
-                rightMenu.appendChild(createLogout());
-            }
-
-            else if(role === "admin"){
                 
+                rightMenu.appendChild(createLogout());
             }
         }
     });

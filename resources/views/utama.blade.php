@@ -6,6 +6,18 @@
     <title>Reusemart</title>
     <!-- Bootstrap CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Bootstrap CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Toastify CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Toastify JS -->
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <!-- Toastify ICON -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 </head>
 
 <style>
@@ -39,48 +51,14 @@
 </style>
 
 <body>
+    @include('layouts.navbarVideo')
     <!-- //////////////////ini background video///////////////////// -->
     <div class="position-relative" style="height: 100vh; overflow: hidden;">
         <video autoplay muted loop id="video-bg">
             <source src="{{ asset('ReUseMartVid.mp4') }}" type="video/mp4">
             Your browser does not support the video tag.
         </video>
-
-        <!-- /////////////////////////////////////ini navbar////////////////////////// -->
-        <nav class="navbar navbar-expand-lg navbar-light shadow-sm fixed-top" style="background-color: rgba(255, 255, 255, 0.0); backdrop-filter: blur(5px);">
-            <div class="container-fluid">
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <!-- Nav-bar kiri -->
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item d-flex align-items-center">
-                            <a class="nav-link active text-black" href="{{url('/')}}" >
-                                <!-- <strong>Home</strong> -->
-                                <img src="{{ asset('logoReUseMart.png') }}" alt="Logo Reusemart" style="width:50px;">
-                            </a>
-                        </li>
-                        <li class="nav-item d-flex align-items-center">
-                            <a class="nav-link text-white" href="{{url('/home')}}">
-                                <strong>Produk</strong>
-                            </a>
-                        </li>
-                    </ul>
-
-                    <!-- Nav-bar kanan -->
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0 profile-menu"> 
-                        <li class="nav-item d-flex align-items-center">
-                            <a class="nav-link text-white" href="{{url('/UsersLogin')}}">
-                                <strong>Masuk</strong>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
+        
         <div class="content-wrapper text-center">
             <h1>Selamat Datang di Reusemart</h1>
             <p>
