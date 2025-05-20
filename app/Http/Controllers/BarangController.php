@@ -12,19 +12,19 @@ class BarangController extends Controller
 {
     // Show all Barang
     public function index()
-{
-    try {
-    
-        $barang = Barang::all();
+    {
+        try {
+        
+            $barang = Barang::where('statusBarang', 'tersedia')->get();
 
-        return response()->json($barang);
-    } catch (\Exception $e) {
-        return response()->json([
-            'error' => 'An error occurred while fetching the products.',
-            'message' => $e->getMessage(),  // Include the exception message for debugging
-        ], 500);  // 500 Internal Server Error
+            return response()->json($barang);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'An error occurred while fetching the products.',
+                'message' => $e->getMessage(),  // Include the exception message for debugging
+            ], 500);  // 500 Internal Server Error
+        }
     }
-}
 
     // Show Barang by id
     public function show($idBarang)
