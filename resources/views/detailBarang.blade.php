@@ -66,6 +66,8 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token from meta tag
+            const token = localStorage.getItem('auth_token');
             const pathSegments = window.location.pathname.split('/');
             const productId = pathSegments[pathSegments.length - 1]; 
             document.querySelector('.btn.btn-dark').addEventListener('click', kirimDiskusi);
@@ -94,7 +96,7 @@
                                     <p class="text-success">Rp. ${formattedPrice}</p>
 
                                     <!-- Add to Cart Button -->
-                                    <button class="btn btn-dark">Add to Cart</button>
+                                    <button class="btn btn-dark add-to-cart-btn" data-id="${product.idBarang}">Add to Cart</button>
                                 </div>
                             </div>
                             
@@ -102,6 +104,14 @@
 
                         // Append the product details to the container
                         productDetailContainer.innerHTML = productDetailHTML;
+                        const addToCartBtn = productDetailContainer.querySelector('.add-to-cart-btn');
+                        if (addToCartBtn) {
+                            addToCartBtn.addEventListener('click', function() {
+                                const idBarang = this.getAttribute('data-id');
+                                addToCart(idBarang);
+                            });
+                        }
+
                         getDiskusi(productId);
 
                         // Handle product not found
@@ -137,7 +147,7 @@
                             <p><strong>${item.tanggalDiskusi}</strong></p>
                                     <p><strong>${item.waktuMengirimDiskusi}</strong></p>
                                 </div>
-                                <p > ${item.pesandiskusi}</p>
+                                <p class="diskusi-pembeli"> ${item.pesandiskusi}</p>
                             `;
                         } else if (item.idPegawai) {
                             diskusiItems += `
@@ -171,9 +181,9 @@
 
         function kirimDiskusi() {
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token from meta tag
+            const token = localStorage.getItem('auth_token');
             const komentar = document.getElementById('exampleFormControlTextarea1').value.trim();
             const idBarang = window.location.pathname.split('/').pop();
-            const token = localStorage.getItem('auth_token');
             const btn = document.getElementById('kirimBtn');
             
             console.log('Token:', token); // Periksa token
@@ -225,6 +235,49 @@
             });
         }
 
+
+        function addToCart(idBarang){
+            const token = localStorage.getItem('auth_token');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token from meta tag
+            if (!token) {
+                alert("Silakan login terlebih dahulu untuk menambahkan ke keranjang.");
+                return;
+            }
+
+            fetch(`http://127.0.0.1:8000/api/tambah-keranjang/${idBarang}`,{
+                method: 'POST',
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
+                    'Accept': 'application/json',
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": csrfToken,
+                },
+            })
+            .then(async (response) => {
+                const status = response.status;
+                const data = await response.json();
+
+                if (status === 200 && data.status) {
+                    alert("Produk berhasil ditambahkan ke keranjang!");
+                    let currentCount = parseInt(localStorage.getItem("cart_count") || 0);
+                    localStorage.setItem("cart_count", currentCount + 1);
+
+                    // Update badge
+                    const badge = document.getElementById("cart-count-badge");
+                    if (badge) {
+                        badge.textContent = currentCount + 1;
+                    }
+                } else if (status === 409) {
+                    alert("Barang sudah ada di keranjang.");
+                } else {
+                    alert("Terjadi kesalahan saat menambahkan ke keranjang.");
+                }
+            })
+            .catch(error => {
+                console.error("Error menambahkan ke keranjang:", error);
+                alert("Terjadi kesalahan saat menambahkan ke keranjang.");
+            });
+        }
             
     </script>
 </body>

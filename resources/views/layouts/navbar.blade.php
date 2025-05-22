@@ -1,9 +1,16 @@
-<!-- <style>
-    .navbar-nav .nav-item .nav-link:hover {
-        background-color: #6c757d; /* abu-abu */
-        color: white !important;   /* teks jadi putih */
+<style>
+    /* .navbar-nav .nav-item .nav-link:hover {
+        background-color: #6c757d; 
+        color: white !important;  
+    } */
+
+    .badge-cart {
+        font-size: 0.7rem;
+        position: absolute;
+        top: 25px !important;
+        right: 100px !important;
     }
-</style> -->
+</style>
 
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light  shadow-sm">
@@ -38,6 +45,8 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
+        // updateCartBadge()
+
         const token = localStorage.getItem("auth_token");
         const role = localStorage.getItem("user_role");
         const leftMenu = document.getElementById("left-menu");
@@ -56,13 +65,18 @@
             link.href = href;
 
             if (isIcon) {
-                // Misal pake Font Awesome icon keranjang
-                link.innerHTML = '<i class="bi bi-cart3" style="font-size: 25px;"></i>';
-                link.title = text;
-            } else {
-                link.textContent = text;
-            }
-
+                // const cartCount = localStorage.getItem("cart_count") || 0;
+                link.innerHTML = `
+                    <i class="bi bi-cart3" style="font-size: 25px;"></i>
+                    `;
+                    link.title = text;
+                } else {
+                    link.textContent = text;
+                }
+                
+                // <span class="position-absolute translate-middle badge rounded-pill bg-danger badge-cart" id="cart-count-badge">
+                //     ${cartCount}
+                // </span>
             li.appendChild(link);
             return li;
         };
@@ -92,6 +106,43 @@
             return li;
         };
 
+        // function updateCartBadge() {
+        //     const token = localStorage.getItem('auth_token');
+        //     if (!token) {
+        //         // Kalau tidak login, badge di-reset
+        //         localStorage.setItem('cart_count', 0);
+        //         const badge = document.getElementById("cart-count-badge");
+        //         if (badge) badge.style.display = 'none';
+        //         return;
+        //     }
+
+        //     fetch('http://127.0.0.1:8000/api/keranjang', {
+        //         method: 'GET',
+        //         headers: {
+        //             'Authorization': `Bearer ${token}`,
+        //             'Accept': 'application/json'
+        //         }
+        //     })
+        //     .then(res => res.json())
+        //     .then(data => {
+        //         const count = data.count || 0;
+        //         localStorage.setItem('cart_count', count);
+
+        //         const badge = document.getElementById("cart-count-badge");
+        //          if (!badge) return;
+
+        //         if (count > 0) {
+        //             badge.textContent = count;
+        //             badge.style.display = 'inline';  // tampilkan badge
+        //         } else {
+        //             badge.style.display = 'none';   // sembunyikan badge
+        //         }
+        //     })
+        //     .catch(err => {
+        //         console.error('Gagal update cart badge:', err);
+        //     });
+        // };
+
         if (token && role) {
             // if (loginMenu){
                 loginMenu.remove(); // sembunyikan tombol masuk
@@ -107,8 +158,8 @@
                 leftMenu.appendChild(createItem("/home", "Produk"));
                 leftMenu.appendChild(createItem("/pembeli/alamat", "Alamat"));
 
-                const cartItem = createItem("/pembeli/keranjang", "Keranjang", true);
-                cartItem.style.marginRight = "15px";  // kasih jarak kanan
+                const cartItem = createItem("/keranjang", "Keranjang", true);
+                cartItem.style.marginRight = "15px";  // jarak kanan
                 rightMenu.appendChild(cartItem);
 
                 rightMenu.appendChild(createLogout());          

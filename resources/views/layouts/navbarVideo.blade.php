@@ -104,7 +104,7 @@
                 leftMenu.appendChild(createItem("/home", "Produk"));
                 leftMenu.appendChild(createItem("/pembeli/alamat", "Alamat"));
 
-                const cartItem = createItem("/pembeli/keranjang", "Keranjang", true);
+                const cartItem = createItem("/keranjang", "Keranjang", true);
                 cartItem.style.marginRight = "15px";  // kasih jarak kanan
                 rightMenu.appendChild(cartItem);
                 

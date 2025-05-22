@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Cache;
 use App\Models\Pembeli;
+use App\Models\Barang;
 use App\Models\Alamat;
 
 class PembeliController extends Controller
@@ -117,5 +119,111 @@ class PembeliController extends Controller
     
         return response()->json(['message' => 'Not logged in'], 401);
     }
+
+    public function addToCart(Request $request, $id) {
+        $pembeli = Auth::guard('pembeli')->user();
+        if(!$pembeli){
+            return response()->json([
+                "status" => false,
+                "message" => "Pembeli Belum Login",
+                "data" => null,
+            ], 400);
+        }
+
+        $cartKey = 'cart_user_' . $pembeli->idPembeli;
+        $cart = Cache::get($cartKey, []); 
+
+        // Cek apakah barang sudah ada di cart
+        if(!isset($cart[$id])) {
+            $cart[$id] = [
+                'idBarang' => $id,
+                'jumlah' => 1
+            ];
+        }else {
+            return response()->json([
+                "status" => false,
+                "message" => "Barang sudah ada di keranjang",
+                "data" => $cart
+            ], 409); // conflict
+        }
+
+        Cache::forever($cartKey, $cart);
+
+        return response()->json([
+            "status" => true,
+            "message" => "Get successful",
+            "data" => $cart
+        ], 200);
+    }
+
+    public function getCart(Request $request)
+    {
+        $user = Auth::guard('pembeli')->user();
+        $cart = Cache::get('cart_user_' . $user->idPembeli, []);
+
+        $detailedCart = [];
+
+        foreach ($cart as $item) {
+            $barang = Barang::select(
+                'idBarang',
+                'namaBarang',
+                'beratBarang',
+                'garansiBarang',
+                'periodeGaransi',
+                'hargaBarang',
+                'haveHunter',
+                'statusBarang',
+                'image',
+                'kategori'
+            )->find($item['idBarang']);
+
+            if ($barang) {
+                $detailedCart[] = [
+                    ...$barang->toArray(),
+                    'jumlah' => $item['jumlah'],
+                ];
+            }
+        }
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Get cart with detail successful',
+            'data' => $detailedCart,
+            'count' => count($detailedCart)
+        ]);
+    }
+
+    public function removeFromCart(Request $request, $id)
+    {
+        $pembeli = Auth::guard('pembeli')->user();
+        if (!$pembeli) {
+            return response()->json([
+                "status" => false,
+                "message" => "Pembeli belum login",
+            ], 401);
+        }
+
+        $cartKey = 'cart_user_' . $pembeli->idPembeli;
+        $cart = Cache::get($cartKey, []);
+
+        if (isset($cart[$id])) {
+            unset($cart[$id]);
+            Cache::forever($cartKey, $cart);
+
+            return response()->json([
+                "status" => true,
+                "message" => "Barang berhasil dihapus dari keranjang",
+            ], 200);
+        } else {
+            return response()->json([
+                "status" => false,
+                "message" => "Barang tidak ditemukan di keranjang",
+            ], 404);
+        }
+    }
+
+
+
+        
 
 }

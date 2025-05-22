@@ -7,7 +7,7 @@
     <title>Reusemart</title>
 
     <script>
-// Cek token saat halaman dimuat
+    // Cek token saat halaman dimuat
         document.addEventListener("DOMContentLoaded", function() {
             if (!localStorage.getItem("auth_token")) {
                 // Jika token tidak ada, redirect ke halaman login
@@ -56,9 +56,7 @@
 </head>
 
 <body>
-
-
-
+    
 
     <!-- ////////////////////INI MODAL DELETE///////////////////////////// -->
     <div class="modal fade" id="deleteAlamat" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -201,8 +199,9 @@
         </div>
     </nav>
     <hr style="margin: 0; border: 2px solid #dee2e6;"/> -->
-        @include('layouts.navbar')
+    @include('layouts.navbar')
 
+    
     <!-- ////////////////////INI ISI///////////////////////////// -->
     <div class="container py-4">
         <h2 class="mb-4">Daftar Alamat</h2>
@@ -220,6 +219,10 @@
             <!-- NANTI DISINI -->
         </div>
     </div>
+
+    <footer class="bg-dark text-white text-center p-3">
+        <p>&copy; 2025 Reusemart</p>
+    </footer>
 
 
     <script>

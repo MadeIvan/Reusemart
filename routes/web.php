@@ -120,6 +120,13 @@ Route::get('/OrganisasiMain', function () {
     return view('OrganisasiView');
 });
 
+Route::get('/keranjang', function () {
+    return view('Pembeli.keranjang');
+});
+Route::get('/checkout', function () {
+    return view('Pembeli.checkout');
+});
+
 // routes/web.php
 // Route::get('/getBarang/{id}', [BarangController::class, 'show'])->name('product.show');
 
