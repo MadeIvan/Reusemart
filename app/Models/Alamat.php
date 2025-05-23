@@ -18,7 +18,8 @@ class Alamat extends Model
         'idPembeli',
         'alamat',
         'kategori',
-        'isDefault'
+        'isDefault',
+        'nama'
     ];
 
     public function pembeli(){

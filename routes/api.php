@@ -105,7 +105,8 @@ Route::middleware(['auth:sanctum', 'auth.pembeli'])->group(function () {
     Route::post('/buat-diskusi/{id}', [DiskusiController::class, 'store']);
     Route::post('/tambah-keranjang/{id}', [PembeliController::class, 'addToCart']);
     Route::get('/keranjang', [PembeliController::class, 'getCart']);     
-    Route::delete('/hapus-keranjang/{id}', [PembeliController::class, 'removeFromCart']);   
+    Route::delete('/hapus-keranjang/{id}', [PembeliController::class, 'removeFromCart']);
+    Route::get('/alamatUtama', [AlamatController::class, 'getUtama']);      
 });
 
 Route::middleware(['auth:penitip'])->group(function () {

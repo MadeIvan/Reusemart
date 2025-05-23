@@ -343,6 +343,13 @@
                     });
                 }
 
+                const dataCheckout = {
+                    barang: barangData,
+                    metode_pengiriman: metode,
+                    total_harga: document.getElementById("total-harga").innerText,
+                };
+                localStorage.setItem("data_checkout", JSON.stringify(dataCheckout));
+
                  const metode_pengiriman = localStorage.getItem("metode");
             }
             fetchBarang();

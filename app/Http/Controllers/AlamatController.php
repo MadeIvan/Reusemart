@@ -20,6 +20,7 @@ class AlamatController extends Controller
                 'alamat'=> 'required|string|max:255',
                 'kategori'=> 'required|string',
                 'isDefault'=> 'required|boolean',
+                'nama'=> 'required|string|max:255'
             ]);
 
             //////////UBAH DEFAULT/////////
@@ -50,7 +51,8 @@ class AlamatController extends Controller
                 'idPembeli' => $pembeliId,
                 'alamat' => $request->alamat,
                 'kategori'=> $request->kategori,
-                'isDefault'=> $request->isDefault
+                'isDefault'=> $request->isDefault,
+                'nama'=> $request->nama
             ]);
     
             return response()->json([
@@ -117,7 +119,8 @@ class AlamatController extends Controller
             $results = Alamat::where('idPembeli', $pembeliId)  // Menambahkan filter berdasarkan pembeli yang login
             ->where(function ($q) use ($query) {
                 $q->where('alamat', 'like', '%' . $query . '%')
-                  ->orWhere('kategori', 'like', '%' . $query . '%');
+                  ->orWhere('kategori', 'like', '%' . $query . '%')
+                  ->orWhere('nama', 'like', '%' . $query . '%');
             })
             ->get();
     
@@ -170,6 +173,7 @@ class AlamatController extends Controller
         $request->validate([
             'alamat'=> 'required|string|max:255',
             'kategori'=> 'required|string',
+            'nama'=> 'required|string|max:255',
         ]);
 
         //cek id pembeli
@@ -192,6 +196,7 @@ class AlamatController extends Controller
             $alamat->update([
                 'alamat' => $request->alamat,
                 'kategori'=> $request->kategori,
+                'nama'=> $request->nama,
             ]);
 
             return response()->json([
@@ -221,5 +226,18 @@ class AlamatController extends Controller
         $alamat->update(['isDefault' => true]);
 
         return response()->json(['message' => 'Berhasil mengatur sebagai alamat utama'], 200);
+    }
+
+    public function getUtama(){
+        $pembeli = auth('pembeli')->user();
+        $pembeliId = $pembeli->idPembeli;
+
+        $alamatUtama = Alamat::where('idPembeli', $pembeliId)->where('isDefault', true)->first();
+        $semuaAlamat = $pembeli->alamat()->get();
+
+        return response()->json([
+            'alamatUtama' => $alamatUtama,
+            'semuaAlamat' => $semuaAlamat
+        ]);
     }
 }
