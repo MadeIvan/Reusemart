@@ -296,10 +296,13 @@
                 const metode = getMetodePengiriman();
                 if (metode === 'Kurir' && totalHarga > 1500000) {
                     ongkir = 0;
+                    localStorage.setItem('metodeAnterAmbil', "Kurir");
                 }else if(metode === 'Kurir' && totalHarga <= 1500000){
                     ongkir = 100000;
+                    localStorage.setItem('metodeAnterAmbil', "Kurir");
                 }else{
                     ongkir = 0;
+                    localStorage.setItem('metodeAnterAmbil', "Ambil Sendiri");
                 }
 
                 if(ongkir > 0){
@@ -316,6 +319,7 @@
                             <span class="text-success">Gratis</span>
                         </li>
                     `;
+
                 }else if(metode === 'Ambil Sendiri'){
                     detailHtml += `
                         <li class="list-group-item d-flex justify-content-between">
@@ -347,6 +351,8 @@
                     barang: barangData,
                     metode_pengiriman: metode,
                     total_harga: document.getElementById("total-harga").innerText,
+                    ongkir: ongkir,
+                    totalhargabarang: totalHarga
                 };
                 localStorage.setItem("data_checkout", JSON.stringify(dataCheckout));
 

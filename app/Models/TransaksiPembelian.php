@@ -17,14 +17,16 @@ class TransaksiPembelian extends Model
     protected $fillable = [
         'noNota',
         'idPembeli',
-        'idPegawai1',
-        'idPegawai2',
+        'idPegawai1', //cs
+        'idPegawai2', //gudang
+        'idPegawai3', //kurir
         'idAlamat',
         'tanggalWaktuPembelian',
         'tanggalWaktuPelunasan',
         'tanggalPengirimanPengambilan',
         'status',
-        'totalHarga'
+        'totalHarga',
+        'buktiPembayaran'
     ];
 
     public function pegawai(){
@@ -33,6 +35,9 @@ class TransaksiPembelian extends Model
 
     public function pegawai2(){
         return $this->hasMany(Pegawai::class, 'idPegawai2', 'idPegawai');
+    }
+    public function pegawai3(){
+        return $this->hasMany(Pegawai::class, 'idPegawai3', 'idPegawai');
     }
 
     public function pembeli(){

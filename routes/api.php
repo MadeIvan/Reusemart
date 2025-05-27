@@ -17,6 +17,7 @@ use App\Http\Controllers\reqdonasiController;
 use App\Http\Controllers\JabatanController;
 use App\Http\Controllers\RequestDonasiController;
 use App\Http\Controllers\TransaksiDonasiController;
+use App\Http\Controllers\TransaksiPembelianController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -107,6 +108,9 @@ Route::middleware(['auth:sanctum', 'auth.pembeli'])->group(function () {
     Route::get('/keranjang', [PembeliController::class, 'getCart']);     
     Route::delete('/hapus-keranjang/{id}', [PembeliController::class, 'removeFromCart']);
     Route::get('/alamatUtama', [AlamatController::class, 'getUtama']);      
+    Route::get('/getData', [PembeliController::class, 'getData']);   
+    Route::post('/checkout', [TransaksiPembelianController::class, 'store']);    
+    Route::put('/updatePoin', [PembeliController::class, 'updatePoin']);    
 });
 
 Route::middleware(['auth:penitip'])->group(function () {

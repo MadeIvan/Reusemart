@@ -222,8 +222,30 @@ class PembeliController extends Controller
         }
     }
 
+    public function getData(Request $request)    
+    {
+        // $penitip = $request->user();
+        $pembeli = auth('pembeli')->user();
+        
+        return response()->json([
+            "status" => true,
+            "message" => "User retrieved successfully",
+            "data" => $pembeli
+        ]);
+    }
 
-
+    public function updatePoin(Request $request)    
+    {
+        $pembeli = auth('pembeli')->user();
+        $pembeli->poin = $request->poin;
+        $pembeli->save();
+        
+        return response()->json([
+            "status" => true,
+            "message" => "User retrieved successfully",
+            "data" => $pembeli
+        ]);
+    }
         
 
 }
