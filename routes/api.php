@@ -15,7 +15,7 @@ use App\Http\Controllers\DompetController;
 use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\reqdonasiController;
 use App\Http\Controllers\JabatanController;
-use App\Http\Controllers\RequestDonasiController;
+// use App\Http\Controllers\RequestDonasiController;
 use App\Http\Controllers\TransaksiDonasiController;
 /*
 |--------------------------------------------------------------------------
@@ -122,13 +122,13 @@ Route::get('/getBarang',[BarangController::class, 'index']);
 Route::get('/getBarang/{id}', [BarangController::class, 'show']);
 Route::get('/diskusi/{id}',[DiskusiController::class, 'getByBarang']);
 
-Route::get('/donasi',[RequestDonasiController::class,'index']);
-Route::get('/barang/available',[BarangController::class,'getAvailableBarang']);
-Route::post('/transaksi-donasi', [TransaksiDonasiController::class, 'store']);
-Route::get('/transaksi-donasi', [TransaksiDonasiController::class, 'index']);
-Route::post('/transaksi-donasi', [TransaksiDonasiController::class, 'store']);
-Route::get('/transaksi-donasi/{id}', [TransaksiDonasiController::class, 'show']);
-Route::put('/transaksi-donasi/{id}', [TransaksiDonasiController::class, 'update']);
+// Route::get('/donasi',[RequestDonasiController::class,'index']);
+// Route::get('/barang/available',[BarangController::class,'getAvailableBarang']);
+// Route::post('/transaksi-donasi', [TransaksiDonasiController::class, 'store']);
+// Route::get('/transaksi-donasi', [TransaksiDonasiController::class, 'index']);
+// Route::post('/transaksi-donasi', [TransaksiDonasiController::class, 'store']);
+// Route::get('/transaksi-donasi/{id}', [TransaksiDonasiController::class, 'show']);
+// Route::put('/transaksi-donasi/{id}', [TransaksiDonasiController::class, 'update']);
   
 Route::middleware('auth:organisasi')->group(function () {
     Route::get('/reqdonasi', [reqdonasiController::class, 'index']);
@@ -139,7 +139,7 @@ Route::middleware('auth:organisasi')->group(function () {
     Route::delete('/reqdonasi/{id}', [reqDonasiController::class, 'destroy']);
 });
 
-Route::delete('/transaksi-donasi/{id}', [TransaksiDonasiController::class, 'destroy']);
+// Route::delete('/transaksi-donasi/{id}', [TransaksiDonasiController::class, 'destroy']);
 
 // Route::middleware('auth:sanctum')->post('/email/verification-notification', [EmailVerificationNotificationController::class, 'store']);
 // Route::post('/reset-password', [NewPasswordController::class, 'store']);

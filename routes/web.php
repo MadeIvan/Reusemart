@@ -58,7 +58,7 @@ Route::get('/UsersLogin', function () {
 
 
 Route::get('/PegawaiLogin', function () {
-    return view('Login.PegawaiLogin');
+    return view('Login.loginPegawai');
 });
 Route::get('/pegawai/PenitipData', function () {
     return view('Pegawai.CsView');
