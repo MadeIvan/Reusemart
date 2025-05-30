@@ -16,8 +16,11 @@ use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\reqdonasiController;
 use App\Http\Controllers\JabatanController;
 use App\Http\Controllers\RequestDonasiController;
-use App\Http\Controllers\TransaksiDonasiController;
 use App\Http\Controllers\TransaksiPembelianController;
+use App\Http\Controllers\TransaksiDonasiController;
+use App\Http\Controllers\TransaksiPenitipanController;
+use App\Models\TransaksiPenitipan;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -153,3 +156,5 @@ Route::delete('/transaksi-donasi/{id}', [TransaksiDonasiController::class, 'dest
 //      ->name('verification.verify');
 // Route::middleware('auth:sanctum')->put('/password/update', [PasswordController::class, 'update']);
 
+Route::get('/transaksiPenitipan', [TransaksiPenitipanController::class, 'index']);
+Route::post('/addTransaksiPenitipan',[TransaksiPenitipanController::class, 'store']);

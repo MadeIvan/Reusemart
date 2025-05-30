@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Password;
 */
 
 Route::get('/', function () {
-    return view('utama');
+    return view('PegawaiLogin');
 });
 Route::get('/home', function () {
     return view('home');
@@ -126,11 +126,13 @@ Route::get('/keranjang', function () {
 Route::get('/checkout', function () {
     return view('Pembeli.checkout');
 });
+Route::get('/gudangview', function () {
+    return view('gudangView');
+});
 
 // routes/web.php
 // Route::get('/getBarang/{id}', [BarangController::class, 'show'])->name('product.show');
 
 
-// Route::get('/products', [BarangController::class, 'index']);
 
 

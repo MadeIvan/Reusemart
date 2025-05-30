@@ -28,7 +28,7 @@ class TransaksiPenitipan extends Model
     ];
 
     public function pegawai(){
-        return $this->hasMany(Pegawai::class, 'idPegawai1', 'idPegawai');
+        return $this->hasMany(Pegawai::class, 'idPegawai');
     }
 
     public function pegawai2(){

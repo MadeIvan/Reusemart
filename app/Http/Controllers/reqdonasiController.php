@@ -17,10 +17,10 @@ class reqDonasiController extends Controller
     // Fetch all ReqDonasi data for authenticated user
     public function index(Request $request)
     {
-        \Log::info('Bearer Token:', ['token' => $request->bearerToken()]);
+        // \Log::info('Bearer Token:', ['token' => $request->bearerToken()]);
 
         $user = Auth::user();
-        \Log::info('Authenticated User:', ['user' => $user]);
+        // \Log::info('Authenticated User:', ['user' => $user]);
 
         if (!$user) {
             return response()->json([
@@ -133,7 +133,7 @@ class reqDonasiController extends Controller
                 'data' => $reqDonasi
             ]);
         } catch (\Exception $e) {
-            Log::error('Error updating request donasi: ' . $e->getMessage());
+            // Log::error('Error updating request donasi: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to update request: ' . $e->getMessage()
@@ -180,7 +180,7 @@ class reqDonasiController extends Controller
                 'message' => 'Request for donation deleted successfully!'
             ]);
         } catch (\Exception $e) {
-            Log::error('Error deleting request donasi: ' . $e->getMessage());
+            // Log::error('Error deleting request donasi: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to delete request: ' . $e->getMessage()

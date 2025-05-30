@@ -36,7 +36,9 @@
 
 
 </head>
+<!-- ini kepake -->
 <body>
+    
 
     <!-- Video Background -->
     <div class="position-relative" style="height: 100vh;">
@@ -121,6 +123,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert('Login As Pegawai Gudang!');
                 localStorage.setItem('auth_token', resData.data.token);
                 localStorage.setItem('user_role', 'gudang');
+                window.location.href = '/csview';
             }else if(IdJabatan==4){
                 alert('Login As Kurir!');
                 localStorage.setItem('auth_token', resData.data.token);
