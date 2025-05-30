@@ -29,6 +29,7 @@ class TransaksiPembelian extends Model
         'buktiPembayaran'
     ];
 
+
     public function pegawai(){
         return $this->hasMany(Pegawai::class, 'idPegawai1', 'idPegawai');
     }

@@ -126,6 +126,9 @@ Route::get('/keranjang', function () {
 Route::get('/checkout', function () {
     return view('Pembeli.checkout');
 });
+Route::get('/pembayaran/{noNota}', function () {
+    return view('Pembeli.pembayaran');
+});
 
 // routes/web.php
 // Route::get('/getBarang/{id}', [BarangController::class, 'show'])->name('product.show');

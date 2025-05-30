@@ -94,6 +94,8 @@
     
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            sessionStorage.removeItem('pesananSelesai');
+
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             const token = localStorage.getItem('auth_token');
             let idBarang = null;

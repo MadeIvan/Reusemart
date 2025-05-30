@@ -57,7 +57,7 @@ class PegawaiController extends Controller
             // 'idDompet'=> 'string|max:255',
 
             'namaPegawai'=> 'required|string|max:255',
-            // 'tanggalLahir'=> 'required|date',
+            'tanggalLahir'=> 'required|date',
             'username'=> 'required|string|max:255',
             'password'=> 'required|string|max:255',
         ]);
@@ -88,7 +88,7 @@ class PegawaiController extends Controller
             'idJabatan'=> $request->idJabatan,
             'idDompet'=> $idDompet,
             'namaPegawai'=> $request->namaPegawai,
-            // 'tanggalLahir'=> $request->tanggalLahir,
+            'tanggalLahir'=> $request->tanggalLahir,
             'username'=> $request->username,
             'password'=> Hash::make($request->password),
         ]);

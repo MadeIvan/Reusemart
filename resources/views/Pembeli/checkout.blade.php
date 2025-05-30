@@ -386,8 +386,10 @@
                 const container = document.getElementById("poinPembeli");
                 const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
                 let poin = 0;
+                let bonusPoin = 0;
+                let totalPoin = 0;
 
-                fetch(`http://127.0.0.1:8000/api/getData`, {
+                fetch(`http://127.0.0.1:8000/api/pembeli/getData`, {
                     method: 'GET',
                     headers: {
                         "Authorization": `Bearer ${token}`,
@@ -405,9 +407,6 @@
                         const ongkir = Number(dataCheck?.ongkir || 0);
                         const totalAwal = totalHargaBarang;
 
-                        let poin = 0;
-                        let bonusPoin = 0;
-                        let totalPoin = 0;
                         
                         if(totalHargaBarang > 500000){
                             poin = Math.floor(totalHargaBarang / 10000);
@@ -431,6 +430,7 @@
                                 <p id="sisaPoinSetelahTransaksi">Sisa poin setelah transaksi pembelian barang adalah <strong>${user.poin + totalPoin}</strong> poin</p>
                             </div>
                         `;
+                        localStorage.setItem('poinUser', user.poin);
 
                         const inputPoin = document.getElementById("inputPoin");
                         const hasilKonversi = document.getElementById("hasilKonversi");
@@ -438,7 +438,7 @@
 
                         inputPoin.addEventListener("input", () => {
                             let nilaiPoin = parseInt(inputPoin.value) || 0;
-
+                            
                             if (nilaiPoin > user.poin) {
                                 nilaiPoin = user.poin;
                                 inputPoin.value = user.poin;
@@ -460,16 +460,16 @@
                                 let totalBaru = totalAwal - rupiah;
                                 if (totalBaru < 0) totalBaru = 0;
 
-
-
                                 totalHargaAkhir.textContent = `Rp ${totalBaru.toLocaleString('id-ID')}`;
                                 localStorage.setItem('totalSetelahPoin', totalBaru);
                             }
 
+                            const sisa = user.poin - nilaiPoin + totalPoin;
                             if (sisaPoinText) {
-                                const sisa = user.poin - nilaiPoin + totalPoin;
                                 sisaPoinText.innerHTML = `Sisa poin setelah transaksi pembelian barang adalah <strong>${sisa}</strong> poin`;
                             }
+                            localStorage.setItem('sisaPoin', sisa);
+                            console.log('localStorage.sisaPoin:', localStorage.getItem('sisaPoin'));
                         });
                     } else {
                         console.error('Gagal ambil data user');
@@ -497,9 +497,22 @@
                 return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
             }
 
+            function hapusKeranjang() {
+                fetch(`http://127.0.0.1:8000/api/hapus-keranjang`, {
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
+                        'Accept': 'application/json',
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": csrfToken,
+                    },
+                })
+            }
+
             
             document.getElementById("checkout-btn").addEventListener("click", function() {
-                
+                dataCheckout = JSON.parse(localStorage.getItem("data_checkout"));
+                const sisaPoin = localStorage.getItem('sisaPoin');
 
                 fetch(`http://127.0.0.1:8000/api/checkout`, {
                     method: "POST",
@@ -516,45 +529,59 @@
                             ? parseFloat(localStorage.getItem('totalSetelahPoin'))
                             : Number(dataCheckout.total_harga.toString().replace(/\./g, '')),
                         id_barang: barangArray,
+                        sisaPoin: sisaPoin,
                     })
                 })
-            .then(response => response.json())
+                .then(response => response.json())
                 .then(data => {
+                    // console.log("Resoine API", data)
                     const modal = bootstrap.Modal.getInstance(document.getElementById("createAlamat"));
-                    if (modal) modal.hide();
-    
-                    Toastify({
-                        text: "Berhasil Membuat Pesanan",
-                        duration: 3000,
-                        gravity: "top",
-                        position: "right",
-                        style: {
-                            background: "#8bc34a"
-                        },
-                    }).showToast();
-                    // window.onload = function () {
-                    //     if (sessionStorage.getItem('pesananSelesai') === '1') {
-                    //         alert("Anda sudah menyelesaikan pesanan.");
-                    //         window.location.href = "/"; // Arahkan kembali ke halaman utama atau riwayat
-                    //     }
-                    // };
+                        if (modal) modal.hide();
+                    
+                    if(data.status) {
+                        // ambil noNota dari response
+                        const noNota = data.data.noNota;
+
+                        // redirect ke halaman pembayaran dengan noNota di URL
+                        window.location.href = `/pembayaran/${noNota}`;
+                        hapusKeranjang();
+                        Toastify({
+                            text: "Berhasil Membuat Pesanan",
+                            duration: 3000,
+                            gravity: "top",
+                            position: "right",
+                            style: {
+                                background: "#8bc34a"
+                            },
+                        }).showToast();
+                    } else {
+                        alert("Gagal membuat transaksi: " + data.message);
+                    }
+
+                    window.onload = function () {
+                        if (sessionStorage.getItem('pesananSelesai') === '1') {
+                            alert("Anda sudah menyelesaikan pesanan.");
+                            window.location.href = "/"; // Arahkan kembali ke halaman utama atau riwayat
+                        }
+                    };
 
                     // localStorage.removeItem('totalSetelahPoin');
                     // localStorage.removeItem('data_checkout');
                     // localStorage.removeItem('selectedIdAlamat');
+
                     // Tambahkan flag agar user tidak bisa kembali ke halaman checkout
-                    // sessionStorage.setItem('pesananSelesai', '1');
+                    sessionStorage.setItem('pesananSelesai', '1');
 
                     // Kalau kamu ingin mengizinkan user belanja lagi setelah itu, kamu bisa reset sessionStorage 
                     // di halaman seperti katalog atau keranjang:
                     // sessionStorage.removeItem('pesananSelesai');
 
-                    //  window.location.href = "{{ url('/pembayaran') }}";
+                        // window.location.href = `{{ url('/pembayaran/${noNota}') }}`;
                 })
                 .catch(error => {
                     console.error("Error:", error);
                     Toastify({
-                        text: "Gagal Membuat PEsanan",
+                        text: "Gagal Membuat Pesanan",
                         duration: 3000,
                         gravity: "top",
                         position: "right",

@@ -103,14 +103,20 @@ Route::middleware(['auth:sanctum', 'auth.pembeli'])->group(function () {
     Route::put('/pembeli/alamat/update/{id}', [AlamatController::class, 'update']);
     Route::delete('/pembeli/alamat/delete/{id}', [AlamatController::class, 'delete']);
     Route::put('/pembeli/alamat/set-default/{id}', [AlamatController::class, 'setAsDefault']);
+    Route::get('/alamatUtama', [AlamatController::class, 'getUtama']);
+
     Route::post('/buat-diskusi/{id}', [DiskusiController::class, 'store']);
-    Route::post('/tambah-keranjang/{id}', [PembeliController::class, 'addToCart']);
-    Route::get('/keranjang', [PembeliController::class, 'getCart']);     
-    Route::delete('/hapus-keranjang/{id}', [PembeliController::class, 'removeFromCart']);
-    Route::get('/alamatUtama', [AlamatController::class, 'getUtama']);      
-    Route::get('/getData', [PembeliController::class, 'getData']);   
-    Route::post('/checkout', [TransaksiPembelianController::class, 'store']);    
-    Route::put('/updatePoin', [PembeliController::class, 'updatePoin']);    
+    Route::get('/pembeli/getData', [PembeliController::class, 'getData']);   
+    Route::put('/updatePoin', [PembeliController::class, 'updatePoin']); 
+    
+    Route::post('/tambah-keranjang/{id}', [TransaksiPembelianController::class, 'addToCart']);
+    Route::get('/keranjang', [TransaksiPembelianController::class, 'getCart']);     
+    Route::delete('/hapus-keranjang/{id}', [TransaksiPembelianController::class, 'removeFromCart']);
+    Route::delete('/hapus-keranjang', [TransaksiPembelianController::class, 'removeAllCart']);
+    Route::post('/checkout', [TransaksiPembelianController::class, 'store']); 
+    Route::get('/getData', [TransaksiPembelianController::class, 'getDataTerbaru']);
+    Route::post('/buktiBayar/{id}', [TransaksiPembelianController::class, 'buktiBayar']); 
+    Route::post('/batalkanPesanan/{id}', [TransaksiPembelianController::class, 'canceled']);    
 });
 
 Route::middleware(['auth:penitip'])->group(function () {
