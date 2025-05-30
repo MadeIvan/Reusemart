@@ -51,41 +51,36 @@ class BarangController extends Controller
 
     // Create a new Barang
     public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'idBarang'=> 'required|string|max:10',
-            'idTransaksiDonasi' => 'required|string|max:255',
-            'namaBarang' => 'required|string|max:255',
-            'beratBarang' => 'required|numeric',
-            'garansiBarang' => 'required|boolean',
-            'periodeGaransi' => 'required|date',
-            'hargaBarang' => 'required|numeric',
-            'haveHunter' => 'required|boolean',
-            'statusBarang' => 'required|string|max:255',
-            'image' => 'nullable|string|max:255',
-            'kategori' => 'required|string|max:50',
-        ]);
+{
+    // Validate the incoming request
+    $validated = $request->validate([
+        'idBarang' => 'required|string|max:10',
+        'idTransaksiDonasi' => 'nullable|string|max:10',
+        'namaBarang' => 'required|string|max:255',
+        'beratBarang' => 'required|numeric',
+        'garansiBarang' => 'required|boolean',
+        'periodeGaransi' => 'nullable|date',
+        'hargaBarang' => 'required|numeric',
+        'haveHunter' => 'required|boolean',
+        'statusBarang' => 'required|string|max:255',
+        'kategori' => 'required|string|max:50',
+        'image' => 'nullable|image|max:2048', // Optional image upload
+    ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 400);
-        }
-
-        $barang = Barang::create([
-            'idBarang' => $request->idBarang,
-            'idTransaksiDonasi' => $request->idTransaksiDonasi,
-            'namaBarang' => $request->namaBarang,
-            'beratBarang' => $request->beratBarang,
-            'garansiBarang' => $request->garansiBarang,
-            'periodeGaransi' => $request->periodeGaransi,
-            'hargaBarang' => $request->hargaBarang,
-            'haveHunter' => $request->haveHunter,
-            'statusBarang' => $request->statusBarang,
-            'image' => $request->image,
-            'kategori' => $request->kategori,
-        ]);
-
-        return response()->json(['message' => 'Barang created successfully', 'data' => $barang], 201);
+    // Handle image upload if present
+    if ($request->hasFile('image')) {
+        $validated['image'] = $request->file('image')->store('barang_images', 'public');
     }
+
+    // Insert into the Barang table
+    $barang = Barang::create($validated);
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Barang created successfully!',
+        'data' => $barang
+    ]);
+}
 
     // Update an existing Barang
     public function update(Request $request, $id)

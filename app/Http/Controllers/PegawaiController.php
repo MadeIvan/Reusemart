@@ -31,6 +31,15 @@ class PegawaiController extends Controller
             ], 400);
         }
     }
+    public function getHunters()
+{
+    $hunters = Pegawai::where('idJabatan', 6)->get(['idPegawai', 'namaPegawai']);
+
+    return response()->json([
+        'status' => true,
+        'data' => $hunters
+    ]);
+}
 
     public function show($id){ //search
         try{
@@ -124,8 +133,11 @@ public function login(Request $request){
                 "status" => true,
                 "message" => "Login successful",
                 "data" => [
+                    'idPegawai' => $pegawai->idPegawai,
                     "pegawai" => $pegawai,
                     "token" => $token,
+                    "namaPegawai" => $pegawai->namaPegawai,
+                    // "idPegawai" => $pegawai->idPegawai,
                 ],
                 
             ], 200);
@@ -274,6 +286,8 @@ public function softDelete($id)
             'message' => 'Berhasil',
         ]);
     }
+
+    
 
 }
 

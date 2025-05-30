@@ -120,10 +120,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 localStorage.setItem('user_role', 'admin');
                 window.location.href = 'http://127.0.0.1:8000/organisasi';
             }else if(IdJabatan==3){
-                alert('Login As Pegawai Gudang!');
+                
                 localStorage.setItem('auth_token', resData.data.token);
                 localStorage.setItem('user_role', 'gudang');
-                window.location.href = '/csview';
+                localStorage.setItem('namaPegawai', resData.data.namaPegawai);
+                localStorage.setItem('idPegawai', resData.data.idPegawai);
+                alert('Login As Pegawai Gudang!');
+                // console.log("Backend returned:", resData.data.namaPegawai);
+                window.location.href = '/gudangview';
             }else if(IdJabatan==4){
                 alert('Login As Kurir!');
                 localStorage.setItem('auth_token', resData.data.token);

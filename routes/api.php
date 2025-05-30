@@ -158,3 +158,6 @@ Route::delete('/transaksi-donasi/{id}', [TransaksiDonasiController::class, 'dest
 
 Route::get('/transaksiPenitipan', [TransaksiPenitipanController::class, 'index']);
 Route::post('/addTransaksiPenitipan',[TransaksiPenitipanController::class, 'store']);
+Route::get('/pegawaiGethunters', [PegawaiController::class, 'getHunters']);
+Route::get('/getpenitip', [PenitipController::class, 'getPenitip']);
+Route::post('/barang',[BarangController::class,'store']);

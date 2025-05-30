@@ -12,9 +12,13 @@ class Barang extends Model
     use HasFactory;
     protected $table = 'barang';
     protected $keyType = 'string';
+    public $incrementing = false;
     protected $primaryKey ='idBarang';
+    public $timestamps = false;
+
+
     protected $fillable = [
-        'idBarang' ,
+        'idBarang',
         'idTransaksiDonasi',
         'namaBarang',
         'beratBarang',
@@ -24,7 +28,7 @@ class Barang extends Model
         'haveHunter',
         'statusBarang',
         'image',
-        'kategori',
+        'kategori'
     ];
 
     public function diskusi()

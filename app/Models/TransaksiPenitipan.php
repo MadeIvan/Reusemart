@@ -14,6 +14,7 @@ class TransaksiPenitipan extends Model
 
     protected $table = 'transaksipenitipan'; 
     protected $primaryKey = 'idTransaksiPenitipan';
+      public $incrementing = false;
     protected $keyType = 'string'; 
     public $timestamps = false;   
 

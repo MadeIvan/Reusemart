@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Menu Perdonasian</title>
+    <title>Menu Gudang</title>
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -83,7 +83,7 @@
 
             <div class="row">
                 <div class="col-12 btn-container">
-                    <button type="submit" class="btn btn-success" id="addBarangButton">Tambah barang</button>
+                    <button type="button" class="btn btn-success" id="addBarangButton">Tambah barang</button>
                     <button type="button" class="btn btn-danger" id="deleteButton">Delete</button>
                 </div>
             </div>
@@ -101,16 +101,20 @@
         <div class="modal-body">
             <form id="addBarangForm">
             <div class="mb-3">
-                <label for="idPegawai1" class="form-label">ID Pegawai 1</label>
-                <input type="text" class="form-control" id="idPegawai1" required>
+                <label for="idPegawai1" class="form-label">Petugas Gudang</label> //done
+                <input type="text" class="form-control" id="idPegawai1" disabled>
             </div>
             <div class="mb-3">
-                <label for="idPegawai2" class="form-label">ID Pegawai 2</label>
-                <input type="text" class="form-control" id="idPegawai2" required>
+                <label for="idPegawai2" class="form-label">Hunter</label>
+                <select class="form-select" id="idPegawai2">
+                    <option value=""> --- </option>
+                </select>
             </div>
             <div class="mb-3">
-                <label for="idPenitip" class="form-label">ID Penitip</label>
-                <input type="text" class="form-control" id="idPenitip" required>
+                <label for="idPenitip" class="form-label">Penitip</label>
+                <select class="form-select" id="idPenitip" required>
+                    <option value=""> --- </option>
+                </select>
             </div>
             <div class="mb-3">
                 <label for="tanggalPenitipan" class="form-label">Tanggal Penitipan</label>
@@ -118,21 +122,87 @@
             </div>
             <div class="mb-3">
                 <label for="tanggalPenitipanSelesai" class="form-label">Tanggal Penitipan Selesai</label>
-                <input type="date" class="form-control" id="tanggalPenitipanSelesai" disabled required>
+                <input type="date" class="form-control" id="tanggalPenitipanSelesai" disabled >
             </div>
-            <div class="mb-3">
-                <label for="totalHarga" class="form-label">Total Harga</label>
-                <input type="number" class="form-control" id="totalHarga" required>
-            </div>
+            
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="submit" class="btn btn-primary">Next</button>
             </div>
             </form>
         </div>
         </div>
     </div>
     </div>
+
+    <div class="modal fade" id="addBarangDetailModal" tabindex="-1" aria-labelledby="addBarangDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addBarangDetailModalLabel">Tambah Barang</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addBarangDetailForm">
+                <div class="mb-3">
+                    <label for="idBarang" class="form-label">ID Barang</label>
+                    <input type="text" class="form-control" id="idBarang" required>
+                </div>
+                <!-- <div class="mb-3">
+                    <label for="idTransaksiDonasi" class="form-label">ID Transaksi Donasi</label>
+                    <input type="text" class="form-control" id="idTransaksiDonasi" >
+                </div> -->
+                <div class="mb-3">
+                    <label for="namaBarang" class="form-label">Nama Barang</label>
+                    <input type="text" class="form-control" id="namaBarang" required>
+                </div>
+                <div class="mb-3">
+                    <label for="beratBarang" class="form-label">Berat Barang</label>
+                    <input type="number" class="form-control" id="beratBarang" required>
+                </div>
+                <div class="mb-3">
+                    <label for="garansiBarang" class="form-label">Garansi Barang</label>
+                    <select class="form-select" id="garansiBarang" required>
+                    <option value="1">Ya</option>
+                    <option value="0">Tidak</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="periodeGaransi" class="form-label">Periode Garansi (bulan)</label>
+                    <input type="number" class="form-control" id="periodeGaransi">
+                </div>
+                <div class="mb-3">
+                    <label for="hargaBarang" class="form-label">Harga Barang</label>
+                    <input type="number" class="form-control" id="hargaBarang" required>
+                </div>
+                <div class="mb-3">
+                    <label for="haveHunter" class="form-label">Barang dengan Hunter?</label>
+                    <select class="form-select" id="haveHunter" required>
+                    <option value="1">Ya</option>
+                    <option value="0">Tidak</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="statusBarang" class="form-label">Status Barang</label>
+                    <input type="text" class="form-control" id="statusBarang" value="Tersedia" disabled>
+                </div>
+                <div class="mb-3">
+                    <label for="image" class="form-label">Upload Gambar</label>
+                    <input type="file" class="form-control" id="image">
+                </div>
+                <div class="mb-3">
+                    <label for="kategori" class="form-label">Kategori</label>
+                    <input type="text" class="form-control" id="kategori" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Simpan Barang</button>
+                </div>
+                </form>
+            </div>
+            </div>
+        </div>
+        </div>
 
     <!-- Toast notification -->
     <div class="toast-container">
@@ -271,16 +341,110 @@
             const addBarangButton = document.getElementById("addBarangButton");
             const addBarangModal = new bootstrap.Modal(document.getElementById("addBarangModal"));
             const addBarangForm = document.getElementById("addBarangForm");
+            const namaPegawai = localStorage.getItem('namaPegawai');
+            const idPegawai = localStorage.getItem('idPegawai');
 
+            console.log("Retrieved namaPegawai:", namaPegawai);
+            console.log("Retrieved IdPegawai:", idPegawai);
+            const user_role = localStorage.getItem('user_role');
+            console.log("Retrieved rolei:", user_role);
+            async function fetchHunters() {
+                try {
+                    const response = await fetch("http://127.0.0.1:8000/api/pegawaiGethunters", {
+                        method: "GET",
+                        headers: {
+                            "Authorization": `Bearer ${localStorage.getItem('auth_token')}`
+                        }
+                    });
+
+                    const data = await response.json();
+                    console.log("Fetched Hunters:", data);
+
+                    const hunterSelect = document.getElementById("idPegawai2");
+                    hunterSelect.innerHTML = `<option value=""> --- </option>`; // reset dropdown
+
+                    if (data.status && data.data.length > 0) {
+                        data.data.forEach(hunter => {
+                            const option = document.createElement("option");
+                            option.value = hunter.idPegawai;
+                            option.textContent = hunter.namaPegawai;
+                            hunterSelect.appendChild(option);
+                        });
+                    } else {
+                        console.warn("No hunters available");
+                    }
+                } catch (error) {
+                    console.error("Error fetching hunters:", error);
+                    alert("Gagal memuat data Hunter");
+                }
+            }
             // When the "Tambah barang" button is clicked, open the modal
+            window.lastCreatedBarangId = null;
             addBarangButton.addEventListener("click", function () {
-                
-                // Set the tanggalPenitipan to the current date when the modal opens
-                const today = new Date().toISOString().split("T")[0]; // Format to YYYY-MM-DD
-                document.getElementById("tanggalPenitipan").value = today;
-
-                addBarangModal.show();
+                const addBarangDetailModal = new bootstrap.Modal(document.getElementById("addBarangDetailModal"));
+                addBarangDetailModal.show();
             });
+            const addBarangDetailForm = document.getElementById("addBarangDetailForm");
+            addBarangDetailForm.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const formData = new FormData();
+            formData.append("idBarang", document.getElementById("idBarang").value);
+            // formData.append("idTransaksiDonasi", document.getElementById("idTransaksiDonasi").value);
+            formData.append("namaBarang", document.getElementById("namaBarang").value);
+            formData.append("beratBarang", document.getElementById("beratBarang").value);
+            formData.append("garansiBarang", document.getElementById("garansiBarang").value);
+            formData.append("periodeGaransi", document.getElementById("periodeGaransi").value);
+            formData.append("hargaBarang", document.getElementById("hargaBarang").value);
+            formData.append("haveHunter", document.getElementById("haveHunter").value);
+            formData.append("statusBarang", document.getElementById("statusBarang").value);
+            formData.append("kategori", document.getElementById("kategori").value);
+
+            const imageInput = document.getElementById("image");
+            if (imageInput.files.length > 0) {
+                formData.append("image", imageInput.files[0]);
+            }
+
+            try {
+                const response = await fetch("http://127.0.0.1:8000/api/barang", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${localStorage.getItem('auth_token')}`,
+                        "X-CSRF-TOKEN": csrfToken
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.status) {
+                    alert("Barang created successfully!");
+
+                    // Save last created idBarang
+                    window.lastCreatedBarangId = result.data.idBarang;
+
+                    // Close Barang modal
+                    const addBarangDetailModal = bootstrap.Modal.getInstance(document.getElementById("addBarangDetailModal"));
+                    addBarangDetailModal.hide();
+
+                    // Open Transaksi Penitipan modal
+                    const addBarangModal = new bootstrap.Modal(document.getElementById("addBarangModal"));
+                    document.getElementById("idPegawai1").value = namaPegawai || '';
+                    document.getElementById("tanggalPenitipan").value = new Date().toISOString().split("T")[0];
+
+                    fetchHunters();
+                    fetchPenitip();
+
+                    addBarangModal.show();
+                } else {
+                    alert("Failed to create Barang.");
+                    console.error(result.message || "Unknown error");
+                }
+            } catch (error) {
+                console.error("Error creating Barang:", error);
+                alert("An error occurred while creating the Barang.");
+            }
+        });
 
             // Handle date calculation (30 days after tanggalPenitipan)
             document.getElementById("tanggalPenitipan").addEventListener("change", function () {
@@ -292,46 +456,98 @@
 
             // Handle form submission (when the user clicks 'Save')
             addBarangForm.addEventListener("submit", async function (e) {
-                e.preventDefault();
+            e.preventDefault();
 
-                const donasiData = {
-                    idPegawai1: document.getElementById("idPegawai1").value,
-                    idPegawai2: document.getElementById("idPegawai2").value,
-                    idPenitip: document.getElementById("idPenitip").value,
-                    tanggalPenitipan: document.getElementById("tanggalPenitipan").value,
-                    tanggalPenitipanSelesai: document.getElementById("tanggalPenitipanSelesai").value,
-                    totalHarga: document.getElementById("totalHarga").value,
-                };
+            if (!window.lastCreatedBarangId) {
+                alert("ID Barang not found! Please create Barang first.");
+                return;
+            }
 
+            const now = new Date();
+            const tanggalPenitipan = now.toISOString().slice(0, 19).replace('T', ' '); // Format: YYYY-MM-DD HH:MM:SS
+
+            const tanggalPenitipanSelesaiObj = new Date(now);
+            tanggalPenitipanSelesaiObj.setDate(now.getDate() + 30);
+            const tanggalPenitipanSelesai = tanggalPenitipanSelesaiObj.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+
+            const idPegawai2Value = document.getElementById("idPegawai2").value;
+            const transaksiData = {
+                
+                idPegawai1: localStorage.getItem('idPegawai'),
+                // idPegawai2: idPegawai2Value !== "" ? idPegawai2Value : null,
+                idPenitip: document.getElementById("idPenitip").value,
+                // tanggalPenitipan: tanggalPenitipan,
+                // tanggalPenitipanSelesai: tanggalPenitipanSelesai,
+                totalHarga: document.getElementById("hargaBarang").value,
+                idBarang: window.lastCreatedBarangId,
+            };
+            console.log("Transaksi Data:", transaksiData);
+            try {
+                const response = await fetch("http://127.0.0.1:8000/api/addTransaksiPenitipan", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${localStorage.getItem('auth_token')}`,
+                        "X-CSRF-TOKEN": csrfToken
+                    },
+                    body: JSON.stringify(transaksiData)
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.status) {
+                    alert("Transaksi Penitipan created successfully!");
+
+                    // Close modal
+                    const addBarangModal = bootstrap.Modal.getInstance(document.getElementById("addBarangModal"));
+                    addBarangModal.hide();
+
+                    // Reset window.lastCreatedBarangId
+                    window.lastCreatedBarangId = null;
+
+                } else {
+                    alert("Failed to create Transaksi Penitipan.");
+                    console.error(result.message || "Unknown error");
+                }
+            } catch (error) {
+                console.error("Error creating Transaksi Penitipan:", error);
+                alert("An error occurred while creating the Transaksi Penitipan.");
+            }
+        });
+
+            async function fetchPenitip() {
                 try {
-                    const response = await fetch("http://127.0.0.1:8000/api/transaksi-penitipan", {
-                        method: "POST",
+                    const response = await fetch("http://127.0.0.1:8000/api/getpenitip", {
+                        method: "GET",
                         headers: {
-                            "Content-Type": "application/json",
-                            "Authorization": `Bearer ${localStorage.getItem('auth_token')}`,
-                            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        },
-                        body: JSON.stringify(donasiData),
+                            "Authorization": `Bearer ${localStorage.getItem('auth_token')}`
+                        }
                     });
 
-                    const result = await response.json();
+                    const data = await response.json();
+                    console.log("Fetched Penitip:", data);
 
-                    if (response.ok) {
-                        alert("Transaksi Penitipan created successfully!");
-                        addBarangModal.hide(); // Close the modal
-                        fetchData(); // Refresh the data if needed
+                    const penitipSelect = document.getElementById("idPenitip");
+                    penitipSelect.innerHTML = `<option value="">Pilih Penitip</option>`; // reset dropdown
+
+                    if (data.status && data.data.length > 0) {
+                        data.data.forEach(penitip => {
+                            const option = document.createElement("option");
+                            option.value = penitip.idPenitip;
+                            option.textContent = penitip.username;
+                            penitipSelect.appendChild(option);
+                        });
                     } else {
-                        alert("Failed to create transaksi penitipan.");
-                        console.error(result.message || "Unknown error");
+                        console.warn("No Penitip available");
                     }
                 } catch (error) {
-                    console.error("Error creating transaksi penitipan:", error);
-                    alert("An error occurred while creating the transaksi penitipan.");
+                    console.error("Error fetching Penitip:", error);
+                    alert("Gagal memuat data Penitip");
                 }
-            });
-
+            }
 
             // Initial fetch when the page loads
+            fetchPenitip();
             fetchPegawai();
         });
     </script>
