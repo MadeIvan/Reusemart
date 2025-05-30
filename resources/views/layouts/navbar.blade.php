@@ -182,7 +182,13 @@
             }
 
 
-            else if(role==="")
+            else if(role==="CS"){
+                leftMenu.appendChild(createItem("/pegawaidata", "Profile"));
+                leftMenu.appendChild(createItem("/pegawai/PenitipData", "Data Penitip"));
+                                rightMenu.appendChild(createLogout());            
+
+            }
+
         }
     });
 </script>

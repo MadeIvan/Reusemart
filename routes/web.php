@@ -63,6 +63,9 @@ Route::get('/PegawaiLogin', function () {
 Route::get('/pegawai/PenitipData', function () {
     return view('Pegawai.CsView');
 });
+Route::get('/pegawaidata', function () {
+    return view('Pegawai.MainPegawai');
+});
 
 Route::get('/pembeli/alamat', function () {
     return view('Pembeli.showAlamat');
