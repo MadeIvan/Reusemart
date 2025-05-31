@@ -276,6 +276,7 @@
                         body: JSON.stringify({
                             id_barang: barangArray,
                             poinAwal: localStorage.getItem('poinUser'),
+                            status: "Dibatalkan (Tidak Dibayar)",
                         })
                     })
                     .then(res => res.json())

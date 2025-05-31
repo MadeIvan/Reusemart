@@ -431,6 +431,7 @@
                             </div>
                         `;
                         localStorage.setItem('poinUser', user.poin);
+                        localStorage.setItem('sisaPoin', user.poin + totalPoin);
 
                         const inputPoin = document.getElementById("inputPoin");
                         const hasilKonversi = document.getElementById("hasilKonversi");
@@ -513,6 +514,16 @@
             document.getElementById("checkout-btn").addEventListener("click", function() {
                 dataCheckout = JSON.parse(localStorage.getItem("data_checkout"));
                 const sisaPoin = localStorage.getItem('sisaPoin');
+                const alamat = JSON.parse(localStorage.getItem('alamatPengiriman'));
+                
+                let idAlamat;
+                if(alamat !== null) {
+                    idAlamat = alamat.idAlamat;
+                }else{
+                    idAlamat = null;
+                }
+
+                console.log('idAlamat:', idAlamat);
 
                 fetch(`http://127.0.0.1:8000/api/checkout`, {
                     method: "POST",
@@ -523,7 +534,7 @@
                         "X-CSRF-TOKEN": csrfToken,
                     },
                     body: JSON.stringify({
-                        idAlamat: localStorage.getItem('selectedIdAlamat'),
+                        idAlamat: idAlamat,
                         tanggalWaktuPembelian: getCurrentDateTime(),
                         totalHarga: localStorage.getItem('totalSetelahPoin') !== null
                             ? parseFloat(localStorage.getItem('totalSetelahPoin'))

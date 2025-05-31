@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use App\Models\TransaksiPembelian;
 use App\Models\DetailTransaksiPembelian;
 use App\Models\Barang;
+use App\Models\Pembeli;
 use Exception;
 
 class TransaksiPembelianController extends Controller
@@ -43,8 +44,10 @@ class TransaksiPembelianController extends Controller
             DB::beginTransaction();
             $yearMonth = date('Y.m');
 
-            $last = TransaksiPembelian::where('noNota', 'like', "$yearMonth.%")
-                ->orderBy('noNota', 'desc')
+            // $last = TransaksiPembelian::where('noNota', 'like', "$yearMonth.%")
+            //     ->orderBy('noNota', 'desc')
+            //     ->first();
+            $last = TransaksiPembelian::orderByRaw("CAST(SUBSTRING_INDEX(noNota, '.', -1) AS UNSIGNED) DESC")
                 ->first();
 
             $lastNumber = 0;
@@ -190,6 +193,7 @@ class TransaksiPembelianController extends Controller
                 'poinAwal' => 'required|numeric',
                 'id_barang' => 'required|array',
                 'id_barang.*' => 'string',
+                'status' => 'required|string',
             ]);
 
             //////////////////////ubah ke sebelum transaksi/////////////////////
@@ -211,6 +215,8 @@ class TransaksiPembelianController extends Controller
             DB::commit();
 
             $transaksi = TransaksiPembelian::where('noNota', $id)->first();
+            $transaksi->status = $validated['status'];
+            $transaksi->save();
             return response()->json([
                 "status" => true,
                 "message" => "Pesanan dibatalkan",
@@ -224,4 +230,218 @@ class TransaksiPembelianController extends Controller
             ], 500);
         }
     }
+
+    public function getNotConfirmed(){
+        try{
+            $data = TransaksiPembelian::where('status', 'Menunggu Verifikasi')->get();
+            return response()->json([
+                "status" => true,
+                "message" => "Get successful",
+                "data" => $data
+            ], 200);
+        }catch(Exception $e){
+            return response()->json([
+                "status" => false,
+                "message" => $e->getMessage(),
+                "data" => null
+            ], 400);
+        }
+    }
+
+    public function terimaPembayaran(Request $request, $id){
+        try{
+            $pegawai = auth('pegawai')->user();
+            if (!$pegawai) {
+                return response()->json([
+                    "status" => false,
+                    "message" => "Pegawai Belum Login",
+                    "data" => null,
+                ], 400);
+            }
+
+            $idPegawai = $pegawai->idPegawai;
+
+            $validated = $request->validate([
+                'status' => 'required|string',
+            ]);
+
+            $transaksi = TransaksiPembelian::where('noNota', $id)->first();
+            $transaksi->status = $validated['status'];
+            $transaksi->idPegawai1 = $idPegawai;
+            $transaksi->save();
+
+            return response()->json([
+                "status" => true,
+                "message" => "Update successful",
+                "data" => $transaksi
+            ], 200);
+        }catch(Exception $e){
+            return response()->json([
+                "status" => false,
+                "message" => $e->getMessage(),
+                "data" => null
+            ], 400);
+        }
+    }
+
+    public function tolakVerifikasi(Request $request, $noNota)
+    {
+        try {
+            $pegawai = auth('pegawai')->user();
+            if (!$pegawai) {
+                return response()->json([
+                    "status" => false,
+                    "message" => "Pegawai belum login",
+                    "data" => null,
+                ], 400);
+            }
+
+            $transaksi = TransaksiPembelian::where('noNota', $noNota)->first();
+            if (!$transaksi) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Transaksi tidak ditemukan.'
+                ]);
+            }
+
+            $pembeli = Pembeli::where('idPembeli', $transaksi->idPembeli)->first();
+            $alamat = $transaksi->idAlamat;
+
+            $detailBarang = DetailTransaksiPembelian::where('noNota', $noNota)->get();
+            $totalHarga = 0;
+
+            foreach ($detailBarang as $detail) {
+                \Log::info("Detail ID Barang: " . $detail->idBarang);
+                $barang = Barang::where('idBarang', $detail->idBarang)->first();
+
+                if ($barang) {
+                    \Log::info("Barang ditemukan: " . $barang->idBarang . " | Harga: " . $barang->hargaBarang);
+                    $totalHarga += $barang->hargaBarang;
+                    $barang->update([
+                        'statusBarang' => 'Tersedia'
+                    ]);
+                }
+            }
+
+            // $poinAkhir = $pembeli->poin;
+            // $poinAwal = $poinAkhir;
+
+           if(($alamat !== null && $totalHarga >= 1500000) || ($alamat === null && $totalHarga >= 1500000)){
+                $poinBelanja = $totalHarga / 10000;
+                $poinBonus = $poinBelanja * 0.2;
+                $selisihHarga = abs($totalHarga - $transaksi->totalHarga);
+                $poinTukar = $selisihHarga / 100;
+                $poinAkhir = $pembeli->poin;
+                \Log::info("poinAkhir: " . $pembeli->poin);
+    
+                $poinAwal = $poinAkhir - $poinBonus - $poinBelanja + $poinTukar;
+                
+                $pembeli->poin = $poinAwal;
+                $pembeli->save();
+                $transaksi->status = 'Dibatalkan (Bukti Tidak Valid)';
+                $transaksi->save();
+                \Log::info("=== DEBUG ===");
+                \Log::info("poinAwal: $poinAwal");
+                \Log::info("poinBelanja: $poinBelanja");
+                \Log::info("poinBonus: $poinBonus");
+                \Log::info("poinTukar: $poinTukar");
+            }else if(($alamat === null && $totalHarga < 1500000)){
+                if($totalHarga >= 500000){
+                    $poinBelanja = $totalHarga / 10000;
+                    $poinBonus = $poinBelanja * 0.2;
+                    $selisihHarga = abs($totalHarga - ($transaksi->totalHarga));
+                    $poinTukar = $selisihHarga / 100;
+                    $poinAkhir = $pembeli->poin;
+                    \Log::info("=== DEBUG ===");
+                    \Log::info("poinAkhir: " . $pembeli->poin);
+
+                    $poinAwal = $poinAkhir - $poinBonus - $poinBelanja + $poinTukar;
+                    
+                    $pembeli->poin = $poinAwal;
+                    $pembeli->save();
+                    $transaksi->status = 'Dibatalkan (Bukti Tidak Valid)';
+                    $transaksi->save();
+                }else{
+                    $poinBelanja = $totalHarga / 10000;
+                    $selisihHarga = abs($totalHarga - ($transaksi->totalHarga));
+                    $poinTukar = $selisihHarga / 100;
+                    $poinAkhir = $pembeli->poin;
+                    \Log::info("=== DEBUG ===");
+                    \Log::info("poinAkhir: " . $pembeli->poin);
+    
+                    $poinAwal = $poinAkhir - $poinBelanja + $poinTukar;
+                    
+                    $pembeli->poin = $poinAwal;
+                    $pembeli->save();
+                    $transaksi->status = 'Dibatalkan (Bukti Tidak Valid)';
+                    $transaksi->save();
+                }
+                //($alamat !== null && $totalHarga < 1500000) || 
+                \Log::info("poinAwal: $poinAwal");
+                \Log::info("totalHargaBarang: " .  $totalHarga);
+                \Log::info("totalHarga: $transaksi->totalHarga");
+                \Log::info("selisihHarga:  $selisihHarga");
+                \Log::info("poinAkhir: " . $pembeli->poin);
+                \Log::info("poinBelanja: $poinBelanja");
+                \Log::info("poinTukar: $poinTukar");
+            }else if($alamat !== null && $totalHarga < 1500000){
+                if($totalHarga >= 500000){
+                    $poinBelanja = $totalHarga / 10000;
+                    $poinBonus = $poinBelanja * 0.2;
+                    $selisihHarga = abs($totalHarga - ($transaksi->totalHarga - 100000));
+                    $poinTukar = $selisihHarga / 100;
+                    $poinAkhir = $pembeli->poin;
+                    \Log::info("=== DEBUG ===");
+                    \Log::info("poinAkhir: " . $pembeli->poin);
+
+                    $poinAwal = $poinAkhir - $poinBonus - $poinBelanja + $poinTukar;
+                    
+                    $pembeli->poin = $poinAwal;
+                    $pembeli->save();
+                    $transaksi->status = 'Dibatalkan (Bukti Tidak Valid)';
+                    $transaksi->save();
+                }else{
+                    $poinBelanja = $totalHarga / 10000;
+                    $selisihHarga = abs($totalHarga - ($transaksi->totalHarga - 100000));
+                    $poinTukar = $selisihHarga / 100;
+                    $poinAkhir = $pembeli->poin;
+                    \Log::info("=== DEBUG ===");
+                    \Log::info("poinAkhir: " . $pembeli->poin);
+    
+                    $poinAwal = $poinAkhir - $poinBelanja + $poinTukar;
+                    
+                    $pembeli->poin = $poinAwal;
+                    $pembeli->save();
+                    $transaksi->status = 'Dibatalkan (Bukti Tidak Valid)';
+                    $transaksi->save();
+                }
+                //($alamat !== null && $totalHarga < 1500000) || 
+                \Log::info("poinAwal: $poinAwal");
+                \Log::info("totalHargaBarang: " .  $totalHarga);
+                \Log::info("totalHarga: $transaksi->totalHarga");
+                \Log::info("selisihHarga:  $selisihHarga");
+                \Log::info("poinAkhir: " . $pembeli->poin);
+                \Log::info("poinBelanja: $poinBelanja");
+                \Log::info("poinTukar: $poinTukar");
+            }
+
+
+            $transaksi->status = 'Dibatalkan (Bukti Tidak Valid)';
+            $transaksi->idPegawai1 = $pegawai->idPegawai;
+            $transaksi->save();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Rollback berhasil tanpa kolom tambahan.'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                "status" => false,
+                "message" => $e->getMessage(),
+                "data" => null
+            ], 500);
+        }
+    }
+
 }

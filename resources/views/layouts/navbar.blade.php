@@ -180,6 +180,13 @@
             else if(role === "admin"){
                 
             }
+
+            else if(role === "cs"){
+                leftMenu.appendChild(createItem("/admin/dashboard", "Home"));
+                leftMenu.appendChild(createItem("/pegawai/PenitipData", "Penitip"));
+                leftMenu.appendChild(createItem("/admin/verif", "Verifikasi"));
+                rightMenu.appendChild(createLogout());    
+            }
         }
     });
 </script>

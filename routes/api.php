@@ -96,6 +96,12 @@ Route::middleware(['auth:pegawai','role:2'])->group(function () {
     // Route::get('/organisasi', [PegawaiController::class, 'index']);
 });
 
+Route::middleware(['auth:pegawai','role:5'])->group(function () {
+    Route::get('/verifikasi', [TransaksiPembelianController::class, 'getNotConfirmed']);
+    Route::post('/verifikasi/{id}', [TransaksiPembelianController::class, 'terimaPembayaran']);    
+     Route::post('/tolak-verifikasi/{id}', [TransaksiPembelianController::class, 'tolakVerifikasi']); 
+});
+
 Route::middleware(['auth:sanctum', 'auth.pembeli'])->group(function () {
     Route::post('/pembeli/buat-alamat', [AlamatController::class, 'store']);
     Route::get('/pembeli/alamat', [AlamatController::class, 'index']);

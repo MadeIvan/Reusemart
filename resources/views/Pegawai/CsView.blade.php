@@ -73,6 +73,7 @@
     </style>
 </head>
 <body>
+    @include('layouts.navbar')
 
     <div class="container mt-4">
         <h2>Data Penitip</h2>
@@ -179,6 +180,10 @@
             </table>
         </div>
     </div>
+
+    <footer class="bg-dark text-white text-center p-3">
+        <p>&copy; 2025 Reusemart</p>
+    </footer>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
