@@ -20,6 +20,7 @@ use App\Http\Controllers\TransaksiPembelianController;
 use App\Http\Controllers\TransaksiDonasiController;
 use App\Http\Controllers\TransaksiPenitipanController;
 use App\Models\TransaksiPenitipan;
+use App\Http\Controllers\ImagesBarangController;
 
 /*
 |--------------------------------------------------------------------------
@@ -161,3 +162,6 @@ Route::post('/addTransaksiPenitipan',[TransaksiPenitipanController::class, 'stor
 Route::get('/pegawaiGethunters', [PegawaiController::class, 'getHunters']);
 Route::get('/getpenitip', [PenitipController::class, 'getPenitip']);
 Route::post('/barang',[BarangController::class,'store']);
+Route::get('/indexall',[BarangController::class,'indexall']);
+
+Route::post('/addimages', [ImagesBarangController::class, 'store']);

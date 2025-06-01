@@ -84,7 +84,7 @@
             <div class="row">
                 <div class="col-12 btn-container">
                     <button type="button" class="btn btn-success" id="addBarangButton">Tambah barang</button>
-                    <button type="button" class="btn btn-danger" id="deleteButton">Delete</button>
+
                 </div>
             </div>
         </form>
@@ -116,18 +116,15 @@
                     <option value=""> --- </option>
                 </select>
             </div>
+
             <div class="mb-3">
-                <label for="tanggalPenitipan" class="form-label">Tanggal Penitipan</label>
-                <input type="date" class="form-control" id="tanggalPenitipan" required>
-            </div>
-            <div class="mb-3">
-                <label for="tanggalPenitipanSelesai" class="form-label">Tanggal Penitipan Selesai</label>
-                <input type="date" class="form-control" id="tanggalPenitipanSelesai" disabled >
+                <label for="tanggalPenitipan" class="form-label">Tanggal Penitipan Selesai</label>
+                <input type="text" class="form-control" id="tanggalPenitipan" disabled >
             </div>
             
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary">Next</button>
+                <button type="submit" class="btn btn-primary">Save</button>
             </div>
             </form>
         </div>
@@ -188,7 +185,17 @@
                 </div>
                 <div class="mb-3">
                     <label for="image" class="form-label">Upload Gambar</label>
-                    <input type="file" class="form-control" id="image">
+                    
+                    <!-- Drag & Drop area -->
+                    <div id="drop-area" 
+                        style="border: 2px dashed #ccc; padding: 20px; text-align: center; cursor: pointer;">
+                        <p>Drag & drop images here or click to select files</p>
+                        <input type="file" class="form-control" id="image" multiple accept="image/*" style="display:none;">
+                    </div>
+
+                    <!-- Preview container for selected images -->
+                    <div id="preview" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 10px;"></div>
+
                 </div>
                 <div class="mb-3">
                     <label for="kategori" class="form-label">Kategori</label>
@@ -196,7 +203,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Simpan Barang</button>
+                    <button type="submit" class="btn btn-primary">Next</button>
                 </div>
                 </form>
             </div>
@@ -222,10 +229,10 @@
             <table class="table table-bordered" id="pegawaiTable">
                 <thead>
                     <tr>
-                        <th>ID transaksi</th>
-                        <th>Penanggung Jawab</th>
-                        <th>Barang</th>
-                        <th>Tanggal Masuk</th>
+                        <th>ID Barang</th>
+                        <th>Nama Barang</th>
+                        <th>Nama Penitip</th>
+                        <th>Status</th>
                         <th>Tanggal kadaluarsa</th>
                         <!-- <th>Password</th>  -->
                     </tr>
@@ -270,7 +277,7 @@
             // Fetch Pegawai Data
             async function fetchPegawai() {
                 try {
-                    const response = await fetch("http://127.0.0.1:8000/api/pegawai", {
+                    const response = await fetch("http://127.0.0.1:8000/api/indexall", {
                         method: "GET",
                         headers: { "Authorization": `Bearer ${localStorage.getItem('auth_token')}` },
                     });
@@ -280,11 +287,11 @@
                     console.log("Response JSON:", data);    
                     console.log("Token:", localStorage.getItem('auth_token'));
 
-                    if (data.status === true && data.data.length > 0) {
-                        pegawaiData = data.data;
+                    if (Array.isArray(data) && data.length > 0) {
+                        pegawaiData = data;
                         renderTable(pegawaiData);
                     } else {
-                        alert("Gagal memuat data pegawai.");
+                        alert("Gagal memuat data barang.");
                         console.error("Error loading data:", data);
                     }
                 } catch (error) {
@@ -298,46 +305,23 @@
             // Render the table with fetched data
             function renderTable(data) {
                 tableBody.innerHTML = ""; // Clear the table before rendering new data
-
-                // Prioritize pegawais with idTopSeller first
-                // const sortedData = data.sort((a, b) => {
-                //     return (b.idTopSeller ? 1 : 0) - (a.idTopSeller ? 1 : 0);  // 1st priority: have idTopSeller
-                // });
-
-                if (!data || data.length === 0) {
-                    const row = tableBody.insertRow();
-                    const cell = row.insertCell(0);
-                    cell.colSpan = 4;
-                    cell.classList.add("no-data-message"); // Add a class for empty state
-                    cell.innerText = "No pegawai data available.";
-                    return;
-                }
-
                 data.forEach(item => {
                     const row = document.createElement("tr");
                     row.innerHTML = `
-                        <td>${item.idPegawai}</td>
-                        <td>${item.namaPegawai || '-'}</td>
-                        <td>${item.jabatan?.namaJabatan || '-'}</td>
-                        <td>${item.username}</td>
+                        <td id="${item.idBarang}">${item.idBarang}</td>
+                        <td>${item.namaBarang || '-'}</td>
+                        <td>${item.namaPenitip || '-'}</td>
+                       
+                        <td>${item.statusBarang}</td>
+                        <td>${item.tanggalPenitipanSelesai || '-'}</td>
                         
                     `;
-                    row.addEventListener("click", () => populateForm(item));  // Add click event to the row
+                    // row.addEventListener("click", () => populateForm(item));  // Add click event to the row
                     tableBody.appendChild(row);
                 });
             }
 
-            // Populate the form when a row is clicked
-            function populateForm(item) {
-                // document.getElementById("")
-                document.getElementById("idPegawai").value = item.idPegawai;
-                document.getElementById("namaPegawai").value = item.namaPegawai || '';  // Set idTopSeller        // Set idDompet
-                document.getElementById("username").value = item.username || '';         // Set username
-                document.getElementById("password").value = item.password || '';   // Set namaPegawai
-                
-                // Store the current Pegawai ID
-                currentPegawaiId = item.idPegawai;
-            }
+            
             const addBarangButton = document.getElementById("addBarangButton");
             const addBarangModal = new bootstrap.Modal(document.getElementById("addBarangModal"));
             const addBarangForm = document.getElementById("addBarangForm");
@@ -388,6 +372,52 @@
             addBarangDetailForm.addEventListener("submit", async function (e) {
             e.preventDefault();
 
+            
+            const firstModal = bootstrap.Modal.getInstance(document.getElementById("addBarangDetailModal"));
+            firstModal.hide();
+
+            const addBarangModal = new bootstrap.Modal(document.getElementById("addBarangModal"));
+            document.getElementById("idPegawai1").value = namaPegawai || '';
+            const today = new Date();
+            const plus30Days = new Date(today);
+            plus30Days.setDate(today.getDate() + 30);
+
+            document.getElementById("tanggalPenitipan").value = plus30Days.toISOString().split("T")[0];
+            fetchHunters();
+            fetchPenitip();
+            addBarangModal.show();
+            // secondModal.show();
+            // const imageInput = document.getElementById("image");
+            // if (imageInput.files.length > 0) {
+            //     formData.append("image", imageInput.files[0]);
+            // }
+
+           
+        });
+
+            // Handle date calculation (30 days after tanggalPenitipan)
+            document.getElementById("tanggalPenitipan").addEventListener("change", function () {
+                const tanggalPenitipan = new Date(this.value);
+                const tanggalPenitipanSelesai = new Date(tanggalPenitipan);
+                tanggalPenitipanSelesai.setDate(tanggalPenitipan.getDate() + 30); // Add 30 days
+                const day = String(tanggalPenitipanSelesai.getDate()).padStart(2, '0');
+                const month = String(tanggalPenitipanSelesai.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+                const year = String(tanggalPenitipanSelesai.getFullYear()).slice(-2); // Last two digits
+
+                const formattedDate = `${year}/${month}/${day}`;
+                // document.getElementById("idPegawai1").value = namaPegawai || '';
+                document.getElementById("tanggalPenitipanSelesai").value = formattedDate || '';
+            });
+
+            // Handle form submission (when the user clicks 'Save')
+            addBarangForm.addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const confirmed = window.confirm("Yakin?");
+            if (!confirmed) {
+                // User clicked Cancel, stop here
+                return;
+            }
             const formData = new FormData();
             formData.append("idBarang", document.getElementById("idBarang").value);
             // formData.append("idTransaksiDonasi", document.getElementById("idTransaksiDonasi").value);
@@ -399,13 +429,8 @@
             formData.append("haveHunter", document.getElementById("haveHunter").value);
             formData.append("statusBarang", document.getElementById("statusBarang").value);
             formData.append("kategori", document.getElementById("kategori").value);
-
-            const imageInput = document.getElementById("image");
-            if (imageInput.files.length > 0) {
-                formData.append("image", imageInput.files[0]);
-            }
-
             try {
+
                 const response = await fetch("http://127.0.0.1:8000/api/barang", {
                     method: "POST",
                     headers: {
@@ -418,7 +443,7 @@
                 const result = await response.json();
 
                 if (response.ok && result.status) {
-                    alert("Barang created successfully!");
+                    // alert("Barang created successfully!");
 
                     // Save last created idBarang
                     window.lastCreatedBarangId = result.data.idBarang;
@@ -428,35 +453,18 @@
                     addBarangDetailModal.hide();
 
                     // Open Transaksi Penitipan modal
-                    const addBarangModal = new bootstrap.Modal(document.getElementById("addBarangModal"));
-                    document.getElementById("idPegawai1").value = namaPegawai || '';
-                    document.getElementById("tanggalPenitipan").value = new Date().toISOString().split("T")[0];
+                    
 
-                    fetchHunters();
-                    fetchPenitip();
-
-                    addBarangModal.show();
+                    
                 } else {
                     alert("Failed to create Barang.");
                     console.error(result.message || "Unknown error");
+                    console.log(formData);
                 }
             } catch (error) {
                 console.error("Error creating Barang:", error);
                 alert("An error occurred while creating the Barang.");
             }
-        });
-
-            // Handle date calculation (30 days after tanggalPenitipan)
-            document.getElementById("tanggalPenitipan").addEventListener("change", function () {
-                const tanggalPenitipan = new Date(this.value);
-                const tanggalPenitipanSelesai = new Date(tanggalPenitipan);
-                tanggalPenitipanSelesai.setDate(tanggalPenitipan.getDate() + 30); // Add 30 days
-                document.getElementById("tanggalPenitipanSelesai").value = tanggalPenitipanSelesai.toISOString().split("T")[0]; // Format to YYYY-MM-DD
-            });
-
-            // Handle form submission (when the user clicks 'Save')
-            addBarangForm.addEventListener("submit", async function (e) {
-            e.preventDefault();
 
             if (!window.lastCreatedBarangId) {
                 alert("ID Barang not found! Please create Barang first.");
@@ -481,6 +489,7 @@
                 totalHarga: document.getElementById("hargaBarang").value,
                 idBarang: window.lastCreatedBarangId,
             };
+            const idBarangValue = document.getElementById("idBarang").value;
             console.log("Transaksi Data:", transaksiData);
             try {
                 const response = await fetch("http://127.0.0.1:8000/api/addTransaksiPenitipan", {
@@ -495,6 +504,34 @@
 
                 const result = await response.json();
 
+                const payload = {
+                    id: idBarangValue,  // some id you want to send
+                    image1: fileNamesArray[0] || null,
+                    image2: fileNamesArray[1] || null,
+                    image3: fileNamesArray[2] || null,
+                    image4: fileNamesArray[3] || null,
+                    image5: fileNamesArray[4] || null,
+                };
+
+                // Send POST request using fetch API
+                fetch('http://127.0.0.1:8000/api/addimages', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    "Authorization": `Bearer ${localStorage.getItem('auth_token')}`,
+                    "X-CSRF-TOKEN": csrfToken
+                    // add authorization headers if needed here
+                },
+                body: JSON.stringify(payload),
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                    console.log('Success:', data);
+                })
+                    .catch(error => {
+                    console.error('Error:', error);
+                });
+
                 if (response.ok && result.status) {
                     alert("Transaksi Penitipan created successfully!");
 
@@ -504,7 +541,7 @@
 
                     // Reset window.lastCreatedBarangId
                     window.lastCreatedBarangId = null;
-
+                    
                 } else {
                     alert("Failed to create Transaksi Penitipan.");
                     console.error(result.message || "Unknown error");
@@ -513,6 +550,7 @@
                 console.error("Error creating Transaksi Penitipan:", error);
                 alert("An error occurred while creating the Transaksi Penitipan.");
             }
+            fetchPegawai()
         });
 
             async function fetchPenitip() {
@@ -543,6 +581,152 @@
                 } catch (error) {
                     console.error("Error fetching Penitip:", error);
                     alert("Gagal memuat data Penitip");
+                }
+            }
+            const dropArea = document.getElementById('drop-area');
+            const fileInput = document.getElementById('image');
+            const preview = document.getElementById('preview');
+
+            let filesArray = []; // Store selected files here
+            let fileNamesArray = [];
+            dropArea.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', () => {
+                handleFiles(fileInput.files);
+            });
+
+            // Drag and drop handlers (same as before)
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropArea.addEventListener(eventName, () => {
+                dropArea.style.borderColor = '#000';
+                dropArea.style.backgroundColor = '#f0f0f0';
+                }, false);
+            });
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, () => {
+                dropArea.style.borderColor = '#ccc';
+                dropArea.style.backgroundColor = '#fff';
+                }, false);
+            });
+            dropArea.addEventListener('drop', e => {
+                const dt = e.dataTransfer;
+                handleFiles(dt.files);
+            });
+
+            
+            function handleFiles(files) {
+                for (const file of files) {
+                if (!file.type.startsWith('image/')) {
+                    alert('Only image files are allowed!');
+                    continue;
+                }
+                filesArray.push(file);
+                fileNamesArray.push(file.name); 
+                previewFile(file);
+                }
+                toggleDropAreaVisibility();
+            }
+
+            function previewFile(file) {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onloadend = function() {
+                const container = document.createElement('div');
+                container.style.position = 'relative';
+                container.style.width = '100px';
+                container.style.height = '100px';
+
+                // Create the image element
+                const img = document.createElement('img');
+                img.src = reader.result;
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'cover';
+                img.style.borderRadius = '8px';
+                img.style.cursor = 'pointer';
+
+                // Click to show fullscreen image
+                img.addEventListener('click', () => {
+                    openFullscreenPreview(reader.result);
+                });
+
+                // Create delete button
+                const btn = document.createElement('button');
+                btn.innerHTML = '&times;';
+                btn.style.position = 'absolute';
+                btn.style.top = '2px';
+                btn.style.right = '2px';
+                btn.style.background = 'rgba(255, 0, 0, 0.6)';
+                btn.style.color = 'white';
+                btn.style.border = 'none';
+                btn.style.borderRadius = '50%';
+                btn.style.width = '20px';
+                btn.style.height = '20px';
+                btn.style.cursor = 'pointer';
+                btn.title = 'Delete image';
+
+                btn.addEventListener('click', () => {
+                    const index = filesArray.indexOf(file);
+                    if (index > -1) {
+                    filesArray.splice(index, 1); // Remove from files array
+                    }
+                    container.remove(); // Remove from preview
+                    toggleDropAreaVisibility();
+                    // updateFileInput();  // Optional: sync input files if needed
+                });
+
+                container.appendChild(img);
+                container.appendChild(btn);
+                preview.appendChild(container);
+                };
+            }
+
+            // Fullscreen preview modal
+            function openFullscreenPreview(src) {
+                // Create overlay
+                const overlay = document.createElement('div');
+                overlay.style.position = 'fixed';
+                overlay.style.top = 0;
+                overlay.style.left = 0;
+                overlay.style.width = '100vw';
+                overlay.style.height = '100vh';
+                overlay.style.backgroundColor = 'rgba(0,0,0,0.8)';
+                overlay.style.display = 'flex';
+                overlay.style.justifyContent = 'center';
+                overlay.style.alignItems = 'center';
+                overlay.style.cursor = 'zoom-out';
+                overlay.style.zIndex = 9999;
+
+                // Create full image
+                const fullImg = document.createElement('img');
+                fullImg.src = src;
+                fullImg.style.maxWidth = '90vw';
+                fullImg.style.maxHeight = '90vh';
+                fullImg.style.borderRadius = '8px';
+                fullImg.style.boxShadow = '0 0 20px rgba(255,255,255,0.3)';
+
+                overlay.appendChild(fullImg);
+
+                // Click anywhere to close
+                overlay.addEventListener('click', () => {
+                document.body.removeChild(overlay);
+                });
+
+                document.body.appendChild(overlay);
+            }
+            function toggleDropAreaVisibility() {
+                const dropArea = document.getElementById('drop-area');
+                if (filesArray.length > 0) {
+                    dropArea.style.display = 'none';
+                } else {
+                    dropArea.style.display = 'block';
                 }
             }
 

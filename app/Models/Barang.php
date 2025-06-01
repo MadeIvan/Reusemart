@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Monolog\Handler\TelegramBotHandler;
 use App\Models\Diskusi;
+use App\Models\ImagesBarang;
 
 class Barang extends Model 
 {
@@ -46,6 +47,12 @@ class Barang extends Model
         return $this->belongsTo(TransaksiPembelian::class, 'noNota', 'noNota');
     }
 
-
-
+    public function detailTransaksiPenitipan()
+    {
+        return $this->hasOne(DetailTransaksiPenitipan::class, 'idBarang', 'idBarang');
+    }
+    public function imagesbarang()
+    {
+        return $this->hasOne(ImagesBarang::class, 'id', 'image');
+    }
 }

@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Barang;  
 use Illuminate\Support\Facades\Validator;
 use App\Models\TransaksiDonasi;
+use Illuminate\Support\Facades\DB;
+use App\Models\ImagesBarang;
 
 
 class BarangController extends Controller
@@ -25,7 +27,40 @@ class BarangController extends Controller
             ], 500);  // 500 Internal Server Error
         }
     }
+    public function indexall()
+    {
+        try {
+            $barang = Barang::with('detailTransaksiPenitipan.transaksiPenitipan.penitip')->get();
+                
 
+            // Transform result to include namaPenitip at top-level for each barang
+            $result = $barang->map(function($item) {
+                return [
+                    'idBarang' => $item->idBarang,
+                    'namaBarang' => $item->namaBarang,
+                    'beratBarang' => $item->beratBarang,
+                    'garansiBarang' => $item->garansiBarang,
+                    'periodeGaransi' => $item->periodeGaransi,
+                    'hargaBarang' => $item->hargaBarang,
+                    'haveHunter' => $item->haveHunter,
+                    'statusBarang' => $item->statusBarang,
+                    'image' => $item->image,
+                    'kategori' => $item->kategori,
+                    'tanggalPenitipanSelesai' => optional(optional($item->detailTransaksiPenitipan)->transaksiPenitipan)->tanggalPenitipanSelesai,
+                    // Access namaPenitip safely with null checks
+                    'namaPenitip' => optional(optional(optional($item->detailTransaksiPenitipan)->transaksiPenitipan)->penitip)->namaPenitip,
+                ];
+            });
+
+            return response()->json($result);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'An error occurred while fetching the products.',
+                'message' => $e->getMessage(),
+                'status' =>true
+            ], 500);
+        }
+    }
     // Show Barang by id
     public function show($idBarang)
 {
@@ -64,22 +99,30 @@ class BarangController extends Controller
         'haveHunter' => 'required|boolean',
         'statusBarang' => 'required|string|max:255',
         'kategori' => 'required|string|max:50',
-        'image' => 'nullable|image|max:2048', // Optional image upload
     ]);
 
-    // Handle image upload if present
-    if ($request->hasFile('image')) {
-        $validated['image'] = $request->file('image')->store('barang_images', 'public');
-    }
+   
+    // Now create Barang and link image field to imagesbarang.id
+    $barang = Barang::create([
+        'idBarang' => $validated['idBarang'],
+        'namaBarang' => $validated['namaBarang'],
+        'beratBarang' => $validated['beratBarang'],
+        'garansiBarang' => $validated['garansiBarang'],
+        'periodeGaransi' => $validated['periodeGaransi'],
+        'hargaBarang' => $validated['hargaBarang'],
+        'haveHunter' => $validated['haveHunter'],
+        'statusBarang' => $validated['statusBarang'],
+        'kategori' => $validated['kategori'],
 
-    // Insert into the Barang table
-    $barang = Barang::create($validated);
+    ]);
+    
+    
 
     return response()->json([
         'status' => true,
-        'message' => 'Barang created successfully!',
+        'message' => 'Barang created successfully with filenames saved',
         'data' => $barang
-    ]);
+    ], 201);
 }
 
     // Update an existing Barang
