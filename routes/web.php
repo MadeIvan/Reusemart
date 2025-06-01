@@ -63,7 +63,7 @@ Route::get('/PegawaiLogin', function () {
 Route::get('/pegawai/PenitipData', function () {
     return view('Pegawai.CsView');
 });
-Route::get('/admin/verif', function () {
+Route::get('/cs/verif', function () {
     return view('Pegawai.verifikasiPembayaran');
 });
 

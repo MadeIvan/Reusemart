@@ -203,10 +203,10 @@ class PembeliController extends Controller
             )->find($item['idBarang']);
 
             if ($barang) {
-                $detailedCart[] = [
-                    ...$barang->toArray(),
-                    'jumlah' => $item['jumlah'],
-                ];
+                $detailedCart[] = array_merge(
+                    $barang->toArray(),
+                    ['jumlah' => $item['jumlah']]
+                );
             }
         }
 
