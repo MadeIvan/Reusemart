@@ -28,39 +28,50 @@ class BarangController extends Controller
         }
     }
     public function indexall()
-    {
-        try {
-            $barang = Barang::with('detailTransaksiPenitipan.transaksiPenitipan.penitip')->get();
+{
+    try {
+        $barang = Barang::with('detailTransaksiPenitipan.transaksiPenitipan.penitip','imagesBarang')->get();
+
+        $result = $barang->map(function($item) {
+            // Get transaksiPenitipan instance safely
+            $transaksi = optional($item->detailTransaksiPenitipan)->transaksiPenitipan;
+
+            return [
+                'idBarang' => $item->idBarang,
+                'namaBarang' => $item->namaBarang,
+                'beratBarang' => $item->beratBarang,
+                'garansiBarang' => $item->garansiBarang,
+                'periodeGaransi' => $item->periodeGaransi,
+                'hargaBarang' => $item->hargaBarang,
+                'haveHunter' => $item->haveHunter,
+                'statusBarang' => $item->statusBarang,
+                'image' => $item->image,
+                'kategori' => $item->kategori,
+                'tanggalPenitipanSelesai' => optional($transaksi)->tanggalPenitipanSelesai,
+                'namaPenitip' => optional(optional($transaksi)->penitip)->namaPenitip,
+
+                // Include all transaksiPenitipan attributes as a nested array
+                'transaksiPenitipan' => $transaksi ? $transaksi->toArray() : null,
+                    'imagesBarang' => $item->imagesBarang ? [
+                    'image1' => $item->imagesBarang->image1,
+                    'image2' => $item->imagesBarang->image2,
+                    'image3' => $item->imagesBarang->image3,
+                    'image4' => $item->imagesBarang->image4,
+                    'image5' => $item->imagesBarang->image5,
+                ] : null,
                 
+            ];
+        });
 
-            // Transform result to include namaPenitip at top-level for each barang
-            $result = $barang->map(function($item) {
-                return [
-                    'idBarang' => $item->idBarang,
-                    'namaBarang' => $item->namaBarang,
-                    'beratBarang' => $item->beratBarang,
-                    'garansiBarang' => $item->garansiBarang,
-                    'periodeGaransi' => $item->periodeGaransi,
-                    'hargaBarang' => $item->hargaBarang,
-                    'haveHunter' => $item->haveHunter,
-                    'statusBarang' => $item->statusBarang,
-                    'image' => $item->image,
-                    'kategori' => $item->kategori,
-                    'tanggalPenitipanSelesai' => optional(optional($item->detailTransaksiPenitipan)->transaksiPenitipan)->tanggalPenitipanSelesai,
-                    // Access namaPenitip safely with null checks
-                    'namaPenitip' => optional(optional(optional($item->detailTransaksiPenitipan)->transaksiPenitipan)->penitip)->namaPenitip,
-                ];
-            });
-
-            return response()->json($result);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'An error occurred while fetching the products.',
-                'message' => $e->getMessage(),
-                'status' =>true
-            ], 500);
-        }
+        return response()->json($result);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'An error occurred while fetching the products.',
+            'message' => $e->getMessage(),
+            'status' => true
+        ], 500);
     }
+}
     // Show Barang by id
     public function show($idBarang)
 {
@@ -113,7 +124,7 @@ class BarangController extends Controller
         'haveHunter' => $validated['haveHunter'],
         'statusBarang' => $validated['statusBarang'],
         'kategori' => $validated['kategori'],
-
+        'image' => $validated['idBarang'],
     ]);
     
     

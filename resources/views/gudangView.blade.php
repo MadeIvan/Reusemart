@@ -209,7 +209,7 @@
             </div>
             </div>
         </div>
-        </div>
+    </div>
 
     <!-- Toast notification -->
     <div class="toast-container">
@@ -225,6 +225,7 @@
 
     <div class="container mt-4">
         <h3>Data Transaksi Penitipan</h3>
+         <input type="text" id="searchInput" class="form-control mb-3" placeholder="Search Data Transaksi">
         <div id="pegawaiTableContainer">
             <table class="table table-bordered" id="pegawaiTable">
                 <thead>
@@ -258,7 +259,38 @@
             // let pegawaiData = [];
             // let currentPegawaiId = null;
             
-            // Toast functionality
+            // SEARCH
+            const searchInput = document.getElementById("searchInput");
+            let pegawaiData = []; // to store fetched data globally
+            function deepSearch(obj, searchTerm) {
+                if (obj === null || obj === undefined) return false;
+
+                if (typeof obj === 'string' || typeof obj === 'number' || typeof obj === 'boolean') {
+                    return String(obj).toLowerCase().includes(searchTerm);
+                }
+
+                if (Array.isArray(obj)) {
+                    return obj.some(item => deepSearch(item, searchTerm));
+                }
+
+                if (typeof obj === 'object') {
+                    return Object.values(obj).some(value => deepSearch(value, searchTerm));
+                }
+
+                return false;
+            }
+            searchInput.addEventListener("input", function () {
+                const searchTerm = this.value.trim().toLowerCase();
+
+                if (!searchTerm) {
+                    renderTable(pegawaiData);
+                    return;
+                }
+
+                const filteredData = pegawaiData.filter(item => deepSearch(item, searchTerm));
+
+                renderTable(filteredData);
+            });
             function showToast(message, bgColor = 'bg-primary') {
                 const toast = document.getElementById('successToast');
                 const toastMessage = document.getElementById('toastMessage');
@@ -316,6 +348,9 @@
                         <td>${item.tanggalPenitipanSelesai || '-'}</td>
                         
                     `;
+                    row.addEventListener("click", () => {
+                        openEditModal(item);
+                    });
                     // row.addEventListener("click", () => populateForm(item));  // Add click event to the row
                     tableBody.appendChild(row);
                 });
@@ -729,6 +764,107 @@
                     dropArea.style.display = 'block';
                 }
             }
+            const baseImagePath = '/img/'
+            function openEditModal(item) {
+                console.log("openEditModal called with item:", item);
+                // Show modal
+                const modalEl = document.getElementById("addBarangDetailModal");
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+
+                // Fill inputs with item data
+                document.getElementById("idBarang").value = item.idBarang || '';
+                document.getElementById("namaBarang").value = item.namaBarang || '';
+                document.getElementById("beratBarang").value = item.beratBarang || '';
+                document.getElementById("garansiBarang").value = item.garansiBarang != null ? item.garansiBarang.toString() : '';
+                document.getElementById("periodeGaransi").value = item.periodeGaransi || '';
+                document.getElementById("hargaBarang").value = item.hargaBarang || '';
+                document.getElementById("haveHunter").value = item.haveHunter != null ? item.haveHunter.toString() : '';
+                document.getElementById("statusBarang").value = item.statusBarang || 'Tersedia';
+                document.getElementById("kategori").value = item.kategori || '';
+
+                // Clear existing previews
+                document.getElementById('preview').innerHTML = '';
+                console.log("item.imagesBarang object:", item.imagesBarang);
+                // Handle existing images
+                let images = [];
+
+                // If item.imagesBarang exists, get images from image1 to image5
+                if (item.imagesBarang) {
+                    images = [
+                        item.imagesBarang.image1,
+                        item.imagesBarang.image2,
+                        item.imagesBarang.image3,
+                        item.imagesBarang.image4,
+                        item.imagesBarang.image5,
+                    ].filter(src => src && src.trim() !== ''); // filter out empty/null
+                }
+
+                console.log("Images array:", images);
+                images = images.map(src => {
+                    if (!src.startsWith('http') && !src.startsWith('/')) {
+                        return baseImagePath + src;
+                    }
+                    return src;
+                });
+                images.forEach(src => {
+                    previewExistingImage(src);
+                });
+
+    // Reset filesArray and fileNamesArray if you use them to track new uploads
+                filesArray = [];
+                fileNamesArray = [];
+                toggleDropAreaVisibility();
+            }
+            function previewExistingImage(src) {
+                console.log("Previewing image src:", src);
+                const preview = document.getElementById('preview');
+
+                const container = document.createElement('div');
+                container.style.position = 'relative';
+                container.style.width = '100px';
+                container.style.height = '100px';
+
+                // Create the image element
+                const img = document.createElement('img');
+                img.src = src;
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'cover';
+                img.style.borderRadius = '8px';
+                img.style.cursor = 'pointer';
+
+                // Click to show fullscreen image
+                img.addEventListener('click', () => {
+                    openFullscreenPreview(src);
+                });
+
+            // Create delete button
+                const btn = document.createElement('button');
+                btn.innerHTML = '&times;';
+                btn.style.position = 'absolute';
+                btn.style.top = '2px';
+                btn.style.right = '2px';
+                btn.style.background = 'rgba(255, 0, 0, 0.6)';
+                btn.style.color = 'white';
+                btn.style.border = 'none';
+                btn.style.borderRadius = '50%';
+                btn.style.width = '20px';
+                btn.style.height = '20px';
+                btn.style.cursor = 'pointer';
+                btn.title = 'Delete image';
+
+                // Optional: add delete behavior (depends on your app logic)
+                btn.addEventListener('click', () => {
+                    container.remove();
+                    // If you keep track of existing images separately, remove it there too
+                    toggleDropAreaVisibility();
+                });
+
+                container.appendChild(img);
+                container.appendChild(btn);
+                preview.appendChild(container);
+        }
 
             // Initial fetch when the page loads
             fetchPenitip();
