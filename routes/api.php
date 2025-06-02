@@ -142,6 +142,7 @@ Route::post('/addTransaksiPenitipan',[TransaksiPenitipanController::class, 'stor
 Route::get('/barang-penjadwalan', [TransaksiPembelianController::class, 'showPenjadwalan']);
 Route::put('/barang-penjadwalan/{noNota}/jadwal', [TransaksiPembelianController::class, 'updatePenjadwalan']);
 Route::get('/barang-titipNota',[TransaksiPembelianController::class,'showfornota']);
+
 Route::get('/showAllTransaksi',[TransaksiPembelianController::class,'index']);
 
 Route::get('/nota-pembelian-pdf/{idTransaksiPenitipan}', [TransaksiPembelianController::class, 'notaPembelianPdf'])->name('nota.pembelian.pdf');
@@ -165,6 +166,8 @@ Route::get('/indexall',[BarangController::class,'indexall']);
 
 Route::post('/addimages', [ImagesBarangController::class, 'store']);
 Route::get('/generate-idbarang', [BarangController::class, 'generateIdBarang']);
+Route::get('/nota-penitipan/{id}/pdf', [TransaksiPenitipanController::class, 'notaPenitipanPdf']);
+
 
 
 
