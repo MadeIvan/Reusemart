@@ -93,7 +93,7 @@ Route::middleware(['auth:sanctum', 'auth.pembeli'])->group(function () {
     Route::delete('/pembeli/alamat/delete/{id}', [AlamatController::class, 'delete']);
     Route::put('/pembeli/alamat/set-default/{id}', [AlamatController::class, 'setAsDefault']);
     Route::get('/alamatUtama', [AlamatController::class, 'getUtama']);
-
+    
     Route::post('/buat-diskusi/{id}', [DiskusiController::class, 'store']);
     Route::get('/pembeli/getData', [PembeliController::class, 'getData']);
     Route::put('/updatePoin', [PembeliController::class, 'updatePoin']);
@@ -105,6 +105,7 @@ Route::middleware(['auth:sanctum', 'auth.pembeli'])->group(function () {
     Route::get('/getData', [TransaksiPembelianController::class, 'getDataTerbaru']);
     Route::post('/buktiBayar/{id}', [TransaksiPembelianController::class, 'buktiBayar']);
     Route::post('/batalkanPesanan/{id}', [TransaksiPembelianController::class, 'canceled']);
+    Route::get('/pembeli/poin', [PembeliController::class, 'getPoin']);
 });
 
 Route::middleware(['auth:penitip'])->group(function () {
@@ -141,7 +142,14 @@ Route::post('/addTransaksiPenitipan',[TransaksiPenitipanController::class, 'stor
 Route::get('/barang-penjadwalan', [TransaksiPembelianController::class, 'showPenjadwalan']);
 Route::put('/barang-penjadwalan/{noNota}/jadwal', [TransaksiPembelianController::class, 'updatePenjadwalan']);
 Route::get('/barang-titipNota',[TransaksiPembelianController::class,'showfornota']);
+
+Route::get('/showAllTransaksi',[TransaksiPembelianController::class,'index']);
+
 Route::get('/nota-pembelian-pdf/{idTransaksiPenitipan}', [TransaksiPembelianController::class, 'notaPembelianPdf'])->name('nota.pembelian.pdf');
+Route::put('/transaksi-pembelian/{noNota}/status', [TransaksiPembelianController::class, 'updateStatus']);
+
+Route::get('/showAllTransaksi', [TransaksiPembelianController::class, 'showAllTransaksiPembeli']);
+
 
 
 

@@ -129,4 +129,15 @@ Route::get('/pegawai/ViewNota', function () {
 });
 
 
+Route::get('/pembeli/HistoryPembeli', function () {
+    return view('Pembeli.HistoryPembeli');
+});
+
+
+Route::get('/pembeli/MyProfile', function () {
+    return view('Pembeli.profilePembeli');
+});
+
+
+
 // Route::get('/products', [BarangController::class, 'index']);
