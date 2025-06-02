@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\DB;
+use App\Models\TransaksiPenitipan;
+use App\Models\DetailTransaksiPenitipan;
 class TransaksiPenitipanController extends Controller
 {
 public function store(Request $request)
@@ -13,7 +15,7 @@ public function store(Request $request)
         'idPegawai2' => 'nullable|exists:pegawai,idPegawai',
         'idPenitip' => 'required|exists:penitip,idPenitip',
         // 'tanggalPenitipan' => now(),
-        'totalHarga' => 'required|numeric|min:0',
+        'totalHarga' => 'nullable|numeric|min:0',
         'idBarang' => 'required|exists:barang,idBarang'
     ]);
 

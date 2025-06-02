@@ -9,6 +9,7 @@ use App\Models\TransaksiDonasi;
 use Illuminate\Support\Facades\DB;
 use App\Models\ImagesBarang;
 
+
 class BarangController extends Controller
 {
     // Show all Barang
@@ -26,23 +27,51 @@ class BarangController extends Controller
             ], 500);  // 500 Internal Server Error
         }
     }
-    
-    public function showAllBarang()
-    {
-        try {
-            // Fetch all barang from the database
-            $barang = Barang::all();
-            // Return the barang as a JSON response
-            return response()->json($barang);
-        } catch (\Exception $e) {
-            // Catch any exception and return a 500 internal server error
-            return response()->json([
-                'error' => 'An error occurred while fetching the products.',
-                'message' => $e->getMessage(), // Include the exception message for debugging
-            ], 500);
-        }
-    }
+    public function indexall()
+{
+    try {
+        $barang = Barang::with('detailTransaksiPenitipan.transaksiPenitipan.penitip','imagesBarang')->get();
 
+        $result = $barang->map(function($item) {
+            // Get transaksiPenitipan instance safely
+            $transaksi = optional($item->detailTransaksiPenitipan)->transaksiPenitipan;
+
+            return [
+                'idBarang' => $item->idBarang,
+                'namaBarang' => $item->namaBarang,
+                'beratBarang' => $item->beratBarang,
+                'garansiBarang' => $item->garansiBarang,
+                'periodeGaransi' => $item->periodeGaransi,
+                'hargaBarang' => $item->hargaBarang,
+                'haveHunter' => $item->haveHunter,
+                'statusBarang' => $item->statusBarang,
+                'image' => $item->image,
+                'kategori' => $item->kategori,
+                'tanggalPenitipanSelesai' => optional($transaksi)->tanggalPenitipanSelesai,
+                'namaPenitip' => optional(optional($transaksi)->penitip)->namaPenitip,
+
+                // Include all transaksiPenitipan attributes as a nested array
+                'transaksiPenitipan' => $transaksi ? $transaksi->toArray() : null,
+                    'imagesBarang' => $item->imagesBarang ? [
+                    'image1' => $item->imagesBarang->image1,
+                    'image2' => $item->imagesBarang->image2,
+                    'image3' => $item->imagesBarang->image3,
+                    'image4' => $item->imagesBarang->image4,
+                    'image5' => $item->imagesBarang->image5,
+                ] : null,
+                
+            ];
+        });
+
+        return response()->json($result);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'An error occurred while fetching the products.',
+            'message' => $e->getMessage(),
+            'status' => true
+        ], 500);
+    }
+}
     // Show Barang by id
     public function show($idBarang)
 {
@@ -67,9 +96,8 @@ class BarangController extends Controller
 }
 
     // Create a new Barang
- public function store(Request $request)
+   public function store(Request $request)
 {
-    // Validate the incoming request
     $validated = $request->validate([
         'idBarang' => 'required|string|max:10',
         'idTransaksiDonasi' => 'nullable|string|max:10',
@@ -83,8 +111,6 @@ class BarangController extends Controller
         'kategori' => 'required|string|max:50',
     ]);
 
-   
-    // Now create Barang and link image field to imagesbarang.id
     $barang = Barang::create([
         'idBarang' => $validated['idBarang'],
         'namaBarang' => $validated['namaBarang'],
@@ -95,18 +121,15 @@ class BarangController extends Controller
         'haveHunter' => $validated['haveHunter'],
         'statusBarang' => $validated['statusBarang'],
         'kategori' => $validated['kategori'],
-        'image' => $validated['idBarang'],
+        'image' => null, // no related imagesBarang yet
     ]);
-    
-    
 
     return response()->json([
         'status' => true,
-        'message' => 'Barang created successfully with filenames saved',
+        'message' => 'Barang created successfully',
         'data' => $barang
     ], 201);
 }
-
 
     // Update an existing Barang
     public function update(Request $request, $id)
@@ -139,7 +162,7 @@ class BarangController extends Controller
         return response()->json(['message' => 'Barang updated successfully', 'data' => $barang]);
     }
 
-
+    // Delete a Barang
     public function destroy($id)
     {
         $barang = Barang::find($id);
@@ -189,49 +212,36 @@ class BarangController extends Controller
         'data' => $availableBarang
     ]);
 }
-    public function indexall()
+
+public function generateIdBarang(Request $request)
 {
-    try {
-        $barang = Barang::with('detailTransaksiPenitipan.transaksiPenitipan.penitip','imagesBarang')->get();
+    $prefix = $request->query('prefix');
 
-        $result = $barang->map(function($item) {
-            // Get transaksiPenitipan instance safely
-            $transaksi = optional($item->detailTransaksiPenitipan)->transaksiPenitipan;
-
-            return [
-                'idBarang' => $item->idBarang,
-                'namaBarang' => $item->namaBarang,
-                'beratBarang' => $item->beratBarang,
-                'garansiBarang' => $item->garansiBarang,
-                'periodeGaransi' => $item->periodeGaransi,
-                'hargaBarang' => $item->hargaBarang,
-                'haveHunter' => $item->haveHunter,
-                'statusBarang' => $item->statusBarang,
-                'image' => $item->image,
-                'kategori' => $item->kategori,
-                'tanggalPenitipanSelesai' => optional($transaksi)->tanggalPenitipanSelesai,
-                'namaPenitip' => optional(optional($transaksi)->penitip)->namaPenitip,
-
-                // Include all transaksiPenitipan attributes as a nested array
-                'transaksiPenitipan' => $transaksi ? $transaksi->toArray() : null,
-                    'imagesBarang' => $item->imagesBarang ? [
-                    'image1' => $item->imagesBarang->image1,
-                    'image2' => $item->imagesBarang->image2,
-                    'image3' => $item->imagesBarang->image3,
-                    'image4' => $item->imagesBarang->image4,
-                    'image5' => $item->imagesBarang->image5,
-                ] : null,
-                
-            ];
-        });
-
-        return response()->json($result);
-    } catch (\Exception $e) {
-        return response()->json([
-            'error' => 'An error occurred while fetching the products.',
-            'message' => $e->getMessage(),
-            'status' => true
-        ], 500);
+    if (!$prefix) {
+        return response()->json(['error' => 'Prefix is required'], 400);
     }
+
+    // Find existing idBarang that start with prefix and extract numbers
+    $existingIds = Barang::where('idBarang', 'like', $prefix . '%')->pluck('idBarang');
+
+    // Extract numbers from existing IDs
+    $numbers = $existingIds->map(function ($id) use ($prefix) {
+        return (int) str_replace($prefix, '', $id);
+    })->filter()->sort()->values();
+
+    // Find next available number
+    $nextNumber = 1;
+    foreach ($numbers as $num) {
+        if ($num == $nextNumber) {
+            $nextNumber++;
+        } else {
+            break;
+        }
+    }
+
+    $nextId = $prefix . $nextNumber;
+
+    return response()->json(['nextId' => $nextId]);
 }
+
 }

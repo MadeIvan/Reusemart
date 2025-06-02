@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BarangController;
 use Illuminate\Support\Facades\Password;
+use App\Http\Controllers\TransaksiPembelianController;
 
 Route::get('/', function () {
     return view('utama');

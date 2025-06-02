@@ -143,7 +143,7 @@
                 <form id="addBarangDetailForm">
                 <div class="mb-3">
                     <label for="idBarang" class="form-label">ID Barang</label>
-                    <input type="text" class="form-control" id="idBarang" required>
+                    <input type="text" class="form-control" id="idBarang" disabled>
                 </div>
                 <!-- <div class="mb-3">
                     <label for="idTransaksiDonasi" class="form-label">ID Transaksi Donasi</label>
@@ -402,9 +402,12 @@
             window.lastCreatedBarangId = null;
             addBarangButton.addEventListener("click", function () {
                 const addBarangDetailModal = new bootstrap.Modal(document.getElementById("addBarangDetailModal"));
+                addBarangDetailForm.reset();
+                // addBarangDetailModal.reset();
                 addBarangDetailModal.show();
             });
             const addBarangDetailForm = document.getElementById("addBarangDetailForm");
+            
             addBarangDetailForm.addEventListener("submit", async function (e) {
             e.preventDefault();
             if (currentEditItem) {
@@ -454,17 +457,11 @@
             // Handle form submission (when the user clicks 'Save')
             addBarangForm.addEventListener("submit", async function (e) {
             e.preventDefault();
-
-            const confirmed = window.confirm("Yakin?");
-            if (!confirmed) {
-                // User clicked Cancel, stop here
-                return;
-            }
             const formData = new FormData();
             formData.append("idBarang", document.getElementById("idBarang").value);
             // formData.append("idTransaksiDonasi", document.getElementById("idTransaksiDonasi").value);
             formData.append("namaBarang", document.getElementById("namaBarang").value);
-             console.log("Form Data:", document.getElementById("namaBarang").value);
+            console.log("Form Data:", document.getElementById("namaBarang").value);
             formData.append("beratBarang", document.getElementById("beratBarang").value);
             formData.append("garansiBarang", document.getElementById("garansiBarang").value);
             formData.append("periodeGaransi", document.getElementById("periodeGaransi").value);
@@ -473,7 +470,15 @@
             formData.append("statusBarang", document.getElementById("statusBarang").value);
             formData.append("kategori", document.getElementById("kategori").value);
             console.log("Form Data:", formData);
+            lastCreatedBarangId=document.getElementById("idBarang").value;
             console.log("id barang : ", lastCreatedBarangId)
+
+            const confirmed = window.confirm("Yakin?");
+            if (!confirmed) {
+                // User clicked Cancel, stop here
+                return;
+            }
+            
             try {
 
                 const response = await fetch("http://127.0.0.1:8000/api/barang", {
@@ -791,6 +796,7 @@
 
             
             function openEditModal(item) {
+                document.getElementById('preview').innerHTML = '';
                 currentEditItem = item;
                 console.log(currentEditItem);
                 console.log("openEditModal called with item:", item);
@@ -898,6 +904,43 @@
                 container.appendChild(btn);
                 preview.appendChild(container);
         }
+        function generateIdBarangPrefix(namaBarang) {
+  // Get first letters of each word in uppercase
+            return namaBarang.trim().charAt(0).toUpperCase();
+            // return namaBarang
+            //     .split(' ')
+            //     .map(word => word.charAt(0).toUpperCase())
+            //     .join('');
+        }
+        document.getElementById('namaBarang').addEventListener('input', async function () {
+            const namaBarang = this.value.trim();
+            if (namaBarang.length === 0) {
+                document.getElementById('idBarang').value = '';
+                return;
+            }
+
+            const prefix = generateIdBarangPrefix(namaBarang);
+
+            // Call backend to get next available number for this prefix
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/generate-idbarang?prefix=${prefix}`, {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem('auth_token')}`,
+                }
+                });
+                const data = await response.json();
+
+                if (data.nextId) {
+                document.getElementById('idBarang').value = data.nextId; // e.g. MB1, MB2, etc.
+                } else {
+                document.getElementById('idBarang').value = prefix + '1'; // fallback
+                }
+            } catch (error) {
+                console.error('Error fetching next idBarang:', error);
+                document.getElementById('idBarang').value = prefix + '1';
+            }
+            });
+
 
             // Initial fetch when the page loads
             fetchPenitip();
