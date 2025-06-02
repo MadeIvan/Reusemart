@@ -145,7 +145,7 @@
         document.querySelectorAll(".confirmPembayaran").forEach(link => {
             link.addEventListener("click", function () {
                 const noNota = this.getAttribute("data-id");
-                updatePembayaran(noNota, "Lunas Belum Dijadwalkan");
+                updatePembayaran(noNota, "LUNAS BELUM DIJADWALKAN");
             });
         });
         

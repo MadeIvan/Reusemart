@@ -124,8 +124,22 @@
                             <option value="Kantor">Kantor</option>
                         </select>
                     </div>
-                    <!-- <div class="mb-3">
-                        <label for="kategoriAlamatCreate" class="form-label"><strong>Kota</strong></label>
+                    <div class="mb-3">
+                        <label for="namaCreate" class="form-label"><strong> Nama</strong></label>
+                        <input class="form-control" id="namaCreate" name="namaCreate" required></input>
+                    </div>
+                    <div class="mb-3">
+                        <label for="alamatCreate" class="form-label"><strong> Alamat</strong></label>
+                        <textarea class="form-control" id="alamatCreate" name="alamatCreate" rows="3" placeholder="Nama Jalan, Gedung, Nomor Rumah, RT, RW" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="ProvinsiAlamatCreate" class="form-label"><strong>Provinsi</strong></label>
+                        <select class="form-control" id="ProvinsiAlamatCreate" name="ProvinsiAlamatCreate" required disabled>
+                            <option value="" disabled selected>Daerah Istimewa Yogyakarta</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="kategoriAlamatCreate" class="form-label"><strong>Kabupaten</strong></label>
                         <select class="form-control" id="kotaAlamatCreate" name="kotaAlamatCreate" required>
                             <option value="" disabled selected>Pilih Kota</option>
                             <option value="bantul">Kab. Bantul</option>
@@ -136,19 +150,14 @@
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="kategoriAlamatCreate" class="form-label"><strong>Kecamatan</strong></label>
-                        <select class="form-control" id="kotaAlamatCreate" name="kotaAlamatCreate" required>
+                        <label for="kecamatanAlamatCreate" class="form-label"><strong>Kecamatan</strong></label>
+                        <select class="form-control" id="kecamatanAlamatCreate" name="kecamatanAlamatCreate" required>
                             <option value="" disabled selected>Pilih Kecamatan</option>
-                            
                         </select>
-                    </div> -->
-                    <div class="mb-3">
-                        <label for="namaCreate" class="form-label"><strong> Nama</strong></label>
-                        <input class="form-control" id="namaCreate" name="namaCreate" required></input>
                     </div>
                     <div class="mb-3">
-                        <label for="alamatCreate" class="form-label"><strong> Alamat</strong></label>
-                        <textarea class="form-control" id="alamatCreate" name="alamatCreate" rows="3" required></textarea>
+                        <label for="kodePosAlamatCreate" class="form-label"><strong>Kode Pos</strong></label>
+                        <input class="form-control" id="kodePosAlamatCreate" name="kodePosAlamatCreate" required></input>
                     </div>
                     <div class="mb-3">
                         <input class="form-check-input" type="checkbox" id="isDefault" aria-label="Checkbox for Atur Sebagai Alamat Utama">
@@ -250,6 +259,42 @@
             
           
             fetchAlamat();
+
+
+            const kecamatanData = {
+                bantul: ["Bambanglipuro", "Bantul", "Banguntapan", "Jetis", "Kasihan", "Pajangan", "Pandak", "Sanden", "Sedayu", "Sewon", "Pleret", "Imogiri"],
+                sleman: ["Depok", "Gamping", "Godean", "Minggir", "Mlati", "Ngaglik", "Ngemplak", "Pakem", "Prambanan", "Seyegan", "Tempel", "Turi"],
+                kulprog: ["Galur", "Kalibawang", "Kokap", "Lendah", "Nanggulan", "Panjatan", "Wates", "Sentolo", "Samigaluh"],
+                gunkid: ["Playen", "Gedangsari", "Nglipar", "Paliyan", "Panggang", "Semanu", "Ngawen", "Wonosari", "Karangmojo", "Patuk", "Ponjong", "Tepus"],
+                yk: ["Gedongtengen", "Gondokusuman", "Gondomanan", "Jetis", "Kotagede", "Kraton", "Mantrijeron", "Mergangsan", "Ngampilan", "Pakualaman", "Tegalrejo", "Umbulharjo"]
+            };
+
+            const kotaSelect = document.getElementById('kotaAlamatCreate');
+            const kecamatanSelect = document.getElementById('kecamatanAlamatCreate');
+
+            kotaSelect.addEventListener('change', function() {
+                const selectedKota = this.value;
+                
+                // Hapus opsi lama di kecamatan
+                kecamatanSelect.innerHTML = '<option value="" disabled selected>Pilih Kecamatan</option>';
+
+                if (selectedKota && kecamatanData[selectedKota]) {
+                    // Isi kecamatan sesuai kota yang dipilih
+                    kecamatanData[selectedKota].forEach(kecamatan => {
+                        const option = document.createElement('option');
+                        option.value = kecamatan.toLowerCase().replace(/\s+/g, '');
+                        option.textContent = kecamatan;
+                        kecamatanSelect.appendChild(option);
+                    });
+                    kecamatanSelect.disabled = false;
+                } else {
+                    // Jika tidak ada data, disable dropdown kecamatan
+                    kecamatanSelect.disabled = true;
+                }
+            });
+
+            // Inisialisasi disable kecamatan jika belum pilih kota
+            kecamatanSelect.disabled = true;
 
             ////////////////////////SHOW ALAMAT//////////////////////////////////;
 
@@ -459,11 +504,16 @@
             ////////////////////////TAMBAH ALAMAT///////////////////////////////////
             document.getElementById("confirmCreate").addEventListener("click", () => {
                 const kategori = document.getElementById("kategoriAlamatCreate").value;
-                const alamat = document.getElementById("alamatCreate").value;
+                const alamatJalan = document.getElementById("alamatCreate").value;
+                const provinsi = document.getElementById("ProvinsiAlamatCreate").options[document.getElementById("ProvinsiAlamatCreate").selectedIndex].text;
+                const kota = document.getElementById("kotaAlamatCreate").options[document.getElementById("kotaAlamatCreate").selectedIndex].text;
+                const kecamatan = document.getElementById("kecamatanAlamatCreate").options[document.getElementById("kecamatanAlamatCreate").selectedIndex].text;
+                const kodePos = document.getElementById("kodePosAlamatCreate").value;
+                const alamat = `${alamatJalan}, ${kecamatan}, ${kota}, ${provinsi}, ${kodePos}`;
                 const nama = document.getElementById("namaCreate").value;
                 const isDefault = document.getElementById("isDefault").checked;
 
-                if(!kategori || !alamat || !nama) {
+                if(!kategori || !alamatJalan || !nama || !kodePos || !kecamatan || !kota) {
                     Toastify({
                         text: "Semua field harus diisi",
                         duration: 3000,
@@ -476,7 +526,7 @@
                     return;
                 };
 
-
+                const alamatLengkap = `${alamatJalan}, ${kecamatan}, ${kota}, ${provinsi}, Kode Pos: ${kodePos}`;
                 fetch("http://127.0.0.1:8000/api/pembeli/buat-alamat", {
                     method: "POST",
                     headers: {
@@ -487,7 +537,7 @@
                     },
                     body: JSON.stringify({
                         kategori,
-                        alamat,
+                        alamat: alamatLengkap,
                         isDefault,
                         nama,
                     })

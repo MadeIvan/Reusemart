@@ -92,14 +92,26 @@ class TransaksiPembelianController extends Controller
             \Log::info("ID yang akan digunakan sebagai noNota:", [$newId]);
 
             // Simpan transaksi utama
-            $transaksiPembelian = TransaksiPembelian::create([
-                'noNota' => $newId,
-                'idPembeli' => $pembeli->idPembeli,
-                'idAlamat' => $validated['idAlamat'],
-                'tanggalWaktuPembelian' => $validated['tanggalWaktuPembelian'],
-                'status' => "Menunggu Pembayaran",
-                'totalHarga' => $validated['totalHarga']
-            ]);
+            if($validated['totalHarga'] === 0){
+                $transaksiPembelian = TransaksiPembelian::create([
+                    'noNota' => $newId,
+                    'idPembeli' => $pembeli->idPembeli,
+                    'idAlamat' => $validated['idAlamat'],
+                    'tanggalWaktuPembelian' => $validated['tanggalWaktuPembelian'],
+                    'status' => "LUNAS BELUM DIJADWALKAN",
+                    'totalHarga' => $validated['totalHarga']
+                ]);
+                
+            }else{
+                $transaksiPembelian = TransaksiPembelian::create([
+                    'noNota' => $newId,
+                    'idPembeli' => $pembeli->idPembeli,
+                    'idAlamat' => $validated['idAlamat'],
+                    'tanggalWaktuPembelian' => $validated['tanggalWaktuPembelian'],
+                    'status' => "Menunggu Pembayaran",
+                    'totalHarga' => $validated['totalHarga']
+                ]);
+            }
 
             \Log::info("transaksiPembelian", [$transaksiPembelian]);
 
@@ -207,7 +219,7 @@ public function notaPenjualanPdf($noNota)
         try {
             $validated = $request->validate([
                 'tanggalWaktuPelunasan' => 'required|date_format:Y-m-d H:i:s',
-                'buktiPembayaran' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+                'buktiPembayaran' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
             ]);
 
             $pembeli = auth('pembeli')->user();
@@ -463,12 +475,11 @@ public function tolakVerifikasi(Request $request, $noNota)
                 \Log::info("poinAkhir: " . $pembeli->poin);
                 \Log::info("poinBelanja: $poinBelanja");
                 \Log::info("poinTukar: $poinTukar");
-                \Log::info("totalHargaBarang: " .  $totalHarga, "totalhargaTransaksi: " . $transaksi->totalHarga, "selisih". $selisihHarga);
             }else if($alamat !== null && $totalHarga < 1500000){
                 if($totalHarga >= 500000){
                     $poinBelanja = $totalHarga / 10000;
                     $poinBonus = $poinBelanja * 0.2;
-                    $selisihHarga = abs($totalHarga - ($transaksi->totalHarga - 100000));
+                    $selisihHarga = abs($totalHarga - ($transaksi->totalHarga));
                     $poinTukar = $selisihHarga / 100;
                     $poinAkhir = $pembeli->poin;
                     \Log::info("=== DEBUG ===");
@@ -482,7 +493,7 @@ public function tolakVerifikasi(Request $request, $noNota)
                     $transaksi->save();
                 }else{
                     $poinBelanja = $totalHarga / 10000;
-                    $selisihHarga = abs($totalHarga - ($transaksi->totalHarga - 100000));
+                    $selisihHarga = abs($totalHarga - ($transaksi->totalHarga));
                     $poinTukar = $selisihHarga / 100;
                     $poinAkhir = $pembeli->poin;
                     \Log::info("=== DEBUG ===");
