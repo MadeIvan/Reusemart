@@ -428,7 +428,7 @@ public function tolakVerifikasi(Request $request, $noNota)
                 if($totalHarga >= 500000){
                     $poinBelanja = $totalHarga / 10000;
                     $poinBonus = $poinBelanja * 0.2;
-                    $selisihHarga = abs($totalHarga - ($transaksi->totalHarga));
+                    $selisihHarga = abs(($transaksi->totalHarga)  -  $totalHarga);
                     $poinTukar = $selisihHarga / 100;
                     $poinAkhir = $pembeli->poin;
                     \Log::info("=== DEBUG ===");
@@ -463,6 +463,7 @@ public function tolakVerifikasi(Request $request, $noNota)
                 \Log::info("poinAkhir: " . $pembeli->poin);
                 \Log::info("poinBelanja: $poinBelanja");
                 \Log::info("poinTukar: $poinTukar");
+                \Log::info("totalHargaBarang: " .  $totalHarga, "totalhargaTransaksi: " . $transaksi->totalHarga, "selisih". $selisihHarga);
             }else if($alamat !== null && $totalHarga < 1500000){
                 if($totalHarga >= 500000){
                     $poinBelanja = $totalHarga / 10000;

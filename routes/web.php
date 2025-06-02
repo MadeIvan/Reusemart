@@ -57,6 +57,10 @@ Route::get('/pegawaidata', function () {
 Route::get('/pembeli/alamat', function () {
     return view('Pembeli.showAlamat');
 });
+Route::get('/pembeli/dashboard', function () {
+    return view('Pembeli.dashboard');
+});
+
 
 Route::get('/penitip/dashboard', function () {
     return view('Penitip.dashboardPenitip');

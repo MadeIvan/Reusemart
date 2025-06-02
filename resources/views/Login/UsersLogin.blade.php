@@ -153,12 +153,13 @@ document.addEventListener('DOMContentLoaded', function () {
             } else if (status == 'pembeli') {
                 localStorage.setItem('auth_token', resData.data.token);
                 localStorage.setItem('user_role', 'pembeli');
-                window.location.href = 'http://127.0.0.1:8000/pembeli/alamat';
+                window.location.href = 'http://127.0.0.1:8000/pembeli/dashboard';
             } else if (status == 'organisasi') {
                 localStorage.setItem('auth_token', resData.data.token);
                 localStorage.setItem('user_role', 'organisasi');
                 window.location.href = 'http://127.0.0.1:8000/OrganisasiMain'
             }
+            // localStorage.setItem('dataUser', JSON.stringify(resData.data[status]));
         } catch (error) {
             console.error('Error:', error);
             alert('An error occurred: ' + error.message);
