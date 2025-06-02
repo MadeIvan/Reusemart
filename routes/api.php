@@ -20,6 +20,7 @@ use App\Http\Controllers\TransaksiDonasiController;
 use App\Http\Controllers\TransaksiPenitipanController;
 use App\Http\Controllers\TransaksiPembelianController;
 use App\Http\Controllers\PointRedemptionController;
+use App\Http\Controllers\ImagesBarangController;
 
 
 
@@ -163,6 +164,8 @@ Route::post('/barang',[BarangController::class,'store']);
 Route::get('/indexall',[BarangController::class,'indexall']);
 
 Route::post('/addimages', [ImagesBarangController::class, 'store']);
+Route::get('/generate-idbarang', [BarangController::class, 'generateIdBarang']);
+
 
 
 

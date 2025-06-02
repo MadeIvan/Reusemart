@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\ImagesBarang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Models\Barang;
 
 class ImagesBarangController extends Controller
 {
@@ -26,9 +27,9 @@ class ImagesBarangController extends Controller
     }
 
     // Store new imagesbarang
-    public function store(Request $request)
-    { 
-        $data = $request->validate([
+   public function store(Request $request)
+{
+    $data = $request->validate([
         'id' => 'required|string|max:10',
         'image1' => 'nullable|string|max:255',
         'image2' => 'nullable|string|max:255',
@@ -37,10 +38,29 @@ class ImagesBarangController extends Controller
         'image5' => 'nullable|string|max:255',
     ]);
 
-    ImagesBarang::create($data);
+    // Create ImagesBarang record
+    $imagesBarang = ImagesBarang::create($data);
 
-        return response()->json($data, 201);
+    // Find the Barang using the id (assuming 'id' matches 'idBarang')
+    $barang = Barang::find($data['id']); 
+    if ($barang) {
+        $barang->image = $imagesBarang->id; // Set FK to imagesBarang's PK
+        $barang->save();
+    } else {
+        // Optional: handle barang not found, e.g. return error
+        return response()->json([
+            'status' => false,
+            'message' => 'Barang not found with id ' . $data['id']
+        ], 404);
     }
+
+    return response()->json([
+        'status' => true,
+        'message' => 'ImagesBarang created and linked successfully',
+        'data' => $imagesBarang
+    ], 201);
+}
+
 
     // Update imagesbarang
     public function update(Request $request, $id)
