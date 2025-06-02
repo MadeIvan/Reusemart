@@ -12,6 +12,7 @@ class TransaksiPembelian extends Model
     protected $table = 'transaksipembelian'; 
     protected $primaryKey = 'noNota';
     protected $keyType = 'string'; 
+    public $incrementing = false;
     public $timestamps = false;   
 
     protected $fillable = [

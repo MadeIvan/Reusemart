@@ -548,10 +548,13 @@
                     // console.log("Resoine API", data)
                     const modal = bootstrap.Modal.getInstance(document.getElementById("createAlamat"));
                         if (modal) modal.hide();
-                    
-                    if(data.status) {
+                        
+                        if(data.status) {
+                        // \Log::info('Data JSON dikirim:', ['data' => $transaksiPembelian->toArray()]);
                         // ambil noNota dari response
                         const noNota = data.data.noNota;
+                        console.log(data);
+                        console.log(noNota);
 
                         // redirect ke halaman pembayaran dengan noNota di URL
                         window.location.href = `/pembayaran/${noNota}`;

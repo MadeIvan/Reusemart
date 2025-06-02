@@ -65,7 +65,7 @@
                 if (data.data) {
                     const cardBody = document.querySelector("#cardPembayaran .card-body");
                     const waktuPembelian = new Date(data.data.tanggalWaktuPembelian);
-                    const batasBayar = new Date(waktuPembelian.getTime() + 15000); // 60 detik
+                    const batasBayar = new Date(waktuPembelian.getTime() + 60000); // 60 detik
                     // const batasBayar = new Date(waktuPembelian.getTime() + 900000);
                     batasBayarGlobal = batasBayar;
                     noNotaUpdated = data.data.noNota;

@@ -57,6 +57,8 @@ class TransaksiPembelianController extends Controller
             }
             $newId = $yearMonth . '.' . ($lastNumber + 1);
 
+            \Log::info("ID yang akan digunakan sebagai noNota:", [$newId]);
+
             // Simpan transaksi utama
             $transaksiPembelian = TransaksiPembelian::create([
                 'noNota' => $newId,
@@ -66,6 +68,7 @@ class TransaksiPembelianController extends Controller
                 'status' => "Menunggu Pembayaran",
                 'totalHarga' => $validated['totalHarga']
             ]);
+            \Log::info("transaksiPembelian", [$transaksiPembelian]);
 
             $idBarangs = $validated['id_barang'];
             // Simpan detail barang
