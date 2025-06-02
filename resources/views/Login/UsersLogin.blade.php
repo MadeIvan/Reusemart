@@ -137,6 +137,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             const resData = await response.json();
             const userStorage=resData.data
+            ////////////////nambah ini sekalian buat simpen data user di localStorage///////////////////////////////////
             localStorage.setItem('userData', JSON.stringify(userStorage));
             console.log(resData);
             if (!response.ok) {

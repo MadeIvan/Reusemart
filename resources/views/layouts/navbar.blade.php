@@ -183,6 +183,7 @@
             leftMenu.appendChild(createItem("/pegawaidata", "Profile"));
             leftMenu.appendChild(createItem("/pegawai/gudangview", "View Gudang"));
             leftMenu.appendChild(createItem("/pegawai/penjadwalan", "Penjadwalan Barang"));
+            leftMenu.appendChild(createItem("/pegawai/ViewNota", "Nota Pembelian Barang"));
             rightMenu.appendChild(createLogout());   
             }
         }
