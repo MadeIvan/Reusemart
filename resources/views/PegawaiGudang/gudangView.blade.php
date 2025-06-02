@@ -265,6 +265,7 @@
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token from meta tag
             let currentEditItem = null;
             const tableBody = document.getElementById("tableBody");
+            const formData = new FormData();
             // const searchInput = document.getElementById("searchInput");
             // const form = document.getElementById("PegawaiForm");
             // const registerButton = document.getElementById("registerButton");
@@ -275,6 +276,22 @@
             // let currentPegawaiId = null;
             
             // SEARCH
+            let fileNamesArray = [];
+            let selectedHunterId = null;
+            const hunterSelected = document.getElementById('idPegawai2');
+                hunterSelected.addEventListener('change', function() {
+                selectedHunterId = this.value;
+                console.log('Selected Hunter ID:', selectedHunterId);
+            });
+
+            
+
+
+            const penitipSelect = document.getElementById('idPenitip');
+            penitipSelect.addEventListener('change', function() {
+                selectedPenitipId = this.value;
+                console.log('Selected Penitip ID:', selectedPenitipId);
+            });
             const searchInput = document.getElementById("searchInput");
             let pegawaiData = []; // to store fetched data globally
             function deepSearch(obj, searchTerm) {
@@ -376,7 +393,8 @@
             const addBarangModal = new bootstrap.Modal(document.getElementById("addBarangModal"));
             const addBarangForm = document.getElementById("addBarangForm");
             const namaPegawai = pegawai.namaPegawai
-            const idPegawai = pegawai.idPegawai   
+            const idPegawai = pegawai.idPegawai 
+            let barangData={};  
 
             console.log("Retrieved namaPegawai:", namaPegawai);
             console.log("Retrieved IdPegawai:", idPegawai);
@@ -418,7 +436,7 @@
                 const addBarangDetailModal = new bootstrap.Modal(document.getElementById("addBarangDetailModal"));
                 addBarangDetailForm.reset();
                 let kategoriSelect ='';
-                toggleGaransiInputs();
+                // toggleGaransiInputs();
                 resetImagePreview();
                 // addBarangDetailModal.reset();
                 addBarangDetailModal.show();
@@ -434,19 +452,44 @@
                 document.getElementById("tanggalPenitipan").value = currentEditItem.tanggalPenitipanSelesai || '';
                 // etc, fill all needed fields
             }
-            
+            if (filesArray.length < 2 || filesArray.length > 5 ) {
+                e.preventDefault();
+                alert('Please upload at least 2 images and no more than 5 images :D');
+                return false;
+            }
+            console.log("idBarang value b4 form : ",  document.getElementById("idBarang").value )
+                
+            barangData = {
+                idBarang: document.getElementById("idBarang").value,
+                namaBarang: document.getElementById("namaBarang").value,
+                beratBarang: document.getElementById("beratBarang").value,
+                garansiBarang: document.getElementById("garansiBarang").value,
+                periodeGaransi: document.getElementById("periodeGaransi").value,
+                hargaBarang: document.getElementById("hargaBarang").value,
+                haveHunter: document.getElementById("haveHunter").value,
+                statusBarang: document.getElementById("statusBarang").value,
+                kategori: document.getElementById("kategori").value,
+                garansiBarang: document.getElementById("garansiBarang").value,
+            };
+            window.lastCreatedBarangId = document.getElementById("idBarang").value;
+            console.log("data barang", barangData);
+
             const firstModal = bootstrap.Modal.getInstance(document.getElementById("addBarangDetailModal"));
             firstModal.hide();
-            let hunterSelect = document.getElementById("haveHunter").value;
+            toggleHunterSelect();
+            // let hunterSelect = document.getElementById("haveHunter").value;
             addBarangDetailForm.reset();
             resetImagePreview();
-            toggleHunterSelect();
+           
 
             const addBarangModal = new bootstrap.Modal(document.getElementById("addBarangModal"));
             document.getElementById("idPegawai1").value = namaPegawai || '';
             const today = new Date();
             const plus30Days = new Date(today);
             plus30Days.setDate(today.getDate() + 30);
+
+            
+            
 
             document.getElementById("tanggalPenitipan").value = plus30Days.toISOString().split("T")[0];
             fetchHunters();
@@ -480,41 +523,32 @@
             e.preventDefault();
             resetImagePreview();
             addBarangForm.reset();
-            const formData = new FormData();
-            formData.append("idBarang", document.getElementById("idBarang").value);
-            // formData.append("idTransaksiDonasi", document.getElementById("idTransaksiDonasi").value);
-            formData.append("namaBarang", document.getElementById("namaBarang").value);
-            console.log("Form Data:", document.getElementById("namaBarang").value);
-            formData.append("beratBarang", document.getElementById("beratBarang").value);
-            formData.append("garansiBarang", document.getElementById("garansiBarang").value);
-            formData.append("periodeGaransi", document.getElementById("periodeGaransi").value);
-            formData.append("hargaBarang", document.getElementById("hargaBarang").value);
-            formData.append("haveHunter", document.getElementById("haveHunter").value);
-            formData.append("statusBarang", document.getElementById("statusBarang").value);
-            formData.append("kategori", document.getElementById("kategori").value);
-            console.log("Form Data:", formData);
-            lastCreatedBarangId=document.getElementById("idBarang").value;
-            console.log("id barang : ", lastCreatedBarangId)
-
+            
+            
             const confirmed = window.confirm("Yakin?");
             if (!confirmed) {
                 // User clicked Cancel, stop here
+                addBarangDetailModal.close();
                 return;
             }
             
-            try {
+            // Log all formData entries
+            
 
+            try {
+                console.log("barang data : ",barangData);
                 const response = await fetch("http://127.0.0.1:8000/api/barang", {
                     method: "POST",
                     headers: {
+                        "Content-Type": "application/json",
                         "Authorization": `Bearer ${localStorage.getItem('auth_token')}`,
                         "X-CSRF-TOKEN": csrfToken
                     },
-                    body: formData
+                    body: JSON.stringify(barangData),
                 });
 
                 const result = await response.json();
-
+                
                 if (response.ok && result.status) {
                     // alert("Barang created successfully!");
 
@@ -533,7 +567,7 @@
                 } else {
                     alert("Failed to create Barang.");
                     console.error(result.message || "Unknown error");
-                    console.log(formData);
+                    // console.log(formData);
                 }
             } catch (error) {
                 console.log("Form Data:", formData);
@@ -558,13 +592,17 @@
                 
                 idPegawai1: pegawai.idPegawai,
                 // idPegawai2: idPegawai2Value !== "" ? idPegawai2Value : null,
-                idPenitip: document.getElementById("idPenitip").value,
+                idPenitip: selectedPenitipId,
                 // tanggalPenitipan: tanggalPenitipan,
                 // tanggalPenitipanSelesai: tanggalPenitipanSelesai,
-                totalHarga: document.getElementById("hargaBarang").value,
+                totalHarga:barangData.hargaBarang,
                 idBarang: window.lastCreatedBarangId,
             };
-            const idBarangValue = document.getElementById("idBarang").value;
+            if (selectedHunterId && selectedHunterId.trim() !== '') {
+                transaksiData.idPegawai2 = selectedHunterId;
+            }       
+            const idBarangValue = window.lastCreatedBarangId;
+           
             console.log("Transaksi Data:", transaksiData);
             try {
                 const response = await fetch("http://127.0.0.1:8000/api/addTransaksiPenitipan", {
@@ -587,7 +625,7 @@
                     image4: fileNamesArray[3] || null,
                     image5: fileNamesArray[4] || null,
                 };
-
+                console.log("list image on payload : ",payload);
                 // Send POST request using fetch API
                 fetch('http://127.0.0.1:8000/api/addimages', {
                 method: 'POST',
@@ -632,6 +670,7 @@
 
             async function fetchPenitip(selectedUsername = null) {
                 const penitipSelect = document.getElementById("idPenitip");
+                console.log("penitip id 1 :", penitipSelect.value);
                 penitipSelect.innerHTML = `<option value="">Pilih Penitip</option>`;
                 try {
                     const response = await fetch("http://127.0.0.1:8000/api/getpenitip", {
@@ -657,6 +696,8 @@
 
                         if (selectedUsername) {
                             penitipSelect.value = selectedUsername;
+                            console.log("penitip id 2 :", penitipSelect);
+                            
                         }
                     } else {
                         console.warn("No Penitip available");
@@ -672,7 +713,7 @@
             
 
             let filesArray = []; // Store selected files here
-            let fileNamesArray = [];
+            // let fileNamesArray = [];
             dropArea.addEventListener('click', () => fileInput.click());
             fileInput.addEventListener('change', () => {
                 handleFiles(fileInput.files);
@@ -713,6 +754,7 @@
                 }
                 filesArray.push(file);
                 fileNamesArray.push(file.name); 
+                console.log("list patn : ", fileNamesArray);
                 previewFile(file);
                 }
                 toggleDropAreaVisibility();
@@ -969,8 +1011,8 @@
             const haveHunterSelect = document.getElementById('haveHunter');
             const hunterSelect = document.getElementById('idPegawai2');
             function toggleHunterSelect() {
-                console.log("have Hunter value func : ", haveHunterSelect.value);
-            if (haveHunterSelect.value === 1) { // 'Ya'
+                console.log("have Hunter value func inside : ", haveHunterSelect.value);
+            if (haveHunterSelect.value === '1') { // 'Ya'
                 hunterSelect.disabled = false;
                 hunterSelect.required = true;
             } else  {
@@ -1015,7 +1057,7 @@
                 garansiSelect.required = false;
                 periodeInput.disabled = true;
                 periodeInput.required = false;
-                garansiSelect.value = "";
+                garansiSelect.value = "0";
                 periodeInput.value = "";
                 }
             }
@@ -1048,7 +1090,7 @@
 
                 // Clear your file tracking arrays
                 filesArray = [];
-                fileNamesArray = [];
+                // fileNamesArray = [];
 
                 // Reset the actual file input element
                 const fileInput = document.getElementById('image');
