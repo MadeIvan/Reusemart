@@ -38,6 +38,15 @@ class PegawaiController extends Controller
             ], 400);
         }
     }
+     public function getHunters()
+    {
+        $hunters = Pegawai::where('idJabatan', 6)->get(['idPegawai', 'namaPegawai']);
+
+        return response()->json([
+            'status' => true,
+            'data' => $hunters
+        ]);
+    }
 
     public function show($id){ //search
         try{

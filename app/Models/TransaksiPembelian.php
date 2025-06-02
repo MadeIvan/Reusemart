@@ -43,10 +43,6 @@ class TransaksiPembelian extends Model
         return $this->belongsTo(Pegawai::class, 'idPegawai3', 'idPegawai')
         ->select(['idPegawai', 'namaPegawai']);
     }
-    public function pegawai3(){
-        return $this->hasMany(Pegawai::class, 'idPegawai3', 'idPegawai');
-    }
-
     public function pembeli(){
         return $this->belongsTo(Pembeli::class, 'idPembeli', 'idPembeli');
     }

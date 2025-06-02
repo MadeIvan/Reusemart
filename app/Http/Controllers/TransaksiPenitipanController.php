@@ -6,48 +6,68 @@ use Illuminate\Http\Request;
 
 class TransaksiPenitipanController extends Controller
 {
-    public function store(Request $request){ //register
-        
+public function store(Request $request)
+{
+    $request->validate([
+        'idPegawai1' => 'required|exists:pegawai,idPegawai',
+        'idPegawai2' => 'nullable|exists:pegawai,idPegawai',
+        'idPenitip' => 'required|exists:penitip,idPenitip',
+        // 'tanggalPenitipan' => now(),
+        'totalHarga' => 'required|numeric|min:0',
+        'idBarang' => 'required|exists:barang,idBarang'
+    ]);
 
-        $request->validate([
-            'idPegawai2'=> 'nullable|string', //hunter
-            'idPenitip'=> 'required|string8',
-            'tanggalPenitipan'=> 'required|date_format:Y-m-d H:i:s',
-            'totalHarga'=> 'required|integer',
-        ]);
-        $last = Penitip::orderBy('idPenitip', 'desc')->first();
-        $lastNumber = 0;
-
-        if ($last) {
-            $lastNumber = (int) str_replace('T', '', $last->idPenitip);
-        }
-
-        $newId = 'T' . ($lastNumber + 1);
-
-        while (Penitip::where('idPenitip', $newId)->withTrashed()->exists()) {
-            $lastNumber++;
-            $newId = 'T' . $lastNumber;
-        }
-
-        $dompet = (new DompetController)->createDompetPenitip(null);
-        $idDompet = (string) $dompet->idDompet;
-
-
-        $penitip = Penitip::create([
-            'idPenitip' => $newId,
-            'idTopeseller'=> null,
-            'idDompet'=> $idDompet,
-            'username'=>  $request->username,
-            'password'=>  Hash::make($request->password),
-            'namaPenitip'=> $request->namaPenitip,
-            'nik'=> $request->nik,
-            'alamat'=> $request->alamat
-        ]);
-
+    // Optional: Check if this barang is already in a penitipan
+    if (DetailTransaksiPenitipan::where('idBarang', $request->idBarang)->exists()) {
         return response()->json([
-            "status" => true,
-            "message" => "Get successful",
-            "data" => $penitip
-        ], 200);
+            'status' => false,
+            'message' => 'Barang already associated with a Transaksi Penitipan'
+        ], 400);
     }
+
+    DB::beginTransaction();
+    try {
+        // Generate new TP ID
+        $last = TransaksiPenitipan::orderBy('idTransaksiPenitipan', 'desc')->first();
+        $lastNumber = $last ? (int) str_replace('TP', '', $last->idTransaksiPenitipan) : 0;
+        $newIdTP = 'TP' . ($lastNumber + 1);
+        while (TransaksiPenitipan::where('idTransaksiPenitipan', $newIdTP)->exists()) {
+            $lastNumber++;
+            $newIdTP = 'TP' . $lastNumber;
+        }
+
+        $tanggalMulai = new \DateTime($request->tanggalPenitipan);
+        $tanggalSelesai = (clone $tanggalMulai)->modify('+30 days');
+
+        // Create transaksiPenitipan
+        $transaksi = TransaksiPenitipan::create([
+            'idTransaksiPenitipan' => $newIdTP,
+            'idPegawai1' => $request->idPegawai1,
+            'idPegawai2' => $request->idPegawai2,
+            'idPenitip' => $request->idPenitip,
+            'tanggalPenitipan' => now(),
+            'tanggalPenitipanSelesai' => now()->addDays(30),
+            'totalHarga' => $request->totalHarga,
+        ]);
+
+        // Link to 1 barang
+        DetailTransaksiPenitipan::create([
+            'idTransaksiPenitipan' => $newIdTP,
+            'idBarang' => $request->idBarang
+        ]);
+
+        DB::commit();
+        return response()->json([
+            'status' => true,
+            'message' => 'Transaksi Penitipan created successfully',
+            'data' => $transaksi
+        ], 201);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json([
+            'status' => false,
+            'message' => 'Transaction failed: ' . $e->getMessage()
+        ], 500);
+    }
+}
 }

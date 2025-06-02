@@ -125,6 +125,8 @@ class PenitipController extends Controller
             'data' => $penitip
         ]);
     }
+
+
     ////////////////[UPDATE PENITIP ID]////////////////////
     public function updatePenitip(Request $request, $id){
     $penitip = Penitip::whereRaw('BINARY idPenitip = ?', [$id])->first();
@@ -209,7 +211,15 @@ public function deletePenitip($id){
         ]);
     }
 
+    public function getPenitip()
+{
+    $penitips = Penitip::all(['idPenitip', 'username']);
 
+    return response()->json([
+        'status' => true,
+        'data' => $penitips
+    ]);
+}
 }
 
 

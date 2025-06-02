@@ -139,6 +139,8 @@
 
           alert('Login successful!');
           const IdJabatan = resData.data.pegawai.idJabatan;
+          const namaPegawai = resData.data.pegawai.namaPegawai;
+
           localStorage.setItem('auth_token', resData.data.token);
 
           if(IdJabatan==1){
@@ -152,7 +154,10 @@
           } else if(IdJabatan==3){
             alert('Login As Pegawai Gudang!');
             localStorage.setItem('user_role', 'gudang');
+            localStorage.setItem('namaPegawai', namaPegawai);
             window.location.href = "/pegawaidata";
+            
+            
           } else if(IdJabatan==4){
             alert('Login As Kurir!');
             localStorage.setItem('user_role', 'kurir');

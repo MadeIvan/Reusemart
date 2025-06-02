@@ -147,5 +147,14 @@ Route::get('/point-redemptions', [PointRedemptionController::class, 'index']);
 Route::post('/point-redemptions', [PointRedemptionController::class, 'store']);
 Route::delete('/point-redemptions/{id}', [PointRedemptionController::class, 'destroy']);
 
+Route::get('/transaksiPenitipan', [TransaksiPenitipanController::class, 'index']);
+Route::post('/addTransaksiPenitipan',[TransaksiPenitipanController::class, 'store']);
+Route::get('/pegawaiGethunters', [PegawaiController::class, 'getHunters']);
+Route::get('/getpenitip', [PenitipController::class, 'getPenitip']);
+Route::post('/barang',[BarangController::class,'store']);
+Route::get('/indexall',[BarangController::class,'indexall']);
+
+Route::post('/addimages', [ImagesBarangController::class, 'store']);
+
 
 

@@ -248,16 +248,6 @@ class PembeliController extends Controller
             ], 404);
         }
     }
-
-public function getData(Request $request)    
-    {
-        $pembeli = auth('pembeli')->user();
-        return response()->json([
-            "status" => true,
-            "message" => "User retrieved successfully",
-            "data" => $pembeli
-        ]);
-    }
     // Remove all items from the cart
     public function removeAllCart(Request $request)
     {
