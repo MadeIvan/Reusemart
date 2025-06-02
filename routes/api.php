@@ -158,6 +158,8 @@ Route::get('/indexall',[BarangController::class,'indexall']);
 
 Route::post('/addimages', [ImagesBarangController::class, 'store']);
 Route::get('/generate-idbarang', [BarangController::class, 'generateIdBarang']);
+Route::get('/nota-penitipan/{id}/pdf', [TransaksiPenitipanController::class, 'notaPenitipanPdf']);
+
 
 
 

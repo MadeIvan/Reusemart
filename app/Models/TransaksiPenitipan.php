@@ -28,13 +28,12 @@ class TransaksiPenitipan extends Model
     ];
 
     public function pegawai(){
-        return $this->hasMany(Pegawai::class, 'idPegawai1', 'idPegawai');
+        return $this->belongsTo(Pegawai::class, 'idPegawai1', 'idPegawai');
     }
 
     public function pegawai2(){
-        return $this->hasMany(Pegawai::class, 'idPegawai2', 'idPegawai');
+        return $this->belongsTo(Pegawai::class, 'idPegawai2', 'idPegawai');
     }
-
     public function penitip(){
         return $this->belongsTo(Penitip::class, 'idPenitip', 'idPenitip');
     }

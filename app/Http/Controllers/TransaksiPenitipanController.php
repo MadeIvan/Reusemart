@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\TransaksiPenitipan;
 use App\Models\DetailTransaksiPenitipan;
+use Barryvdh\DomPDF\Facade\Pdf;
 class TransaksiPenitipanController extends Controller
 {
 public function store(Request $request)
@@ -71,5 +72,24 @@ public function store(Request $request)
             'message' => 'Transaction failed: ' . $e->getMessage()
         ], 500);
     }
+}
+public function notaPenitipanPdf($id)
+{
+    $transaksi = \App\Models\TransaksiPenitipan::with([
+        'detailTransaksiPenitipan.barang',
+        'pegawai',
+        'pegawai2',
+        'penitip',
+
+        
+    ])->where('idTransaksiPenitipan', $id)->firstOrFail();
+    // return response()->json([
+    //     'status' => true,
+    //     'message' => 'Data transaksi berhasil diambil',
+    //     'data' => $transaksi
+    // ]);
+
+    return Pdf::loadView('PegawaiGudang.notaPenitipan', compact('transaksi'))
+        ->download("nota-penitipan-{$id}.pdf");
 }
 }
