@@ -12,6 +12,7 @@ use App\Models\Barang;
 use App\Models\Pembeli;
 use Exception;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Services\FCMService;
 
 class TransaksiPembelianController extends Controller
 {
@@ -155,30 +156,91 @@ class TransaksiPembelianController extends Controller
         }
     }
 // In TransaksiPembelianController.php
+// public function updatePenjadwalan(Request $request, $noNota)
+// {
+//     $transaksi = TransaksiPembelian::where('noNota', $noNota)->first();
+
+//     if (!$transaksi) {
+//         return response()->json(['status' => false, 'message' => 'Transaksi tidak ditemukan'], 404);
+//     }
+
+//     $transaksi->status = $request->input('status');
+    
+//     // If a kurir is selected, assign to idPegawai3 (assuming this is the kurir column)
+//     if ($request->has('idKurir')) {
+//         $transaksi->idPegawai3 = $request->input('idKurir');
+//     }
+//     // (Optional) If you want to store kurirNama
+//     // $transaksi->kurirNama = $request->input('kurirNama');
+    
+//     // (Optional) If you want to store scheduled date
+//     $transaksi->tanggalPengirimanPengambilan = $request->input('tanggalKirim');
+
+//     $transaksi->save();
+
+//     return response()->json(['status' => true, 'message' => 'Penjadwalan berhasil disimpan']);
+// }
+
 public function updatePenjadwalan(Request $request, $noNota)
 {
-    $transaksi = TransaksiPembelian::where('noNota', $noNota)->first();
+    $transaksi = TransaksiPembelian::with([
+        'detailTransaksiPembelian.barang.detailTransaksiPenitipan.transaksiPenitipan.penitip',
+        'pembeli'
+    ])->where('noNota', $noNota)->first();
 
     if (!$transaksi) {
         return response()->json(['status' => false, 'message' => 'Transaksi tidak ditemukan'], 404);
     }
 
     $transaksi->status = $request->input('status');
-    
-    // If a kurir is selected, assign to idPegawai3 (assuming this is the kurir column)
+
     if ($request->has('idKurir')) {
         $transaksi->idPegawai3 = $request->input('idKurir');
     }
-    // (Optional) If you want to store kurirNama
-    // $transaksi->kurirNama = $request->input('kurirNama');
-    
-    // (Optional) If you want to store scheduled date
-    $transaksi->tanggalPengirimanPengambilan = $request->input('tanggalKirim');
 
+    $transaksi->tanggalPengirimanPengambilan = $request->input('tanggalKirim');
     $transaksi->save();
+
+    // === Ambil data ===
+    $detailBarang = $transaksi->detailTransaksiPembelian->first();
+    $barang = $detailBarang?->barang;
+    $penitip = $barang?->detailTransaksiPenitipan?->transaksiPenitipan?->penitip;
+    $pembeli = $transaksi->pembeli;
+
+    // === Kurir dari idPegawai3 ===
+    $kurir = \App\Models\Pegawai::find($transaksi->idPegawai3); // pastikan model Pegawai sesuai
+
+    // === Kirim notifikasi ke PENITIP ===
+    if ($penitip && $penitip->fcm_token) {
+        app(FCMService::class)->sendNotification(
+            $penitip->fcm_token,
+            'Barang Anda Akan Dikirim',
+            'Barang titipan Anda akan segera dikirimkan atau diambil oleh pembeli.'
+        );
+    }
+
+    // === Kirim notifikasi ke PEMBELI ===
+    if ($pembeli && $pembeli->fcm_token) {
+        app(FCMService::class)->sendNotification(
+            $pembeli->fcm_token,
+            'Barang Anda Akan Tiba',
+            'Barang Anda akan segera dikirimkan atau bisa segera Anda ambil.'
+        );
+    }
+
+    // === Kirim notifikasi ke KURIR ===
+    if ($kurir && $kurir->fcm_token) {
+        app(FCMService::class)->sendNotification(
+            $kurir->fcm_token,
+            'Tugas Pengiriman Barang',
+            'Segera antarkan barang ke pembeli sesuai jadwal.'
+        );
+    }
 
     return response()->json(['status' => true, 'message' => 'Penjadwalan berhasil disimpan']);
 }
+
+
 public function notaPenjualanPdf($noNota)
 {
     $transaksi = TransaksiPembelian::with([
@@ -357,6 +419,26 @@ public function notaPenjualanPdf($noNota)
             $transaksi->status = $validated['status'];
             $transaksi->idPegawai1 = $idPegawai;
             $transaksi->save();
+
+           if ($validated['status'] === 'LUNAS BELUM DIJADWALKAN') {
+                $detailBarang = $transaksi->detailTransaksiPembelian()->first();
+                if ($detailBarang) {
+                    $barang = $detailBarang->barang;
+                    $penitip = $barang?->detailTransaksiPenitipan?->transaksiPenitipan?->penitip;   
+                    \Log::info('FCM Token Penitip: ' . $penitip);
+
+                    if ($penitip && $penitip->fcm_token) {
+                        app(FCMService::class)->sendNotification(
+                            $penitip->fcm_token,
+                            'Barang Terjual!',
+                            'Selamat! Barang Anda telah berhasil terjual.'
+                        );
+                        \Log::info('FCM Token Penitip: ' . $penitip->fcm_token);
+                    } else {
+                        \Log::info('Penitip tidak ditemukan atau token kosong');
+                    }
+                }
+            }
 
             return response()->json([
                 "status" => true,

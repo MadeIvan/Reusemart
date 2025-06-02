@@ -20,7 +20,16 @@ use App\Http\Controllers\TransaksiDonasiController;
 use App\Http\Controllers\TransaksiPenitipanController;
 use App\Http\Controllers\TransaksiPembelianController;
 use App\Http\Controllers\PointRedemptionController;
+use App\Http\Controllers\FCMTokenController;
+use App\Http\Controllers\NotificationController;
 
+Route::post('/send-notification', [NotificationController::class, 'sendNotification']);
+
+
+
+Route::middleware('auth:pegawai')->post('/pegawai/register-fcm-token', [FCMTokenController::class, 'registerFcmToken']);
+Route::middleware('auth:penitip')->post('/penitip/register-fcm-token', [FCMTokenController::class, 'registerFcmToken']);
+Route::middleware('auth:pembeli')->post('/pembeli/register-fcm-token', [FCMTokenController::class, 'registerFcmToken']);
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

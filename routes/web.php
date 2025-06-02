@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BarangController;
 use Illuminate\Support\Facades\Password;
+use App\Services\FCMService;
 
 Route::get('/', function () {
     return view('utama');
@@ -128,3 +129,16 @@ Route::get('/pegawai/ViewNota', function () {
 
 
 // Route::get('/products', [BarangController::class, 'index']);
+
+// routes/web.php
+
+// Route::get('/test-fcm', function () {
+//     $fcmToken = 'fqGedr4nTueD1UF_L1iOQZ:APA91bEbz2pWuk1XjpWiUT8aOD13bEpG0KToPpv98i9FC8C64ls4SEfTV9smpSkw7sq1tmV85MeDFGyHDqj8LZgQ17DWmyHY4s8wwD6CQ_TX0qKTg9BIMMA'; // Ganti dengan token FCM yang valid dari DB
+//     app(FCMService::class)->sendNotification(
+//         $fcmToken,
+//         'Test Judul',
+//         'Isi Pesan Test'
+//     );
+
+//     return 'Notifikasi test sudah dikirim, cek HP kamu.';
+// });
