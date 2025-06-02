@@ -389,6 +389,9 @@
 
 
             // Render the table with fetched data
+            let currentItem = null;     // full item object for editing
+            let currentItemId = null;   // just id for printing
+
             function renderTable(data) {
                 tableBody.innerHTML = ""; // Clear the table before rendering new data
                 data.forEach(item => {
@@ -397,47 +400,33 @@
                         <td id="${item.idBarang}">${item.idBarang}</td>
                         <td>${item.namaBarang || '-'}</td>
                         <td>${item.namaPenitip || '-'}</td>
-                       
                         <td>${item.statusBarang}</td>
                         <td>${item.tanggalPenitipanSelesai || '-'}</td>
-                        
                     `;
                     row.addEventListener("click", () => {
-                        currentItem = item.transaksiPenitipan.idTransaksiPenitipan; 
-                        console.log("selected item : ",currentItem);// store the clicked row's data
+                        currentItem = item;  // full item for edit modal
+                        currentItemId = item.transaksiPenitipan.idTransaksiPenitipan; // id for printing
+                        console.log("selected item:", currentItem);
                         actionModal.show();
                     });
-                                function openActionModal(item) {
-                const modal = document.getElementById('actionModal');
-                modal.style.display = 'flex'; // show modal
-
-                
-                // Close modal button
-                document.getElementById('closeModalBtn').onclick = closeModal;
-            }
-
-            function closeModal() {
-                const modal = document.getElementById('actionModal');
-                modal.style.display = 'none';
-            }
-                    // row.addEventListener("click", () => populateForm(item));  // Add click event to the row
                     tableBody.appendChild(row);
                 });
             }
-            // Set up print button
-                document.getElementById('printNotaBtn').addEventListener('click', () => {
-                    if (!currentItem) return;
-                    
-                    const url = `/api/nota-penitipan/${currentItem}/pdf`;
-                    window.open(url, '_blank');
-                    actionModal.hide();
-                });
 
-                    document.getElementById('editBtn').addEventListener('click', () => {
-                    if (!currentItem) return;
-                    openEditModal(currentItem); // your edit modal function
-                    actionModal.hide();
-                });
+            // Print Nota button
+            document.getElementById('printNotaBtn').addEventListener('click', () => {
+                if (!currentItemId) return;
+                const url = `/api/nota-penitipan/${currentItemId}/pdf`;
+                window.open(url, '_blank');
+                actionModal.hide();
+            });
+
+            // Edit button
+            document.getElementById('editBtn').addEventListener('click', () => {
+                if (!currentItem) return;
+                openEditModal(currentItem); // pass full item object
+                actionModal.hide();
+            });
 
             const pegawai = JSON.parse(pegawaiDataString);
             const addBarangButton = document.getElementById("addBarangButton");
@@ -917,11 +906,12 @@
             function openEditModal(item) {
                 document.getElementById('preview').innerHTML = '';
                 currentEditItem = item;
-                console.log(currentEditItem);
+                console.log("current:",currentEditItem);
                 console.log("openEditModal called with item:", item);
                 const username = item.transaksiPenitipan?.penitip?.username || '';
-                console.log(username);
                 fetchPenitip(username);
+                console.log(username);
+                
                 // Show modal
                 const modalEl = document.getElementById("addBarangDetailModal");
                 const modal = new bootstrap.Modal(modalEl);
