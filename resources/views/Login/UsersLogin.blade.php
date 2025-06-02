@@ -136,12 +136,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 body: JSON.stringify(data)
             });
             const resData = await response.json();
+            const userStorage=resData.data
+            localStorage.setItem('userData', JSON.stringify(userStorage));
             console.log(resData);
             if (!response.ok) {
                 alert(resData.message || 'Login failed');
                 return;
             }
         alert('Login successful! Login as ' + status);
+            
 
             if (status == 'penitip'  && resData.penitip) {
                 localStorage.setItem('auth_token', resData.penitip.token);

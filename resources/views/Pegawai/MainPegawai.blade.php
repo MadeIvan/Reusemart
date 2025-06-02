@@ -20,6 +20,18 @@
 
   @include('layouts.navbar')
 
+<video autoplay muted loop id="video-bg"
+  style="
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: -1;
+  ">
+    <source src="{{ asset('ReUseMartVid.mp4') }}" type="video/mp4">
+    Your browser does not support the video tag.
+</video>
   <main class="container my-5 p-4 bg-white rounded shadow-sm" style="max-width: 700px;">
     <h1 class="text-center text-success mb-3">Selamat Datang!</h1>
     <p class="lead text-center">
@@ -72,9 +84,22 @@
 
       try {
         const pegawai = JSON.parse(pegawaiDataString);
-
+        let  loggedInAs = "Pegawai";
+        if(pegawai.idJabatan==="1"){
+          loggedInAs="Owner";
+        }else if (pegawai.idJabatan==="2"){
+          loggedInAs="Admin";
+        }else if (pegawai.idJabatan==="3"){
+          loggedInAs="Pegawaai Gudang";
+        }else if (pegawai.idJabatan==="4"){
+          loggedInAs="Kuiri";
+        }else if (pegawai.idJabatan==="5"){
+          loggedInAs="Customer Service";
+        }else if (pegawai.idJabatan==="6"){
+          loggedInAs="Hunter";
+        }
         document.getElementById("loggedInAs").textContent =
-          pegawai.namaPegawai || "Pegawai";
+          loggedInAs || "Pegawai";
         document.getElementById("pegawaiId").textContent =
           pegawai.idPegawai || "-";
         document.getElementById("pegawaiNama").textContent =
@@ -100,9 +125,9 @@
           position: "right",
           backgroundColor: "rgb(221, 25, 25)",
         }).showToast();
-        setTimeout(() => {
-          window.location.href = "/PegawaiLogin";
-        }, 2000);
+        // setTimeout(() => {
+        //   window.location.href = "/PegawaiLogin";
+        // }, 2000);
       }
     });
   </script>

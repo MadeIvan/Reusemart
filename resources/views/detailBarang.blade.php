@@ -96,7 +96,7 @@
                                     <p class="text-success">Rp. ${formattedPrice}</p>
 
                                     <!-- Add to Cart Button -->
-                                    <button class="btn btn-dark add-to-cart-btn" data-id="${product.idBarang}">Add to Cart</button>
+                                    <button type="button" class="btn btn-dark add-to-cart-btn" data-id="${product.idBarang}">Add to Cart</button>
                                 </div>
                             </div>
                             
@@ -106,7 +106,8 @@
                         productDetailContainer.innerHTML = productDetailHTML;
                         const addToCartBtn = productDetailContainer.querySelector('.add-to-cart-btn');
                         if (addToCartBtn) {
-                            addToCartBtn.addEventListener('click', function() {
+                            addToCartBtn.addEventListener('click', function(event) {
+                                event.preventDefault(); // <- tambahkan ini
                                 const idBarang = this.getAttribute('data-id');
                                 addToCart(idBarang);
                             });

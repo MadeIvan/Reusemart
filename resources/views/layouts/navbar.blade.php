@@ -163,31 +163,29 @@
                 rightMenu.appendChild(cartItem);
 
                 rightMenu.appendChild(createLogout());          
-            }
-
-            else if (role === "penitip") {
+            }else if (role === "penitip") {
                 leftMenu.appendChild(createItem("/penitip/dashboard", "Home"));
                 leftMenu.appendChild(createItem("/penitip/history", "History Penitip"));
                 leftMenu.appendChild(createItem("/penitip/profile", "Profile"));
                 rightMenu.appendChild(createLogout());            
-            }
-
-            else if (role === "organisasi") {
+            }else if (role === "organisasi") {
                 leftMenu.appendChild(createItem("/organisasi/history-request", "History Request Donasi"));
                 rightMenu.appendChild(createLogout());
-            }
-
-            else if(role === "admin"){
+            }else if(role === "admin"){
                 
-            }
-
-
-            else if(role==="CS"){
+            }else if(role==="cs"){
                 leftMenu.appendChild(createItem("/pegawaidata", "Profile"));
                 leftMenu.appendChild(createItem("/pegawai/PenitipData", "Data Penitip"));
-                                rightMenu.appendChild(createLogout());            
+                leftMenu.appendChild(createItem("/verifikasi", "Verifikasi Pembayaran"));
+                rightMenu.appendChild(createLogout());            
 
+            }else if (role==="gudang"){
+            leftMenu.appendChild(createItem("/pegawaidata", "Profile"));
+            leftMenu.appendChild(createItem("/pegawai/gudangview", "View Gudang"));
+            leftMenu.appendChild(createItem("/pegawai/penjadwalan", "Penjadwalan Barang"));
+            rightMenu.appendChild(createLogout());   
             }
+
 
         }
     });

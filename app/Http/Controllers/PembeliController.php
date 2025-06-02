@@ -134,7 +134,7 @@ class PembeliController extends Controller
         $cart = Cache::get($cartKey, []); 
 
         // Cek apakah barang sudah ada di cart
-        if(!isset($cart[$id])) {
+        if(!isset($cart[$id])) {    
             $cart[$id] = [
                 'idBarang' => $id,
                 'jumlah' => 1
@@ -178,10 +178,10 @@ class PembeliController extends Controller
             )->find($item['idBarang']);
 
             if ($barang) {
-                $detailedCart[] = [
-                    ...$barang->toArray(),
-                    'jumlah' => $item['jumlah'],
-                ];
+                $detailedCart[] = array_merge(
+    $barang->toArray(),
+    ['jumlah' => $item['jumlah']]
+);
             }
         }
 
@@ -222,7 +222,46 @@ class PembeliController extends Controller
         }
     }
 
+public function getData(Request $request)    
+    {
+        $pembeli = auth('pembeli')->user();
+        return response()->json([
+            "status" => true,
+            "message" => "User retrieved successfully",
+            "data" => $pembeli
+        ]);
+    }
 
+    // Update poin value for pembeli
+    public function updatePoin(Request $request)    
+    {
+        $pembeli = auth('pembeli')->user();
+        $pembeli->poin = $request->poin;
+        $pembeli->save();
+        return response()->json([
+            "status" => true,
+            "message" => "User retrieved successfully",
+            "data" => $pembeli
+        ]);
+    }
+
+    // Remove all items from the cart
+    public function removeAllCart(Request $request)
+    {
+        $pembeli = Auth::guard('pembeli')->user();
+        if (!$pembeli) {
+            return response()->json([
+                "status" => false,
+                "message" => "Pembeli belum login",
+            ], 401);
+        }
+        $cartKey = 'cart_user_' . $pembeli->idPembeli;
+        Cache::forget($cartKey);
+        return response()->json([
+            "status" => true,
+            "message" => "Keranjang berhasil dikosongkan",
+        ], 200);
+    }
 
         
 

@@ -19,6 +19,7 @@ class TransaksiPembelian extends Model
         'idPembeli',
         'idPegawai1',
         'idPegawai2',
+        'idPegawai3',
         'idAlamat',
         'tanggalWaktuPembelian',
         'tanggalWaktuPelunasan',
@@ -28,11 +29,16 @@ class TransaksiPembelian extends Model
     ];
 
     public function pegawai(){
-        return $this->hasMany(Pegawai::class, 'idPegawai1', 'idPegawai');
+        return $this->belongsTo(Pegawai::class, 'idPegawai1', 'idPegawai')
+            ->select(['idPegawai', 'namaPegawai']);
     }
-
     public function pegawai2(){
-        return $this->hasMany(Pegawai::class, 'idPegawai2', 'idPegawai');
+        return $this->belongsTo(Pegawai::class, 'idPegawai2', 'idPegawai')
+        ->select(['idPegawai', 'namaPegawai']);
+    }
+        public function pegawai3(){
+        return $this->belongsTo(Pegawai::class, 'idPegawai3', 'idPegawai')
+        ->select(['idPegawai', 'namaPegawai']);
     }
 
     public function pembeli(){
