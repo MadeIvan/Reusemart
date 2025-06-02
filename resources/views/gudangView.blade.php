@@ -248,7 +248,7 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token from meta tag
-
+            let currentEditItem = null;
             const tableBody = document.getElementById("tableBody");
             // const searchInput = document.getElementById("searchInput");
             // const form = document.getElementById("PegawaiForm");
@@ -406,7 +406,13 @@
             const addBarangDetailForm = document.getElementById("addBarangDetailForm");
             addBarangDetailForm.addEventListener("submit", async function (e) {
             e.preventDefault();
-
+            if (currentEditItem) {
+                document.getElementById("idPegawai1").value = currentEditItem.idPegawai1 || '';  // adjust property names
+                document.getElementById("idPegawai2").value = currentEditItem.idPegawai2 || '';
+                document.getElementById("idPenitip").value = currentEditItem.transaksiPenitipan?.penitip?.username || '';
+                document.getElementById("tanggalPenitipan").value = currentEditItem.tanggalPenitipanSelesai || '';
+                // etc, fill all needed fields
+            }
             
             const firstModal = bootstrap.Modal.getInstance(document.getElementById("addBarangDetailModal"));
             firstModal.hide();
@@ -588,7 +594,9 @@
             fetchPegawai()
         });
 
-            async function fetchPenitip() {
+            async function fetchPenitip(selectedUsername = null) {
+                const penitipSelect = document.getElementById("idPenitip");
+                penitipSelect.innerHTML = `<option value="">Pilih Penitip</option>`;
                 try {
                     const response = await fetch("http://127.0.0.1:8000/api/getpenitip", {
                         method: "GET",
@@ -600,8 +608,8 @@
                     const data = await response.json();
                     console.log("Fetched Penitip:", data);
 
-                    const penitipSelect = document.getElementById("idPenitip");
-                    penitipSelect.innerHTML = `<option value="">Pilih Penitip</option>`; // reset dropdown
+                    // const penitipSelect = document.getElementById("idPenitip");
+                    // penitipSelect.innerHTML = `<option value="">Pilih Penitip</option>`; // reset dropdown
 
                     if (data.status && data.data.length > 0) {
                         data.data.forEach(penitip => {
@@ -610,6 +618,10 @@
                             option.textContent = penitip.username;
                             penitipSelect.appendChild(option);
                         });
+
+                        if (selectedUsername) {
+                            penitipSelect.value = selectedUsername;
+                        }
                     } else {
                         console.warn("No Penitip available");
                     }
@@ -621,6 +633,7 @@
             const dropArea = document.getElementById('drop-area');
             const fileInput = document.getElementById('image');
             const preview = document.getElementById('preview');
+            
 
             let filesArray = []; // Store selected files here
             let fileNamesArray = [];
@@ -720,6 +733,7 @@
                 container.appendChild(img);
                 container.appendChild(btn);
                 preview.appendChild(container);
+                toggleDropAreaVisibility();
                 };
             }
 
@@ -756,22 +770,41 @@
 
                 document.body.appendChild(overlay);
             }
-            function toggleDropAreaVisibility() {
-                const dropArea = document.getElementById('drop-area');
-                if (filesArray.length > 0) {
-                    dropArea.style.display = 'none';
-                } else {
-                    dropArea.style.display = 'block';
-                }
-            }
-            const baseImagePath = '/img/'
+           function toggleDropAreaVisibility() {
+    const dropArea = document.getElementById('drop-area');
+    const preview = document.getElementById('preview');
+
+    // Count how many images are previewed (both existing and new)
+    const hasImages = preview.children.length > 0;
+
+    if (hasImages) {
+        dropArea.style.display = 'none';
+    } else {
+        dropArea.style.display = 'block';
+    }
+}
+
+            
             function openEditModal(item) {
+                currentEditItem = item;
+                console.log(currentEditItem);
                 console.log("openEditModal called with item:", item);
+                const username = item.transaksiPenitipan?.penitip?.username || '';
+                console.log(username);
+                fetchPenitip(username);
                 // Show modal
                 const modalEl = document.getElementById("addBarangDetailModal");
                 const modal = new bootstrap.Modal(modalEl);
+                
                 modal.show();
-
+                if (currentEditItem) {
+                    document.getElementById("idPegawai1").value = currentEditItem.idPegawai1 || '';  // adjust property names
+                    document.getElementById("idPegawai2").value = currentEditItem.idPegawai2 || '';
+                    document.getElementById("idPenitip").value = username || '';
+                    document.getElementById("tanggalPenitipan").value = currentEditItem.tanggalPenitipanSelesai || '';
+                    // etc, fill all needed fields
+                }
+                
                 // Fill inputs with item data
                 document.getElementById("idBarang").value = item.idBarang || '';
                 document.getElementById("namaBarang").value = item.namaBarang || '';
@@ -799,14 +832,9 @@
                         item.imagesBarang.image5,
                     ].filter(src => src && src.trim() !== ''); // filter out empty/null
                 }
-
+                const baseUrl = "http://127.0.0.1:8000/";
                 console.log("Images array:", images);
-                images = images.map(src => {
-                    if (!src.startsWith('http') && !src.startsWith('/')) {
-                        return baseImagePath + src;
-                    }
-                    return src;
-                });
+                images = images.map(src => baseUrl + src);
                 images.forEach(src => {
                     previewExistingImage(src);
                 });
