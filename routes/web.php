@@ -118,4 +118,9 @@ Route::get('/pegawai/penjadwalan', function () {
 });
 Route::get('/nota-penjualan/{noNota}/pdf', [TransaksiPembelianController::class, 'notaPenjualanPdf']);
 
+Route::get('/pegawai/ViewNota', function () {
+    return view('PegawaiGudang.NotaPembelian');
+});
+
+
 // Route::get('/products', [BarangController::class, 'index']);
