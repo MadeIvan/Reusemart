@@ -92,7 +92,7 @@ Route::middleware(['auth:sanctum', 'auth.pembeli'])->group(function () {
     Route::delete('/pembeli/alamat/delete/{id}', [AlamatController::class, 'delete']);
     Route::put('/pembeli/alamat/set-default/{id}', [AlamatController::class, 'setAsDefault']);
     Route::get('/alamatUtama', [AlamatController::class, 'getUtama']);
-
+    
     Route::post('/buat-diskusi/{id}', [DiskusiController::class, 'store']);
     Route::get('/pembeli/getData', [PembeliController::class, 'getData']);
     Route::put('/updatePoin', [PembeliController::class, 'updatePoin']);
@@ -104,6 +104,7 @@ Route::middleware(['auth:sanctum', 'auth.pembeli'])->group(function () {
     Route::get('/getData', [TransaksiPembelianController::class, 'getDataTerbaru']);
     Route::post('/buktiBayar/{id}', [TransaksiPembelianController::class, 'buktiBayar']);
     Route::post('/batalkanPesanan/{id}', [TransaksiPembelianController::class, 'canceled']);
+    Route::get('/pembeli/poin', [PembeliController::class, 'getPoin']);
 });
 
 Route::middleware(['auth:penitip'])->group(function () {

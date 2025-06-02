@@ -128,8 +128,13 @@ Route::get('/pegawai/ViewNota', function () {
     return view('PegawaiGudang.NotaPembelian');
 });
 
-Route::get('/pegawai/HistoryPembeli', function () {
+Route::get('/pembeli/HistoryPembeli', function () {
     return view('Pembeli.HistoryPembeli');
+});
+
+
+Route::get('/pembeli/MyProfile', function () {
+    return view('Pembeli.profilePembeli');
 });
 
 

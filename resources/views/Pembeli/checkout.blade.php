@@ -456,7 +456,7 @@
 
                             if (poinDitukarkan && totalHargaAkhir) {
                                 poinDitukarkan.textContent = `- Rp ${rupiah.toLocaleString('id-ID')}`;
-
+                                const totalAwal = totalHargaBarang+ongkir;
                                 // Hitung total baru (total awal - poin)
                                 let totalBaru = totalAwal - rupiah;
                                 if (totalBaru < 0) totalBaru = 0;
