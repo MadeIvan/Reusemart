@@ -50,4 +50,8 @@ class TransaksiPembelian extends Model
     public function detailTransaksiPembelian(){
         return $this->hasMany(DetailTransaksiPembelian::class, 'noNota', 'noNota');
     }
+
+    public function pointRedemption(){
+        return $this->belongsTo(PointRedemption::class,'noNota','transaction_id');
+    }
 }
