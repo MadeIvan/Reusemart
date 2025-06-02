@@ -192,53 +192,88 @@ public function updatePenjadwalan(Request $request, $noNota)
         return response()->json(['status' => false, 'message' => 'Transaksi tidak ditemukan'], 404);
     }
 
-    $transaksi->status = $request->input('status');
+    // Simpan id kurir sebelumnya sebelum diubah
+    $kurirLama = $transaksi->idPegawai3;
 
+    // Update status dan tanggal pengiriman
+    $transaksi->status = $request->input('status');
+    $transaksi->tanggalPengirimanPengambilan = $request->input('tanggalKirim');
+
+    // Update kurir jika dikirimkan
     if ($request->has('idKurir')) {
         $transaksi->idPegawai3 = $request->input('idKurir');
     }
 
-    $transaksi->tanggalPengirimanPengambilan = $request->input('tanggalKirim');
     $transaksi->save();
 
-    // === Ambil data ===
+    // === Ambil data terkait ===
     $detailBarang = $transaksi->detailTransaksiPembelian->first();
     $barang = $detailBarang?->barang;
     $penitip = $barang?->detailTransaksiPenitipan?->transaksiPenitipan?->penitip;
     $pembeli = $transaksi->pembeli;
+    $kurir = \App\Models\Pegawai::find($transaksi->idPegawai3);
 
-    // === Kurir dari idPegawai3 ===
-    $kurir = \App\Models\Pegawai::find($transaksi->idPegawai3); // pastikan model Pegawai sesuai
+    // Cek apakah barang diantar atau diambil
+    $isDiantar = !is_null($transaksi->idAlamat);
+    $tanggal = \Carbon\Carbon::parse($transaksi->tanggalPengirimanPengambilan)->format('d M Y');
 
     // === Kirim notifikasi ke PENITIP ===
     if ($penitip && $penitip->fcm_token) {
+        $pesanPenitip = $isDiantar
+            ? "Barang titipan Anda akan segera dikirim ke pembeli oleh kurir pada tanggal $tanggal."
+            : "Barang titipan Anda akan segera diambil oleh pembeli pada tanggal $tanggal.";
+
         app(FCMService::class)->sendNotification(
             $penitip->fcm_token,
-            'Barang Anda Akan Dikirim',
-            'Barang titipan Anda akan segera dikirimkan atau diambil oleh pembeli.'
+            'Jadwal Pengiriman Barang',
+            $pesanPenitip
         );
     }
 
     // === Kirim notifikasi ke PEMBELI ===
     if ($pembeli && $pembeli->fcm_token) {
+        $pesanPembeli = $isDiantar
+            ? "Barang Anda akan segera diantar oleh kurir pada tanggal $tanggal."
+            : "Silakan ambil barang Anda pada tanggal $tanggal.";
+
         app(FCMService::class)->sendNotification(
             $pembeli->fcm_token,
-            'Barang Anda Akan Tiba',
-            'Barang Anda akan segera dikirimkan atau bisa segera Anda ambil.'
+            'Jadwal Pengambilan/Pengiriman',
+            $pesanPembeli
         );
     }
 
     // === Kirim notifikasi ke KURIR ===
-    if ($kurir && $kurir->fcm_token) {
+    if ($isDiantar && $kurir && $kurir->fcm_token) {
         app(FCMService::class)->sendNotification(
             $kurir->fcm_token,
-            'Tugas Pengiriman Barang',
-            'Segera antarkan barang ke pembeli sesuai jadwal.'
+            'Tugas Pengiriman Baru',
+            "Segera antarkan barang ke pembeli pada tanggal $tanggal."
         );
+    }
+
+    // === Notifikasi tambahan jika kurir baru ditentukan ===
+    if (is_null($kurirLama) && $kurir) {
+        if ($penitip && $penitip->fcm_token) {
+            app(FCMService::class)->sendNotification(
+                $penitip->fcm_token,
+                'Kurir Ditugaskan',
+                'Kurir telah ditugaskan untuk mengirimkan barang titipan Anda.'
+            );
+        }
+
+        if ($pembeli && $pembeli->fcm_token) {
+            app(FCMService::class)->sendNotification(
+                $pembeli->fcm_token,
+                'Kurir Ditugaskan',
+                'Kurir telah ditugaskan. Barang Anda akan segera dikirimkan.'
+            );
+        }
     }
 
     return response()->json(['status' => true, 'message' => 'Penjadwalan berhasil disimpan']);
 }
+
 
 
 public function notaPenjualanPdf($noNota)
