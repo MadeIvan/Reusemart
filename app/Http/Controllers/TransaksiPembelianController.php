@@ -531,4 +531,55 @@ public function tolakVerifikasi(Request $request, $noNota)
             ], 500);
         }
     }
+
+public function updateStatus(Request $request, $noNota)
+{
+    
+    $transaksi = TransaksiPembelian::where('noNota', $noNota)->first();
+    
+    if (!$transaksi) {
+        return response()->json(['status' => false, 'message' => 'Transaksi tidak ditemukan'], 404);
+    }
+    $transaksi->status = $request->status;
+    $transaksi->save();
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Status berhasil diperbarui',
+        'data' => $transaksi,
+    ]);
+}
+public function showAllTransaksiPembeli()
+{
+    try {
+        $transaksi = \App\Models\TransaksiPembelian::with([
+            'detailTransaksiPembelian.barang',
+            'pembeli.alamat'
+        ])
+        ->where('status', 'Barang Diterima')
+        ->orderBy('tanggalWaktuPembelian', 'desc')
+        ->get();
+
+        return response()->json([
+            "status" => true,
+            "message" => "Get successful",
+            "data" => $transaksi
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            "status" => false,
+            "message" => $e->getMessage(),
+            "data" => null
+        ], 500);
+    }
+}
+
+public function index(){
+  $transaksi= TransaksiPembelian::all();
+    return response()->json($barang);
+    return response()->json([
+        "status" => true,
+        "message" => "Get successful",
+
+    ], 200);
+}
 }

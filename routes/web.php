@@ -128,5 +128,9 @@ Route::get('/pegawai/ViewNota', function () {
     return view('PegawaiGudang.NotaPembelian');
 });
 
+Route::get('/pegawai/HistoryPembeli', function () {
+    return view('Pembeli.HistoryPembeli');
+});
+
 
 // Route::get('/products', [BarangController::class, 'index']);

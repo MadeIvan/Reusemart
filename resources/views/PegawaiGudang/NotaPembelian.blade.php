@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Penjadwalan Barang</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
     <style>
         table.table-bordered > :not(caption) > * > * {
@@ -61,6 +63,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token from meta tag
+
         let data = [];
         let isLoading = true;
 
@@ -212,6 +216,9 @@ async function fetchData() {
                                 <a href="/nota-pembelian-pdf/${row.noNota}" class="btn btn-warning btn-sm" title="Download Nota" target="_blank">
                                     <i class="bi bi-receipt"></i>
                                 </a>
+                                <button class="btn btn-success btn-sm" title="Tandai Barang Diterima" onclick="markBarangDiterima('${row.noNota}')">
+                                    <i class="bi bi-check2-circle"></i>
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -256,6 +263,42 @@ async function fetchData() {
         function refreshData() {
             fetchData();
         }
+
+
+        async function markBarangDiterima(noNota) {
+    if (!confirm(`Apakah Anda yakin ingin menandai nota ${noNota} sebagai "Barang Diterima"?`)) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://127.0.0.1:8000/api/transaksi-pembelian/${noNota}/status`, {
+            method: 'PUT', // or POST, depends on your backend
+            headers: {
+                'Content-Type': 'application/json', 
+                "X-CSRF-TOKEN": csrfToken
+
+            },
+            body: JSON.stringify({
+                'status': "Barang Diterima"
+            }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Gagal mengupdate status.');
+        }
+
+        alert(`Status nota ${noNota} berhasil diubah menjadi "Barang Diterima".`);
+        
+        // Refresh data table
+        fetchData();
+
+    } catch (error) {
+        console.error('Error updating status:', error);
+        alert(`Error: ${error.message}`);
+    }
+}
+
     </script>
 </body>
 </html>

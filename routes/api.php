@@ -140,7 +140,13 @@ Route::post('/addTransaksiPenitipan',[TransaksiPenitipanController::class, 'stor
 Route::get('/barang-penjadwalan', [TransaksiPembelianController::class, 'showPenjadwalan']);
 Route::put('/barang-penjadwalan/{noNota}/jadwal', [TransaksiPembelianController::class, 'updatePenjadwalan']);
 Route::get('/barang-titipNota',[TransaksiPembelianController::class,'showfornota']);
+Route::get('/showAllTransaksi',[TransaksiPembelianController::class,'index']);
+
 Route::get('/nota-pembelian-pdf/{idTransaksiPenitipan}', [TransaksiPembelianController::class, 'notaPembelianPdf'])->name('nota.pembelian.pdf');
+Route::put('/transaksi-pembelian/{noNota}/status', [TransaksiPembelianController::class, 'updateStatus']);
+
+Route::get('/showAllTransaksi', [TransaksiPembelianController::class, 'showAllTransaksiPembeli']);
+
 
 
 
