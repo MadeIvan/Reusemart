@@ -56,7 +56,7 @@
                         const productCard = `
                             <div class="col-md-3 mb-4"> <!-- 4 cards per row on medium screens -->
                                 <div class="card">
-                                    <img src="{{ asset('${product.image}') }}" class="card-img-top" alt="${product.namaBarang}" />
+                                    <img src="{{ asset('${product.image}.jpg') }}" class="card-img-top" alt="${product.namaBarang}" />
                                     <div class="card-body d-flex flex-column justify-content-between">
                                         <div>
                                             <h5 class="card-title">${product.namaBarang}</h5>

@@ -249,6 +249,38 @@ public function generateIdBarang(Request $request)
 
     return response()->json(['nextId' => $nextId]);
 }
+public function showIdPenitipAndBarang($idBarang)
+{
+    try {
+        $item = Barang::with('detailTransaksiPenitipan.transaksiPenitipan.penitip')
+            ->where('idBarang', $idBarang)
+            ->first();
+
+        if (!$item) {
+            return response()->json([
+                'error' => 'Barang not found',
+                'status' => false
+            ], 404);
+        }
+
+        $transaksi = optional($item->detailTransaksiPenitipan)->transaksiPenitipan;
+        $idPenitip = optional($transaksi)->idPenitip;
+
+        $result = [
+            'idBarang' => $item->idBarang,
+            'idPenitip' => $idPenitip,
+        ];
+
+        return response()->json($result);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'An error occurred while fetching data.',
+            'message' => $e->getMessage(),
+            'status' => false
+        ], 500);
+    }
+}
+
 
 
 }

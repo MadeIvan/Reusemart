@@ -21,8 +21,7 @@ use App\Http\Controllers\TransaksiPenitipanController;
 use App\Http\Controllers\TransaksiPembelianController;
 use App\Http\Controllers\PointRedemptionController;
 use App\Http\Controllers\ImagesBarangController;
-
-
+use App\Http\Controllers\RatingController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
      return response()->json($request->user());
@@ -167,6 +166,10 @@ Route::get('/indexall',[BarangController::class,'indexall']);
 Route::post('/addimages', [ImagesBarangController::class, 'store']);
 Route::get('/generate-idbarang', [BarangController::class, 'generateIdBarang']);
 Route::get('/nota-penitipan/{id}/pdf', [TransaksiPenitipanController::class, 'notaPenitipanPdf']);
+Route::get('/barang/simple/{idBarang}', [BarangController::class, 'showIdPenitipAndBarang']);
+Route::post('/rating',[RatingController::class,'store']);
+Route::get('/rating/average/{idTarget}', [RatingController::class, 'getAverageRating']);
+
 
 
 
