@@ -185,8 +185,6 @@
             leftMenu.appendChild(createItem("/pegawai/penjadwalan", "Penjadwalan Barang"));
             rightMenu.appendChild(createLogout());   
             }
-
-
         }
     });
 </script>

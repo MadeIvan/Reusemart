@@ -49,6 +49,7 @@ Route::get('/PegawaiLogin', function () {
 Route::get('/pegawai/PenitipData', function () {
     return view('Pegawai.CsView');
 });
+
 Route::get('/pegawaidata', function () {
     return view('Pegawai.MainPegawai');
 });
@@ -103,6 +104,7 @@ Route::get('/checkout', function () {
 Route::get('/pembayaran/{noNota}', function () {
     return view('Pembeli.pembayaran');
 });
+
 Route::get('/verifikasi', function () {
     return view('Pegawai.verifikasiPembayaran');
 });

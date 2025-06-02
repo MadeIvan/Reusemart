@@ -129,6 +129,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 alert('Login As CS!');
                 localStorage.setItem('auth_token', resData.data.token);
                 localStorage.setItem('user_role', 'cs');
+                window.location.href = 'http://127.0.0.1:8000/pegawai/PenitipData';
             }else if(IdJabatan==6){
                 alert('Login As Hunter!');
                 localStorage.setItem('auth_token', resData.data.token);

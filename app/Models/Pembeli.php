@@ -10,6 +10,8 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Alamat;
+use App\Models\Diskusi;
+use App\Models\TransaksiPembelian;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Auth\Passwords\CanResetPassword as CanResetPasswordTrait;
 
@@ -40,5 +42,9 @@ class Pembeli extends Authenticatable implements CanResetPassword
 
     public function diskusi(){
         return $this->hasMany(Diskusi::class, 'idPembeli', 'idPembeli');
+    }
+
+    public function transaksiPembelian(){
+        return $this->hasMany(TransaksiPembelian::class, 'idPembeli', 'idPembeli');
     }
 }

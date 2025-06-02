@@ -12,21 +12,24 @@ class TransaksiPembelian extends Model
     protected $table = 'transaksipembelian'; 
     protected $primaryKey = 'noNota';
     protected $keyType = 'string'; 
+    public $incrementing = false;
     public $timestamps = false;   
 
     protected $fillable = [
         'noNota',
         'idPembeli',
-        'idPegawai1',
-        'idPegawai2',
-        'idPegawai3',
+        'idPegawai1', //cs
+        'idPegawai2', //gudang
+        'idPegawai3', //kurir
         'idAlamat',
         'tanggalWaktuPembelian',
         'tanggalWaktuPelunasan',
         'tanggalPengirimanPengambilan',
         'status',
-        'totalHarga'
+        'totalHarga',
+        'buktiPembayaran'
     ];
+
 
     public function pegawai(){
         return $this->belongsTo(Pegawai::class, 'idPegawai1', 'idPegawai')
@@ -39,6 +42,9 @@ class TransaksiPembelian extends Model
         public function pegawai3(){
         return $this->belongsTo(Pegawai::class, 'idPegawai3', 'idPegawai')
         ->select(['idPegawai', 'namaPegawai']);
+    }
+    public function pegawai3(){
+        return $this->hasMany(Pegawai::class, 'idPegawai3', 'idPegawai');
     }
 
     public function pembeli(){

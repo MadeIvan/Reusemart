@@ -91,6 +91,10 @@
                         <input type="text" class="form-control" id="kategoriAlamat" name="kategoriAlamat" required>
                     </div>
                     <div class="mb-3">
+                        <label for="namaAlamat" class="form-label"><strong>Nama</strong></label>
+                        <input type="text" class="form-control" id="namaAlamat" name="namaAlamat" required>
+                    </div>
+                    <div class="mb-3">
                         <label for="alamat" class="form-label"><strong> Alamat</strong></label>
                         <textarea class="form-control" id="alamat" name="alamat" rows="3" required></textarea>
                     </div>
@@ -138,6 +142,10 @@
                             
                         </select>
                     </div> -->
+                    <div class="mb-3">
+                        <label for="namaCreate" class="form-label"><strong> Nama</strong></label>
+                        <input class="form-control" id="namaCreate" name="namaCreate" required></input>
+                    </div>
                     <div class="mb-3">
                         <label for="alamatCreate" class="form-label"><strong> Alamat</strong></label>
                         <textarea class="form-control" id="alamatCreate" name="alamatCreate" rows="3" required></textarea>
@@ -288,6 +296,7 @@
                                     <div class="d-flex justify-content-end mb-2"" >
                                     <a href="#" class="card-link me-2 text-decoration-none update-link" data-id="${alamat.idAlamat}"
                                         data-alamat="${alamat.alamat}" data-kategoriAlamat="${alamat.kategori}"
+                                        data-namaAlamat="${alamat.nama}"
                                         data-bs-toggle="modal" data-bs-target="#updateAlamat">Ubah</a>
                                     <a href="#" class="card-link text-danger text-decoration-none delete-link" data-id="${alamat.idAlamat}"
                                         data-bs-toggle="modal" data-bs-target="#deleteAlamat">Hapus</a>
@@ -300,9 +309,10 @@
                                 
                                 <!-- Alamat content -->
                                 <div class="d-flex align-items-center gap-2">
-                                    <h5 class="card-title mb-2">${alamat.kategori}</h5>
+                                    <h5 class="card-title mt-2"><strong>${alamat.kategori}</strong></h5>
                                     ${isDefaultLabel}
                                 </div>
+                                <p class="card-subtitle mt-2"><strong>${alamat.nama}</strong></p>
                                 <p class="card-subtitle text-body-secondary mt-2">${alamat.alamat}</p>
                             </div>
                         </div>
@@ -322,10 +332,13 @@
                         idToUpdate = this.getAttribute("data-id");
                         const kategori = this.getAttribute("data-kategoriAlamat");
                         const alamat = this.getAttribute("data-alamat");
+                        const nama = this.getAttribute("data-namaAlamat");
 
                         document.getElementById("kategoriAlamat").value = kategori;
                         document.getElementById("alamat").value = alamat;
+                        document.getElementById("namaAlamat").value = nama;
                     });
+                    
                 });
 
                 document.querySelectorAll(".btn-outline-success").forEach(button => {
@@ -357,6 +370,7 @@
 
                     const kategori = document.getElementById("kategoriAlamat").value;
                     const alamat = document.getElementById("alamat").value;
+                    const nama = document.getElementById("namaAlamat").value;
 
                     fetch(`http://127.0.0.1:8000/api/pembeli/alamat/update/${idToUpdate}`, {
                         method: 'PUT',
@@ -369,6 +383,7 @@
                         body: JSON.stringify({
                             alamat,
                             kategori,
+                            nama,
                         }),
                     })
                     .then(response => response.json())
@@ -445,8 +460,10 @@
             document.getElementById("confirmCreate").addEventListener("click", () => {
                 const kategori = document.getElementById("kategoriAlamatCreate").value;
                 const alamat = document.getElementById("alamatCreate").value;
+                const nama = document.getElementById("namaCreate").value;
                 const isDefault = document.getElementById("isDefault").checked;
-                if(!kategori || !alamat ) {
+
+                if(!kategori || !alamat || !nama) {
                     Toastify({
                         text: "Semua field harus diisi",
                         duration: 3000,
@@ -471,7 +488,8 @@
                     body: JSON.stringify({
                         kategori,
                         alamat,
-                        isDefault
+                        isDefault,
+                        nama,
                     })
                 })
                 .then(response => response.json())
