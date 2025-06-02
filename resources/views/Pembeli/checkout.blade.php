@@ -456,7 +456,7 @@
 
                             if (poinDitukarkan && totalHargaAkhir) {
                                 poinDitukarkan.textContent = `- Rp ${rupiah.toLocaleString('id-ID')}`;
-
+                                const totalAwal = totalHargaBarang+ongkir;
                                 // Hitung total baru (total awal - poin)
                                 let totalBaru = totalAwal - rupiah;
                                 if (totalBaru < 0) totalBaru = 0;
@@ -509,102 +509,109 @@
                     },
                 })
             }
-            document.getElementById("checkout-btn").addEventListener("click", function() {
-                dataCheckout = JSON.parse(localStorage.getItem("data_checkout"));
-                const sisaPoin = localStorage.getItem('sisaPoin');
-                const alamat = JSON.parse(localStorage.getItem('alamatPengiriman'));
-                
-                let idAlamat;
-                if(alamat !== null) {
-                    idAlamat = alamat.idAlamat;
-                }else{
-                    idAlamat = null;
-                }
+    document.getElementById("checkout-btn").addEventListener("click", function() {
+    const dataCheckout = JSON.parse(localStorage.getItem("data_checkout"));
+    const inputPoinElement = document.getElementById('inputPoin');
+    const nilaiPoin = inputPoinElement ? parseInt(inputPoinElement.value) || 0 : 0;
+    const sisaPoin = localStorage.getItem('sisaPoin');
+    const alamat = JSON.parse(localStorage.getItem('alamatPengiriman'));
 
-                console.log('idAlamat:', idAlamat);
+    let idAlamat = alamat ? alamat.idAlamat : null;
 
-                fetch(`http://127.0.0.1:8000/api/checkout`, {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
-                        'Accept': 'application/json',
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": csrfToken,
-                    },
-                    body: JSON.stringify({
-                        idAlamat: idAlamat,
-                        tanggalWaktuPembelian: getCurrentDateTime(),
-                        totalHarga: localStorage.getItem('totalSetelahPoin') !== null
-                            ? parseFloat(localStorage.getItem('totalSetelahPoin'))
-                            : Number(dataCheckout.total_harga.toString().replace(/\./g, '')),
-                        id_barang: barangArray,
-                        sisaPoin: sisaPoin,
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // console.log("Resoine API", data)
-                    const modal = bootstrap.Modal.getInstance(document.getElementById("createAlamat"));
-                        if (modal) modal.hide();
-                        
-                        if(data.status) {
-                        // \Log::info('Data JSON dikirim:', ['data' => $transaksiPembelian->toArray()]);
-                        // ambil noNota dari response
-                        const noNota = data.data.noNota;
-                        console.log(data);
-                        console.log(noNota);
+    console.log('idAlamat:', idAlamat);
 
-                        // redirect ke halaman pembayaran dengan noNota di URL
-                        window.location.href = `/pembayaran/${noNota}`;
-                        hapusKeranjang();
-                        Toastify({
-                            text: "Berhasil Membuat Pesanan",
-                            duration: 3000,
-                            gravity: "top",
-                            position: "right",
-                            style: {
-                                background: "#8bc34a"
-                            },
-                        }).showToast();
-                    } else {
-                        alert("Gagal membuat transaksi: " + data.message);
-                    }
+    fetch(`http://127.0.0.1:8000/api/checkout`, {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
+            'Accept': 'application/json',
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+        },
+        body: JSON.stringify({
+            idAlamat: idAlamat,
+            tanggalWaktuPembelian: getCurrentDateTime(),
+            totalHarga: localStorage.getItem('totalSetelahPoin') !== null
+                ? parseFloat(localStorage.getItem('totalSetelahPoin'))
+                : Number(dataCheckout.total_harga.toString().replace(/\./g, '')),
+            id_barang: barangArray,
+            sisaPoin: sisaPoin,
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Checkout response:", data);
 
-                    window.onload = function () {
-                        if (sessionStorage.getItem('pesananSelesai') === '1') {
-                            alert("Anda sudah menyelesaikan pesanan.");
-                            window.location.href = "/"; // Arahkan kembali ke halaman utama atau riwayat
-                        }
-                    };
+        if (!data.status) {
+            alert("Gagal membuat transaksi: " + data.message);
+            throw new Error("Checkout failed");
+        }
 
-                    // localStorage.removeItem('totalSetelahPoin');
-                    // localStorage.removeItem('data_checkout');
-                    // localStorage.removeItem('selectedIdAlamat');
+        const noNota = data.data.noNota;
+        console.log("Extracted noNota:", noNota);
 
-                    // Tambahkan flag agar user tidak bisa kembali ke halaman checkout
-                    sessionStorage.setItem('pesananSelesai', '1');
+        if (!noNota || noNota === "0") {
+            throw new Error("Invalid transaction ID (noNota) from checkout response");
+        }
 
-                    // Kalau kamu ingin mengizinkan user belanja lagi setelah itu, kamu bisa reset sessionStorage 
-                    // di halaman seperti katalog atau keranjang:
-                    // sessionStorage.removeItem('pesananSelesai');
+        if (nilaiPoin > 0) {
+            const userData = localStorage.getItem('userData');
+            const pembeli = userData ? JSON.parse(userData).pembeli : null;
+            const idPembeli = pembeli?.idPembeli;
+            console.log('Point redemption request data:', {
+                idPembeli: idPembeli,
+                points_used: nilaiPoin,
+                transaction_id: noNota,
+            });
 
-                        // window.location.href = `{{ url('/pembayaran/${noNota}') }}`;
-                })
-                .catch(error => {
-                    console.error("Error:", error);
-                    Toastify({
-                        text: "Gagal Membuat Pesanan",
-                        duration: 3000,
-                        gravity: "top",
-                        position: "right",
-                        style: {
-                            background: "rgb(221, 25, 25)"
-                        },
-                    }).showToast();
-                });
-            })
+            // Fire and forget, no waiting for response
+            fetch('http://127.0.0.1:8000/api/point-redemptions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                },
+                body: JSON.stringify({
+                    idPembeli: idPembeli,
+                    points_used: nilaiPoin,
+                    transaction_id: noNota,
+                }),
+            }).catch(err => console.error("Point redemption error:", err));
+        }
 
-        });
+        // Redirect right away after checkout success
+        window.location.href = `/pembayaran/${noNota}`;
+        hapusKeranjang();
+
+        Toastify({
+            text: "Berhasil Membuat Pesanan",
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            style: { background: "#8bc34a" },
+        }).showToast();
+
+        sessionStorage.setItem('pesananSelesai', '1');
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        Toastify({
+            text: "Gagal Membuat Pesanan",
+            duration: 3000,
+            gravity: "top",
+            position: "right",
+            style: { background: "rgb(221, 25, 25)" },
+        }).showToast();
+    });
+});
+
+            
+   
+
+
+            });
     </script>
 </body>
 </html>

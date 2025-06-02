@@ -5,6 +5,7 @@ use App\Http\Controllers\BarangController;
 use Illuminate\Support\Facades\Password;
 use App\Http\Controllers\TransaksiPembelianController;
 
+
 Route::get('/', function () {
     return view('utama');
 });
@@ -110,6 +111,10 @@ Route::get('/verifikasi', function () {
     return view('Pegawai.verifikasiPembayaran');
 });
 
+Route::get('/nota-penitipan/${noNota}', function () {
+    return view('nota.pdf.nota_pembelian');
+});
+
 // PegawaiGudang special views (only code 1)
 Route::get('/pegawai/gudangview', function () {
     return view('PegawaiGudang.gudangView');
@@ -117,6 +122,20 @@ Route::get('/pegawai/gudangview', function () {
 Route::get('/pegawai/penjadwalan', function () {
     return view('PegawaiGudang.penjadwalanBarang');
 });
-Route::get('/nota-penjualan/{noNota}/pdf', [TransaksiPembelianController::class, 'notaPenjualanPdf']);
+Route::get('/nota-pembelian-pdf/{noNota}', [TransaksiPembelianController::class, 'notaPembelianPdf']);
+
+Route::get('/pegawai/ViewNota', function () {
+    return view('PegawaiGudang.NotaPembelian');
+});
+
+Route::get('/pembeli/HistoryPembeli', function () {
+    return view('Pembeli.HistoryPembeli');
+});
+
+
+Route::get('/pembeli/MyProfile', function () {
+    return view('Pembeli.profilePembeli');
+});
+
 
 // Route::get('/products', [BarangController::class, 'index']);

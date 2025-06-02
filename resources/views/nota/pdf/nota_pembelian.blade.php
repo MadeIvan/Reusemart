@@ -55,49 +55,97 @@
         <div>
             Delivery: 
             @if($transaksi->idAlamat)
-                Kurir ReUseMart ({{ $transaksi->kurir_nama ?? '-' }})
+                Kurir ReUseMart ({{ $transaksi->pegawai3->namaPegawai ?? '-' }})
             @else
                 - (diambil sendiri)
             @endif
         </div>
 
-        <!-- ... lanjut tabel produk, total, dll, seperti sebelumnya ... -->
+        @php
+            // Calculate ongkir based on your business logic
+            if (is_null($transaksi->idAlamat)) {
+                // Ambil sendiri
+                $ongkir = 0;
+            } else {
+                // Delivery - fixed logic
+                if ($transaksi->totalHarga > 1500000) {
+                    $ongkir = 0; // Free shipping for orders > 1.5M
+                } else {
+                    $ongkir = 100000; // Standard shipping fee
+                }
+            }
+
+            // Calculate point discount - correct property name
+            if (is_null($transaksi->pointRedemption) || is_null($transaksi->pointRedemption->points_used) || $transaksi->pointRedemption->points_used == 0) {
+                $HargaPoin = 0;
+            } else {
+                $HargaPoin = 100 * $transaksi->pointRedemption->points_used;
+            }
+
+            // Progressive totals for display
+            // Total1: Original item total (totalHarga already contains sum of all barang, but we need to subtract ongkir and add back HargaPoin to get pure item total)
+            $total1 = ($transaksi->totalHarga ?? 0) - $ongkir + $HargaPoin;
+            
+            // Total2: After adding ongkir
+            $total2 = $total1 + $ongkir;
+            
+            // Total3: Final total after subtracting points
+            $total3 = $total2 - $HargaPoin;
+        @endphp
 
         <table width="100%" style="margin-top:10px;">
+            {{-- Display individual items --}}
             @foreach($transaksi->detailTransaksiPembelian as $item)
                 <tr>
                     <td>{{ $item->barang->namaBarang ?? '-' }}</td>
                     <td class="right">{{ number_format($item->barang->hargaBarang ?? 0, 0, ',', '.') }}</td>
                 </tr>
-            @endforeach
+            @endforeach 
+
+            {{-- Total1: Just adding the barang harga --}}
             <tr>
                 <td class="bold">Total</td>
-                <td class="right bold">{{ number_format($transaksi->totalHarga, 0, ',', '.') }}</td>
+                <td class="right bold">{{ number_format($total1, 0, ',', '.') }}</td>
             </tr>
+                    
+            {{-- Add ongkir --}}
             <tr>
-                <td>Ongkos Kirim</td>
-                <td class="right">{{ number_format($transaksi->ongkir ?? 0, 0, ',', '.') }}</td>
+                <td>Ongkir</td>
+                <td class="right">{{ number_format($ongkir, 0, ',', '.') }}</td>
             </tr>
-            <tr>
-                <td class="bold">Total</td>
-                <td class="right bold">{{ number_format(($transaksi->totalHarga ?? 0) + ($transaksi->ongkir ?? 0), 0, ',', '.') }}</td>
-            </tr>
-            @if(isset($transaksi->potongan_poin) && $transaksi->potongan_poin > 0)
-            <tr>
-                <td>Potongan {{ $transaksi->potongan_poin }} poin</td>
-                <td class="right">- {{ number_format($transaksi->potongan_rupiah ?? 0, 0, ',', '.') }}</td>
-            </tr>
-            @endif
+            
+            {{-- Total2: After adding ongkir --}}
             <tr>
                 <td class="bold">Total</td>
-                <td class="right bold">{{ number_format($transaksi->final_total ?? 0, 0, ',', '.') }}</td>
+                <td class="right bold">{{ number_format($total2, 0, ',', '.') }}</td>
+            </tr>
+
+            {{-- Point discount (if any) --}}
+
+            <tr>
+                <td>Potongan Poin ({{ number_format($HargaPoin / 100, 0, ',', '.') }} poin)</td>
+                <td class="right">- {{ number_format($HargaPoin, 0, ',', '.') }}</td>
+            </tr>
+
+
+            {{-- Total3: Final total after subtracting points --}}
+            <tr>
+                <td class="bold">Total</td>
+                <td class="right bold">{{ number_format($total3, 0, ',', '.') }}</td>
             </tr>
         </table>
 
-        <div style="margin-top: 8px;">Poin dari pesanan ini: {{ $transaksi->poin_dari_pesanan ?? 0 }}</div>
+        <div style="margin-top: 8px;">
+            Poin dari pesanan ini: 
+            {{
+            $transaksi->totalHarga < 500000
+                ? floor($transaksi->totalHarga / 10000)
+                : floor(($transaksi->totalHarga / 10000)+(($transaksi->totalHarga / 10000)*0.2))
+            }}
+        </div>
         <div>Total poin customer: {{ $transaksi->pembeli->poin ?? 0 }}</div>
 
-        <div style="margin-top: 8px;">QC oleh: {{ $transaksi->pegawaiQc->namaPegawai ?? '-' }} ({{ $transaksi->pegawaiQc->idPegawai ?? '' }})</div>
+        <div style="margin-top: 8px;">QC oleh: {{ $transaksi->pegawai->namaPegawai ?? '-' }} ({{ $transaksi->pegawai->idPegawai ?? '' }})</div>
 
         <div class="sign-box">
             @if($transaksi->idAlamat)

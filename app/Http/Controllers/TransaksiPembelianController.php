@@ -41,10 +41,32 @@ class TransaksiPembelianController extends Controller
         'pembeli.alamat',
         
     ])
-    ->where('status', 'Lunas Siap')
+    ->whereIn('status', ['Lunas Siap Diambil', 'Lunas Siap Diantarkan'])
     ->get();
 
     return response()->json($pembelians);
+}
+
+public function notaPembelianPdf($idTransaksiPenitipan)
+{
+    $transaksi = \App\Models\TransaksiPembelian::with([
+        'detailTransaksiPembelian.barang',
+        'pegawai',
+        'pegawai2',
+        'pegawai3',
+        'pembeli',
+        'pembeli.alamat',
+        'pointRedemption'
+        
+    ])->where('noNota', $idTransaksiPenitipan)->firstOrFail();
+    // return response()->json([
+    //     'status' => true,
+    //     'message' => 'Data transaksi berhasil diambil',
+    //     'data' => $transaksi
+    // ]);
+
+    return Pdf::loadView('nota.pdf.nota_pembelian', compact('transaksi'))
+        ->stream("nota-pembelian-{$idTransaksiPenitipan}.pdf");
 }
 
 
@@ -167,20 +189,7 @@ public function updatePenjadwalan(Request $request, $noNota)
 
     return response()->json(['status' => true, 'message' => 'Penjadwalan berhasil disimpan']);
 }
-public function notaPenjualanPdf($noNota)
-{
-    $transaksi = TransaksiPembelian::with([
-        'detailTransaksiPembelian.barang',
-        'pembeli.alamat',
-        'pegawaiQc', // Add the relationships you need
-        // ...add kurir, etc.
-    ])->where('noNota', $noNota)->firstOrFail();
 
-    // You may need to prepare extra values, e.g., points, discount, etc.
-
-    return Pdf::loadView('pdf.nota_penjualan', compact('transaksi'))
-        ->stream("nota-penjualan-{$noNota}.pdf"); // use ->download() if you want forced download
-}
 
  public function getDataTerbaru(Request $request){
         $pembeli = auth('pembeli')->user();
@@ -522,4 +531,55 @@ public function tolakVerifikasi(Request $request, $noNota)
             ], 500);
         }
     }
+
+public function updateStatus(Request $request, $noNota)
+{
+    
+    $transaksi = TransaksiPembelian::where('noNota', $noNota)->first();
+    
+    if (!$transaksi) {
+        return response()->json(['status' => false, 'message' => 'Transaksi tidak ditemukan'], 404);
+    }
+    $transaksi->status = $request->status;
+    $transaksi->save();
+    return response()->json([
+        'status' => 'success',
+        'message' => 'Status berhasil diperbarui',
+        'data' => $transaksi,
+    ]);
+}
+public function showAllTransaksiPembeli()
+{
+    try {
+        $transaksi = \App\Models\TransaksiPembelian::with([
+            'detailTransaksiPembelian.barang',
+            'pembeli.alamat'
+        ])
+        ->where('status', 'Barang Diterima')
+        ->orderBy('tanggalWaktuPembelian', 'desc')
+        ->get();
+
+        return response()->json([
+            "status" => true,
+            "message" => "Get successful",
+            "data" => $transaksi
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            "status" => false,
+            "message" => $e->getMessage(),
+            "data" => null
+        ], 500);
+    }
+}
+
+public function index(){
+  $transaksi= TransaksiPembelian::all();
+    return response()->json($barang);
+    return response()->json([
+        "status" => true,
+        "message" => "Get successful",
+
+    ], 200);
+}
 }

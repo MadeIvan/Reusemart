@@ -266,6 +266,30 @@ class PembeliController extends Controller
         ], 200);
     }
 
-        
+public function getPoin(Request $request)
+{
+    try {
+        $user = $request->user() ?? auth('pembeli')->user();
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'User not authenticated',
+                'data' => null
+            ], 401);
+        }
+        $pembeli = \App\Models\Pembeli::with('alamat')->where('idPembeli', $user->idPembeli)->first();
+        return response()->json([
+            'status' => true,
+            'message' => 'Get successful',
+            'data' => $pembeli
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => false,
+            'message' => $e->getMessage(),
+            'data' => null
+        ], 500);
+    }
+}
 
 }
