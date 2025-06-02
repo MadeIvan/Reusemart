@@ -41,4 +41,5 @@ class TransaksiPenitipan extends Model
     public function detailTransaksiPenitipan(){
         return $this->hasMany(DetailTransaksiPenitipan::class, 'idTransaksiPenitipan', 'idTransaksiPenitipan');
     }
+    
 }

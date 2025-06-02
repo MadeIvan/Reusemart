@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\TransaksiPenitipan;
 use App\Models\DetailTransaksiPenitipan;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\Pegawai;
 class TransaksiPenitipanController extends Controller
 {
 public function store(Request $request)
@@ -75,21 +76,31 @@ public function store(Request $request)
 }
 public function notaPenitipanPdf($id)
 {
-    $transaksi = \App\Models\TransaksiPenitipan::with([
-        'detailTransaksiPenitipan.barang',
-        'pegawai',
-        'pegawai2',
-        'penitip',
+    $idTransaksi=$id;
+    $transaksiPenitipan = TransaksiPenitipan::with(['penitip', 'detailTransaksiPenitipan.barang'])->findOrFail($idTransaksi);
+    $detailTransaksiPenitipan = $transaksiPenitipan->detailTransaksiPenitipan;
+    $pegawai = Pegawai::find($transaksiPenitipan->idPegawai1); // misal idPegawaiQC untuk yang QC
+    
+
+    $pdf = Pdf::loadView('PegawaiGudang.notaPenitipan', compact('transaksiPenitipan', 'detailTransaksiPenitipan', 'pegawai'));
+
+    return $pdf->download('nota-penitipan-' . $id . '.pdf');
+
+    // $transaksi = \App\Models\TransaksiPenitipan::with([
+    //     'detailTransaksiPenitipan.barang',
+    //     'pegawai',
+    //     'pegawai2',
+    //     'penitip',
 
         
-    ])->where('idTransaksiPenitipan', $id)->firstOrFail();
-    // return response()->json([
-    //     'status' => true,
-    //     'message' => 'Data transaksi berhasil diambil',
-    //     'data' => $transaksi
-    // ]);
+    // ])->where('idTransaksiPenitipan', $id)->firstOrFail();
+    // // return response()->json([
+    // //     'status' => true,
+    // //     'message' => 'Data transaksi berhasil diambil',
+    // //     'data' => $transaksi
+    // // ]);
 
-    return Pdf::loadView('PegawaiGudang.notaPenitipan', compact('transaksi'))
-        ->download("nota-penitipan-{$id}.pdf");
+    // return Pdf::loadView('Pegawai.notaPenitipan', compact('transaksi'))
+    //     ->download("nota-penitipan-{$id}.pdf");
 }
 }

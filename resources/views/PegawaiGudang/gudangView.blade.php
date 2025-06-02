@@ -224,8 +224,29 @@
             </div>
         </div>
     </div>
+    
 
-    <!-- Toast notification -->
+
+
+    <div class="modal fade" id="actionModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Pilih Aksi</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body d-flex justify-content-around">
+        <button id="printNotaBtn" type="button" class="btn btn-warning">Cetak Nota</button>
+        <button id="editBtn" type="button" class="btn btn-primary">Edit Data</button>
+      </div>
+    </div>
+  </div>
+</div>
+    <!-- Toast notification
+    
+    
+    
+    -->
     <div class="toast-container">
         <div class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true" id="successToast">
             <div class="d-flex">
@@ -266,6 +287,7 @@
             let currentEditItem = null;
             const tableBody = document.getElementById("tableBody");
             const formData = new FormData();
+            const actionModal = new bootstrap.Modal(document.getElementById('actionModal'), {});
             // const searchInput = document.getElementById("searchInput");
             // const form = document.getElementById("PegawaiForm");
             // const registerButton = document.getElementById("registerButton");
@@ -381,14 +403,43 @@
                         
                     `;
                     row.addEventListener("click", () => {
-                        openEditModal(item);
+                        currentItem = item.transaksiPenitipan.idTransaksiPenitipan; 
+                        console.log("selected item : ",currentItem);// store the clicked row's data
+                        actionModal.show();
                     });
+                                function openActionModal(item) {
+                const modal = document.getElementById('actionModal');
+                modal.style.display = 'flex'; // show modal
+
+                
+                // Close modal button
+                document.getElementById('closeModalBtn').onclick = closeModal;
+            }
+
+            function closeModal() {
+                const modal = document.getElementById('actionModal');
+                modal.style.display = 'none';
+            }
                     // row.addEventListener("click", () => populateForm(item));  // Add click event to the row
                     tableBody.appendChild(row);
                 });
             }
+            // Set up print button
+                document.getElementById('printNotaBtn').addEventListener('click', () => {
+                    if (!currentItem) return;
+                    
+                    const url = `/api/nota-penitipan/${currentItem}/pdf`;
+                    window.open(url, '_blank');
+                    actionModal.hide();
+                });
 
-             const pegawai = JSON.parse(pegawaiDataString);
+                    document.getElementById('editBtn').addEventListener('click', () => {
+                    if (!currentItem) return;
+                    openEditModal(currentItem); // your edit modal function
+                    actionModal.hide();
+                });
+
+            const pegawai = JSON.parse(pegawaiDataString);
             const addBarangButton = document.getElementById("addBarangButton");
             const addBarangModal = new bootstrap.Modal(document.getElementById("addBarangModal"));
             const addBarangForm = document.getElementById("addBarangForm");

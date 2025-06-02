@@ -18,7 +18,7 @@
             padding: 0.25rem 0.5rem;
         }
     </style>
-</head>
+</head>         
 <body>
 @include('layouts.navbar')
 
