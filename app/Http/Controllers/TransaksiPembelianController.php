@@ -15,46 +15,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class TransaksiPembelianController extends Controller
 {
-   // ===== Methods from code 1 (Pembeli methods) =====
-    public function getData(Request $request)    
-    {
-        $pembeli = auth('pembeli')->user();
-        return response()->json([
-            "status" => true,
-            "message" => "User retrieved successfully",
-            "data" => $pembeli
-        ]);
-    }
-
-    public function updatePoin(Request $request)    
-    {
-        $pembeli = auth('pembeli')->user();
-        $pembeli->poin = $request->poin;
-        $pembeli->save();
-        return response()->json([
-            "status" => true,
-            "message" => "User retrieved successfully",
-            "data" => $pembeli
-        ]);
-    }
-
-    public function removeAllCart(Request $request)
-    {
-        $pembeli = Auth::guard('pembeli')->user();
-        if (!$pembeli) {
-            return response()->json([
-                "status" => false,
-                "message" => "Pembeli belum login",
-            ], 401);
-        }
-        $cartKey = 'cart_user_' . $pembeli->idPembeli;
-        Cache::forget($cartKey);
-        return response()->json([
-            "status" => true,
-            "message" => "Keranjang berhasil dikosongkan",
-        ], 200);
-    }
-
     // ===== Methods from code 2 (TransaksiPembelianController) =====
     public function showPenjadwalan(){
     $pembelians = TransaksiPembelian::with([
@@ -86,7 +46,6 @@ class TransaksiPembelianController extends Controller
 
     return response()->json($pembelians);
 }
-
 
 
     public function store(Request $request){
@@ -130,6 +89,8 @@ class TransaksiPembelianController extends Controller
             }
             $newId = $yearMonth . '.' . ($lastNumber + 1);
 
+            \Log::info("ID yang akan digunakan sebagai noNota:", [$newId]);
+
             // Simpan transaksi utama
             $transaksiPembelian = TransaksiPembelian::create([
                 'noNota' => $newId,
@@ -139,6 +100,8 @@ class TransaksiPembelianController extends Controller
                 'status' => "Menunggu Pembayaran",
                 'totalHarga' => $validated['totalHarga']
             ]);
+
+            \Log::info("transaksiPembelian", [$transaksiPembelian]);
 
             $idBarangs = $validated['id_barang'];
             // Simpan detail barang
@@ -240,7 +203,6 @@ public function notaPenjualanPdf($noNota)
         ]);
     }
 
-
     public function buktiBayar(Request $request, $id){
         try {
             $validated = $request->validate([
@@ -289,7 +251,80 @@ public function notaPenjualanPdf($noNota)
             ], 500);
         }
     }
-     public function terimaPembayaran(Request $request, $id){
+
+
+    public function canceled(Request $request, $id){
+        try{
+            ///////////cek pembeli///////////
+            $pembeli = auth('pembeli')->user();
+            if (!$pembeli) {
+                return response()->json([
+                    "status" => false,
+                    "message" => "Pembeli Belum Login",
+                    "data" => null,
+                ], 400);
+            }
+
+            $validated = $request->validate([
+                'poinAwal' => 'required|numeric',
+                'id_barang' => 'required|array',
+                'id_barang.*' => 'string',
+                'status' => 'required|string',
+            ]);
+
+            //////////////////////ubah ke sebelum transaksi/////////////////////
+            DB::beginTransaction();
+            $idBarangs = $validated['id_barang'];
+            // Simpan detail barang
+            foreach ($validated['id_barang'] as $idBarang) {
+                \Log::info("ID Barang:", [$idBarang]);
+
+                DB::table('barang')->where('idBarang', $idBarang)->update([
+                    'statusBarang' => 'Tersedia'
+                ]);
+            }
+
+            DB::table('pembeli')->where('idPembeli', $pembeli->idPembeli)->update([
+                'poin' => $validated['poinAwal']
+            ]);
+
+            DB::commit();
+
+            $transaksi = TransaksiPembelian::where('noNota', $id)->first();
+            $transaksi->status = $validated['status'];
+            $transaksi->save();
+            return response()->json([
+                "status" => true,
+                "message" => "Pesanan dibatalkan",
+                "data" => $transaksi
+            ], 200);
+        }catch (Exception $e) {
+            return response()->json([
+                "status" => false,
+                "message" => "Terjadi kesalahan: " . $e->getMessage(),
+                "data" => null
+            ], 500);
+        }
+    }
+
+    public function getNotConfirmed(){
+        try{
+            $data = TransaksiPembelian::where('status', 'Menunggu Verifikasi')->get();
+            return response()->json([
+                "status" => true,
+                "message" => "Get successful",
+                "data" => $data
+            ], 200);
+        }catch(Exception $e){
+            return response()->json([
+                "status" => false,
+                "message" => $e->getMessage(),
+                "data" => null
+            ], 400);
+        }
+    }
+
+    public function terimaPembayaran(Request $request, $id){
         try{
             $pegawai = auth('pegawai')->user();
             if (!$pegawai) {
@@ -324,7 +359,9 @@ public function notaPenjualanPdf($noNota)
             ], 400);
         }
     }
+
 public function tolakVerifikasi(Request $request, $noNota)
+
     {
         try {
             $pegawai = auth('pegawai')->user();
@@ -366,7 +403,9 @@ public function tolakVerifikasi(Request $request, $noNota)
             // $poinAkhir = $pembeli->poin;
             // $poinAwal = $poinAkhir;
 
-        if(($alamat !== null && $totalHarga >= 1500000) || ($alamat === null && $totalHarga >= 1500000)){
+
+           if(($alamat !== null && $totalHarga >= 1500000) || ($alamat === null && $totalHarga >= 1500000)){
+
                 $poinBelanja = $totalHarga / 10000;
                 $poinBonus = $poinBelanja * 0.2;
                 $selisihHarga = abs($totalHarga - $transaksi->totalHarga);
@@ -483,6 +522,7 @@ public function tolakVerifikasi(Request $request, $noNota)
             ], 500);
         }
     }
+
     public function getNotConfirmed(){
         try{
             $data = TransaksiPembelian::where('status', 'Menunggu Verifikasi')->get();

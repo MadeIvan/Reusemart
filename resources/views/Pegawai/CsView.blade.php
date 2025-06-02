@@ -73,6 +73,7 @@
     </style>
 </head>
 <body>
+    @include('layouts.navbar')
 
     @include('layouts.navbar')
 
@@ -195,7 +196,10 @@
         </div>
     </div>
 
-    <!-- Your existing JavaScript here (unchanged) -->
+    <footer class="bg-dark text-white text-center p-3">
+        <p>&copy; 2025 Reusemart</p>
+    </footer>
+
   <script>
         document.addEventListener("DOMContentLoaded", function () {
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token from meta tag

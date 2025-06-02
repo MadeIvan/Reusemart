@@ -22,6 +22,7 @@ use App\Http\Controllers\TransaksiPembelianController;
 use App\Http\Controllers\PointRedemptionController;
 
 
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
      return response()->json($request->user());
 });
@@ -77,6 +78,7 @@ Route::middleware(['auth:pegawai','role:2'])->group(function () {
     Route::put('/pegawai/reset-password/{id}', [PegawaiController::class, 'resetPassword']);
     Route::post('/buat-diskusi/{id}', [DiskusiController::class, 'store']);
 });
+
 Route::middleware(['auth:pegawai','role:5'])->group(function () {
     Route::get('/verifikasi', [TransaksiPembelianController::class, 'getNotConfirmed']);
     Route::post('/verifikasi/{id}', [TransaksiPembelianController::class, 'terimaPembayaran']);    
@@ -90,6 +92,7 @@ Route::middleware(['auth:sanctum', 'auth.pembeli'])->group(function () {
     Route::delete('/pembeli/alamat/delete/{id}', [AlamatController::class, 'delete']);
     Route::put('/pembeli/alamat/set-default/{id}', [AlamatController::class, 'setAsDefault']);
     Route::get('/alamatUtama', [AlamatController::class, 'getUtama']);
+
     Route::post('/buat-diskusi/{id}', [DiskusiController::class, 'store']);
     Route::get('/pembeli/getData', [PembeliController::class, 'getData']);
     Route::put('/updatePoin', [PembeliController::class, 'updatePoin']);

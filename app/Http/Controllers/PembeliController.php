@@ -120,7 +120,32 @@ class PembeliController extends Controller
         return response()->json(['message' => 'Not logged in'], 401);
     }
 
-    public function addToCart(Request $request, $id) {
+    public function getData(Request $request)    
+    {
+        // $penitip = $request->user();
+        $pembeli = auth('pembeli')->user();
+        
+        return response()->json([
+            "status" => true,
+            "message" => "User retrieved successfully",
+            "data" => $pembeli
+        ]);
+    }
+
+    public function updatePoin(Request $request)    
+    {
+        $pembeli = auth('pembeli')->user();
+        $pembeli->poin = $request->poin;
+        $pembeli->save();
+        
+        return response()->json([
+            "status" => true,
+            "message" => "User retrieved successfully",
+            "data" => $pembeli
+        ]);
+    }
+
+     public function addToCart(Request $request, $id) {
         $pembeli = Auth::guard('pembeli')->user();
         if(!$pembeli){
             return response()->json([
@@ -179,9 +204,11 @@ class PembeliController extends Controller
 
             if ($barang) {
                 $detailedCart[] = array_merge(
-    $barang->toArray(),
-    ['jumlah' => $item['jumlah']]
-);
+                    $barang->toArray(),
+                    ['jumlah' => $item['jumlah']]
+                );
+
+
             }
         }
 
@@ -231,20 +258,6 @@ public function getData(Request $request)
             "data" => $pembeli
         ]);
     }
-
-    // Update poin value for pembeli
-    public function updatePoin(Request $request)    
-    {
-        $pembeli = auth('pembeli')->user();
-        $pembeli->poin = $request->poin;
-        $pembeli->save();
-        return response()->json([
-            "status" => true,
-            "message" => "User retrieved successfully",
-            "data" => $pembeli
-        ]);
-    }
-
     // Remove all items from the cart
     public function removeAllCart(Request $request)
     {
