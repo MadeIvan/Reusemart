@@ -159,7 +159,7 @@ class PembeliController extends Controller
         $cart = Cache::get($cartKey, []); 
 
         // Cek apakah barang sudah ada di cart
-        if(!isset($cart[$id])) {
+        if(!isset($cart[$id])) {    
             $cart[$id] = [
                 'idBarang' => $id,
                 'jumlah' => 1
@@ -207,6 +207,8 @@ class PembeliController extends Controller
                     $barang->toArray(),
                     ['jumlah' => $item['jumlah']]
                 );
+
+
             }
         }
 
@@ -247,6 +249,16 @@ class PembeliController extends Controller
         }
     }
 
+public function getData(Request $request)    
+    {
+        $pembeli = auth('pembeli')->user();
+        return response()->json([
+            "status" => true,
+            "message" => "User retrieved successfully",
+            "data" => $pembeli
+        ]);
+    }
+    // Remove all items from the cart
     public function removeAllCart(Request $request)
     {
         $pembeli = Auth::guard('pembeli')->user();
@@ -256,15 +268,14 @@ class PembeliController extends Controller
                 "message" => "Pembeli belum login",
             ], 401);
         }
-
         $cartKey = 'cart_user_' . $pembeli->idPembeli;
         Cache::forget($cartKey);
-
         return response()->json([
             "status" => true,
             "message" => "Keranjang berhasil dikosongkan",
         ], 200);
     }
+
         
 
 }

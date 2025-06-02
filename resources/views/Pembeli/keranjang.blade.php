@@ -99,7 +99,7 @@
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             const token = localStorage.getItem('auth_token');
             let idBarang = null;
-             
+            
             function fetchBarang(){
                 const token = localStorage.getItem('auth_token');
                 if (!token) {

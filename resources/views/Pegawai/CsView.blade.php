@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Data Penitip</title>
 
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" />
+
     <style>
         /* Styling for table with scrollable body */
         #penitipTableContainer {
@@ -65,7 +65,7 @@
 
         /* Toast Styling */
         .toast-container {
-            position: absolute;
+            position: fixed;
             top: 20px;
             right: 20px;
             z-index: 1000;
@@ -75,36 +75,37 @@
 <body>
     @include('layouts.navbar')
 
-    <div class="container mt-4">
+    @include('layouts.navbar')
+
+    <div class="container mt-4 ">
         <h2>Data Penitip</h2>
 
         <!-- Form for Penitip data -->
-        <form id="penitipForm">
-            <input type="hidden" id="currentPenitipId">
+        <form id="penitipForm" class="mb-4">
+            <input type="hidden" id="currentPenitipId" />
             <div class="row mb-3">
                 <div class="col-md-4">
                     <label for="namaPenitip" class="form-label">Nama Penitip</label>
-                    <input type="text" class="form-control" id="namaPenitip" required>
+                    <input type="text" class="form-control" id="namaPenitip" required />
                 </div>
                 <div class="col-md-4">
                     <label for="nik" class="form-label">NIK</label>
-                    <input type="text" class="form-control" id="nik" required>
+                    <input type="text" class="form-control" id="nik" required />
                 </div>
-                
                 <div class="col-md-4">
                     <label for="username" class="form-label">Username</label>
-                    <input type="text" class="form-control" id="username" required>
+                    <input type="text" class="form-control" id="username" required />
                 </div>
             </div>
 
             <div class="row mb-3">
                 <div class="col-md-4">
                     <label for="idTopSeller" class="form-label">ID Top Seller</label>
-                    <input type="text" class="form-control" id="idTopSeller" disabled>
+                    <input type="text" class="form-control" id="idTopSeller" disabled />
                 </div>
                 <div class="col-md-4">
                     <label for="idDompet" class="form-label">ID Dompet</label>
-                    <input type="text" class="form-control" id="idDompet" disabled>
+                    <input type="text" class="form-control" id="idDompet" disabled />
                 </div>
             </div>
 
@@ -125,21 +126,21 @@
         <form id="registerForm">
             <div class="mb-3">
                 <label for="registerNamaPenitip" class="form-label">Nama Penitip</label>
-                <input type="text" class="form-control" id="registerNamaPenitip" required>
+                <input type="text" class="form-control" id="registerNamaPenitip" required />
             </div>
             <div class="mb-3">
                 <label for="registerNik" class="form-label">NIK</label>
-                <input type="text" class="form-control" id="registerNik" required>
+                <input type="text" class="form-control" id="registerNik" required />
             </div>
             <div class="mb-3">
                 <label for="registerUsername" class="form-label">Username</label>
-                <input type="text" class="form-control" id="registerUsername" required>
+                <input type="text" class="form-control" id="registerUsername" required />
             </div>
             <div class="mb-3">
                 <label for="registerPassword" class="form-label">Password</label>
-                <input type="password" class="form-control" id="registerPassword" required>
+                <input type="password" class="form-control" id="registerPassword" required />
             </div>
-            <div class="mb-3">
+            <div class="mb-3 d-flex gap-2">
                 <button type="submit" class="btn btn-success">Register</button>
                 <button type="button" class="btn btn-secondary" id="closeRegisterForm">Close</button>
             </div>
@@ -148,19 +149,33 @@
 
     <!-- Toast notification -->
     <div class="toast-container">
-        <div class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true" id="successToast">
+        <div
+            class="toast align-items-center text-bg-primary border-0"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            id="successToast"
+        >
             <div class="d-flex">
-                <div class="toast-body" id="toastMessage">
-                    Action completed successfully!
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                <div class="toast-body" id="toastMessage">Action completed successfully!</div>
+                <button
+                    type="button"
+                    class="btn-close btn-close-white me-2 m-auto"
+                    data-bs-dismiss="toast"
+                    aria-label="Close"
+                ></button>
             </div>
         </div>
     </div>
 
     <div class="container mt-4">
         <h3>Penitip Data</h3>
-        <input type="text" id="searchInput" class="form-control mb-3" placeholder="Search by username or name">
+        <input
+            type="text"
+            id="searchInput"
+            class="form-control mb-3"
+            placeholder="Search by username or name"
+        />
 
         <div id="penitipTableContainer">
             <table class="table table-bordered" id="penitipTable">
@@ -185,7 +200,7 @@
         <p>&copy; 2025 Reusemart</p>
     </footer>
 
-    <script>
+  <script>
         document.addEventListener("DOMContentLoaded", function () {
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token from meta tag
 

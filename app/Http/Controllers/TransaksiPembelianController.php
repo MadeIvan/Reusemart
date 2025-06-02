@@ -11,10 +11,42 @@ use App\Models\DetailTransaksiPembelian;
 use App\Models\Barang;
 use App\Models\Pembeli;
 use Exception;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class TransaksiPembelianController extends Controller
 {
-   
+    // ===== Methods from code 2 (TransaksiPembelianController) =====
+    public function showPenjadwalan(){
+    $pembelians = TransaksiPembelian::with([
+        'detailTransaksiPembelian.barang',
+        'pegawai',
+        'pegawai2',
+        'pegawai3',
+        'pembeli',
+        'pembeli.alamat',
+        
+    ])
+    ->where('status', 'Lunas Belum Dijadwalkan')
+    ->get();
+
+    return response()->json($pembelians);
+}
+    public function showfornota(){
+    $pembelians = TransaksiPembelian::with([
+        'detailTransaksiPembelian.barang',
+        'pegawai',
+        'pegawai2',
+        'pegawai3',
+        'pembeli',
+        'pembeli.alamat',
+        
+    ])
+    ->where('status', 'Lunas Siap')
+    ->get();
+
+    return response()->json($pembelians);
+}
+
 
     public function store(Request $request){
         try {
@@ -68,6 +100,7 @@ class TransaksiPembelianController extends Controller
                 'status' => "Menunggu Pembayaran",
                 'totalHarga' => $validated['totalHarga']
             ]);
+
             \Log::info("transaksiPembelian", [$transaksiPembelian]);
 
             $idBarangs = $validated['id_barang'];
@@ -109,8 +142,47 @@ class TransaksiPembelianController extends Controller
             ], 500);
         }
     }
+// In TransaksiPembelianController.php
+public function updatePenjadwalan(Request $request, $noNota)
+{
+    $transaksi = TransaksiPembelian::where('noNota', $noNota)->first();
 
-    public function getDataTerbaru(Request $request){
+    if (!$transaksi) {
+        return response()->json(['status' => false, 'message' => 'Transaksi tidak ditemukan'], 404);
+    }
+
+    $transaksi->status = $request->input('status');
+    
+    // If a kurir is selected, assign to idPegawai3 (assuming this is the kurir column)
+    if ($request->has('idKurir')) {
+        $transaksi->idPegawai3 = $request->input('idKurir');
+    }
+    // (Optional) If you want to store kurirNama
+    // $transaksi->kurirNama = $request->input('kurirNama');
+    
+    // (Optional) If you want to store scheduled date
+    $transaksi->tanggalPengirimanPengambilan = $request->input('tanggalKirim');
+
+    $transaksi->save();
+
+    return response()->json(['status' => true, 'message' => 'Penjadwalan berhasil disimpan']);
+}
+public function notaPenjualanPdf($noNota)
+{
+    $transaksi = TransaksiPembelian::with([
+        'detailTransaksiPembelian.barang',
+        'pembeli.alamat',
+        'pegawaiQc', // Add the relationships you need
+        // ...add kurir, etc.
+    ])->where('noNota', $noNota)->firstOrFail();
+
+    // You may need to prepare extra values, e.g., points, discount, etc.
+
+    return Pdf::loadView('pdf.nota_penjualan', compact('transaksi'))
+        ->stream("nota-penjualan-{$noNota}.pdf"); // use ->download() if you want forced download
+}
+
+ public function getDataTerbaru(Request $request){
         $pembeli = auth('pembeli')->user();
             if (!$pembeli) {
                 return response()->json([
@@ -179,6 +251,7 @@ class TransaksiPembelianController extends Controller
             ], 500);
         }
     }
+
 
     public function canceled(Request $request, $id){
         try{
@@ -287,7 +360,8 @@ class TransaksiPembelianController extends Controller
         }
     }
 
-    public function tolakVerifikasi(Request $request, $noNota)
+public function tolakVerifikasi(Request $request, $noNota)
+
     {
         try {
             $pegawai = auth('pegawai')->user();
@@ -329,7 +403,9 @@ class TransaksiPembelianController extends Controller
             // $poinAkhir = $pembeli->poin;
             // $poinAwal = $poinAkhir;
 
+
            if(($alamat !== null && $totalHarga >= 1500000) || ($alamat === null && $totalHarga >= 1500000)){
+
                 $poinBelanja = $totalHarga / 10000;
                 $poinBonus = $poinBelanja * 0.2;
                 $selisihHarga = abs($totalHarga - $transaksi->totalHarga);
@@ -447,4 +523,74 @@ class TransaksiPembelianController extends Controller
         }
     }
 
+    public function getNotConfirmed(){
+        try{
+            $data = TransaksiPembelian::where('status', 'Menunggu Verifikasi')->get();
+            return response()->json([
+                "status" => true,
+                "message" => "Get successful",
+                "data" => $data
+            ], 200);
+        }catch(Exception $e){
+            return response()->json([
+                "status" => false,
+                "message" => $e->getMessage(),
+                "data" => null
+            ], 400);
+        }
+    }
+
+     public function canceled(Request $request, $id){
+        try{
+            ///////////cek pembeli///////////
+            $pembeli = auth('pembeli')->user();
+            if (!$pembeli) {
+                return response()->json([
+                    "status" => false,
+                    "message" => "Pembeli Belum Login",
+                    "data" => null,
+                ], 400);
+            }
+
+            $validated = $request->validate([
+                'poinAwal' => 'required|numeric',
+                'id_barang' => 'required|array',
+                'id_barang.*' => 'string',
+                'status' => 'required|string',
+            ]);
+
+            //////////////////////ubah ke sebelum transaksi/////////////////////
+            DB::beginTransaction();
+            $idBarangs = $validated['id_barang'];
+            // Simpan detail barang
+            foreach ($validated['id_barang'] as $idBarang) {
+                \Log::info("ID Barang:", [$idBarang]);
+
+                DB::table('barang')->where('idBarang', $idBarang)->update([
+                    'statusBarang' => 'Tersedia'
+                ]);
+            }
+
+            DB::table('pembeli')->where('idPembeli', $pembeli->idPembeli)->update([
+                'poin' => $validated['poinAwal']
+            ]);
+
+            DB::commit();
+
+            $transaksi = TransaksiPembelian::where('noNota', $id)->first();
+            $transaksi->status = $validated['status'];
+            $transaksi->save();
+            return response()->json([
+                "status" => true,
+                "message" => "Pesanan dibatalkan",
+                "data" => $transaksi
+            ], 200);
+        }catch (Exception $e) {
+            return response()->json([
+                "status" => false,
+                "message" => "Terjadi kesalahan: " . $e->getMessage(),
+                "data" => null
+            ], 500);
+        }
+    }
 }

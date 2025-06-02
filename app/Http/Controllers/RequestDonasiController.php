@@ -6,7 +6,7 @@ use App\Models\ReqDonasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class reqDonasiController extends Controller
+class RequestDonasiController extends Controller
 {
     // Middleware to ensure that the user is authenticated
     public function __construct()

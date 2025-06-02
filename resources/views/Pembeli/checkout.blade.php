@@ -509,8 +509,6 @@
                     },
                 })
             }
-
-            
             document.getElementById("checkout-btn").addEventListener("click", function() {
                 dataCheckout = JSON.parse(localStorage.getItem("data_checkout"));
                 const sisaPoin = localStorage.getItem('sisaPoin');
@@ -605,6 +603,7 @@
                     }).showToast();
                 });
             })
+
         });
     </script>
 </body>

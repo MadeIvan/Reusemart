@@ -25,6 +25,22 @@ class BarangController extends Controller
             ], 500);  // 500 Internal Server Error
         }
     }
+    
+    public function showAllBarang()
+    {
+        try {
+            // Fetch all barang from the database
+            $barang = Barang::all();
+            // Return the barang as a JSON response
+            return response()->json($barang);
+        } catch (\Exception $e) {
+            // Catch any exception and return a 500 internal server error
+            return response()->json([
+                'error' => 'An error occurred while fetching the products.',
+                'message' => $e->getMessage(), // Include the exception message for debugging
+            ], 500);
+        }
+    }
 
     // Show Barang by id
     public function show($idBarang)
@@ -118,7 +134,7 @@ class BarangController extends Controller
         return response()->json(['message' => 'Barang updated successfully', 'data' => $barang]);
     }
 
-    // Delete a Barang
+
     public function destroy($id)
     {
         $barang = Barang::find($id);
