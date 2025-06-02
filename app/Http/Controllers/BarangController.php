@@ -6,7 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Barang;  
 use Illuminate\Support\Facades\Validator;
 use App\Models\TransaksiDonasi;
-
+use Illuminate\Support\Facades\DB;
+use App\Models\ImagesBarang;
 
 class BarangController extends Controller
 {
@@ -66,42 +67,46 @@ class BarangController extends Controller
 }
 
     // Create a new Barang
-    public function store(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'idBarang'=> 'required|string|max:10',
-            'idTransaksiDonasi' => 'required|string|max:255',
-            'namaBarang' => 'required|string|max:255',
-            'beratBarang' => 'required|numeric',
-            'garansiBarang' => 'required|boolean',
-            'periodeGaransi' => 'required|date',
-            'hargaBarang' => 'required|numeric',
-            'haveHunter' => 'required|boolean',
-            'statusBarang' => 'required|string|max:255',
-            'image' => 'nullable|string|max:255',
-            'kategori' => 'required|string|max:50',
-        ]);
+ public function store(Request $request)
+{
+    // Validate the incoming request
+    $validated = $request->validate([
+        'idBarang' => 'required|string|max:10',
+        'idTransaksiDonasi' => 'nullable|string|max:10',
+        'namaBarang' => 'required|string|max:255',
+        'beratBarang' => 'required|numeric',
+        'garansiBarang' => 'required|boolean',
+        'periodeGaransi' => 'nullable|date',
+        'hargaBarang' => 'required|numeric',
+        'haveHunter' => 'required|boolean',
+        'statusBarang' => 'required|string|max:255',
+        'kategori' => 'required|string|max:50',
+    ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 400);
-        }
+   
+    // Now create Barang and link image field to imagesbarang.id
+    $barang = Barang::create([
+        'idBarang' => $validated['idBarang'],
+        'namaBarang' => $validated['namaBarang'],
+        'beratBarang' => $validated['beratBarang'],
+        'garansiBarang' => $validated['garansiBarang'],
+        'periodeGaransi' => $validated['periodeGaransi'],
+        'hargaBarang' => $validated['hargaBarang'],
+        'haveHunter' => $validated['haveHunter'],
+        'statusBarang' => $validated['statusBarang'],
+        'kategori' => $validated['kategori'],
+        'image' => $validated['idBarang'],
+    ]);
+    
+    
 
-        $barang = Barang::create([
-            'idBarang' => $request->idBarang,
-            'idTransaksiDonasi' => $request->idTransaksiDonasi,
-            'namaBarang' => $request->namaBarang,
-            'beratBarang' => $request->beratBarang,
-            'garansiBarang' => $request->garansiBarang,
-            'periodeGaransi' => $request->periodeGaransi,
-            'hargaBarang' => $request->hargaBarang,
-            'haveHunter' => $request->haveHunter,
-            'statusBarang' => $request->statusBarang,
-            'image' => $request->image,
-            'kategori' => $request->kategori,
-        ]);
+    return response()->json([
+        'status' => true,
+        'message' => 'Barang created successfully with filenames saved',
+        'data' => $barang
+    ], 201);
+}
 
-        return response()->json(['message' => 'Barang created successfully', 'data' => $barang], 201);
-    }
 
     // Update an existing Barang
     public function update(Request $request, $id)
@@ -183,5 +188,50 @@ class BarangController extends Controller
         'status' => true,
         'data' => $availableBarang
     ]);
+}
+    public function indexall()
+{
+    try {
+        $barang = Barang::with('detailTransaksiPenitipan.transaksiPenitipan.penitip','imagesBarang')->get();
+
+        $result = $barang->map(function($item) {
+            // Get transaksiPenitipan instance safely
+            $transaksi = optional($item->detailTransaksiPenitipan)->transaksiPenitipan;
+
+            return [
+                'idBarang' => $item->idBarang,
+                'namaBarang' => $item->namaBarang,
+                'beratBarang' => $item->beratBarang,
+                'garansiBarang' => $item->garansiBarang,
+                'periodeGaransi' => $item->periodeGaransi,
+                'hargaBarang' => $item->hargaBarang,
+                'haveHunter' => $item->haveHunter,
+                'statusBarang' => $item->statusBarang,
+                'image' => $item->image,
+                'kategori' => $item->kategori,
+                'tanggalPenitipanSelesai' => optional($transaksi)->tanggalPenitipanSelesai,
+                'namaPenitip' => optional(optional($transaksi)->penitip)->namaPenitip,
+
+                // Include all transaksiPenitipan attributes as a nested array
+                'transaksiPenitipan' => $transaksi ? $transaksi->toArray() : null,
+                    'imagesBarang' => $item->imagesBarang ? [
+                    'image1' => $item->imagesBarang->image1,
+                    'image2' => $item->imagesBarang->image2,
+                    'image3' => $item->imagesBarang->image3,
+                    'image4' => $item->imagesBarang->image4,
+                    'image5' => $item->imagesBarang->image5,
+                ] : null,
+                
+            ];
+        });
+
+        return response()->json($result);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'An error occurred while fetching the products.',
+            'message' => $e->getMessage(),
+            'status' => true
+        ], 500);
+    }
 }
 }
