@@ -221,20 +221,26 @@ public function generateIdBarang(Request $request)
         return response()->json(['error' => 'Prefix is required'], 400);
     }
 
-    // Find existing idBarang that start with prefix and extract numbers
+    // Fetch all existing idBarang starting with the prefix
     $existingIds = Barang::where('idBarang', 'like', $prefix . '%')->pluck('idBarang');
 
-    // Extract numbers from existing IDs
+    // Extract numeric suffixes from existing IDs
     $numbers = $existingIds->map(function ($id) use ($prefix) {
-        return (int) str_replace($prefix, '', $id);
-    })->filter()->sort()->values();
+        return (int) substr($id, strlen($prefix));
+    })
+    ->filter(function ($num) {
+        return $num > 0; // only positive integers
+    })
+    ->sort()
+    ->values();
 
-    // Find next available number
+    // Find the smallest missing positive integer suffix
     $nextNumber = 1;
     foreach ($numbers as $num) {
         if ($num == $nextNumber) {
             $nextNumber++;
-        } else {
+        } elseif ($num > $nextNumber) {
+            // Found a gap, stop incrementing
             break;
         }
     }
@@ -243,5 +249,6 @@ public function generateIdBarang(Request $request)
 
     return response()->json(['nextId' => $nextId]);
 }
+
 
 }

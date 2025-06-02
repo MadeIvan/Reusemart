@@ -155,7 +155,23 @@
                 </div>
                 <div class="mb-3">
                     <label for="beratBarang" class="form-label">Berat Barang</label>
-                    <input type="number" class="form-control" id="beratBarang" required>
+                    <input type="number" step="0.01" min ="0" class="form-control" id="beratBarang" required>
+                </div>
+                <div class="mb-3">
+                    <label for="kategori" class="form-label">Kategori</label>
+                    <select class="form-select" id="kategori" required>
+                        <option value="">---</option>
+                        <option value="Elektronik & Gadget">Elektronik & Gadget</option>
+                        <option value="Pakaian & Aksesori">Pakaian & Aksesori</option>
+                        <option value="Perabotan Rumah Tangga">Perabotan Rumah Tangga</option>
+                        <option value="Buku, Alat Tulis, & Peralatan Sekolah">Buku, Alat Tulis, & Peralatan Sekolah</option>
+                        <option value="Hobi, Mainan, & Koleksi">Hobi, Mainan, & Koleksi</option>
+                        <option value="Perlengkapan Bayi & Anak">Perlengkapan Bayi & Anak</option>
+                        <option value="Otomotif & Aksesori">Otomotif & Aksesori</option>
+                        <option value="Perlengkapan Taman & Outdoor">Perlengkapan Taman & Outdoor</option>
+                        <option value="Peralatan Kantor & Industri">Peralatan Kantor & Industri</option>
+                        <option value="Kosmetik & Perawatan Diri">Kosmetik & Perawatan Diri</option>
+                    </select>
                 </div>
                 <div class="mb-3">
                     <label for="garansiBarang" class="form-label">Garansi Barang</label>
@@ -164,13 +180,14 @@
                     <option value="0">Tidak</option>
                     </select>
                 </div>
+                
                 <div class="mb-3">
                     <label for="periodeGaransi" class="form-label">Periode Garansi (bulan)</label>
-                    <input type="number" class="form-control" id="periodeGaransi">
+                    <input type="date" class="form-control" id="periodeGaransi">
                 </div>
                 <div class="mb-3">
                     <label for="hargaBarang" class="form-label">Harga Barang</label>
-                    <input type="number" class="form-control" id="hargaBarang" required>
+                    <input type="number" class="form-control" min ="0" id="hargaBarang" required>
                 </div>
                 <div class="mb-3">
                     <label for="haveHunter" class="form-label">Barang dengan Hunter?</label>
@@ -197,10 +214,7 @@
                     <div id="preview" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 10px;"></div>
 
                 </div>
-                <div class="mb-3">
-                    <label for="kategori" class="form-label">Kategori</label>
-                    <input type="text" class="form-control" id="kategori" required>
-                </div>
+                
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary">Next</button>
@@ -403,6 +417,9 @@
             addBarangButton.addEventListener("click", function () {
                 const addBarangDetailModal = new bootstrap.Modal(document.getElementById("addBarangDetailModal"));
                 addBarangDetailForm.reset();
+                let kategoriSelect ='';
+                toggleGaransiInputs();
+                resetImagePreview();
                 // addBarangDetailModal.reset();
                 addBarangDetailModal.show();
             });
@@ -420,6 +437,10 @@
             
             const firstModal = bootstrap.Modal.getInstance(document.getElementById("addBarangDetailModal"));
             firstModal.hide();
+            let hunterSelect = document.getElementById("haveHunter").value;
+            addBarangDetailForm.reset();
+            resetImagePreview();
+            toggleHunterSelect();
 
             const addBarangModal = new bootstrap.Modal(document.getElementById("addBarangModal"));
             document.getElementById("idPegawai1").value = namaPegawai || '';
@@ -457,6 +478,8 @@
             // Handle form submission (when the user clicks 'Save')
             addBarangForm.addEventListener("submit", async function (e) {
             e.preventDefault();
+            resetImagePreview();
+            addBarangForm.reset();
             const formData = new FormData();
             formData.append("idBarang", document.getElementById("idBarang").value);
             // formData.append("idTransaksiDonasi", document.getElementById("idTransaksiDonasi").value);
@@ -501,6 +524,7 @@
                     // Close Barang modal
                     const addBarangDetailModal = bootstrap.Modal.getInstance(document.getElementById("addBarangDetailModal"));
                     addBarangDetailModal.hide();
+                    toggleGaransiInputs();
 
                     // Open Transaksi Penitipan modal
                     
@@ -589,6 +613,7 @@
                     // Close modal
                     const addBarangModal = bootstrap.Modal.getInstance(document.getElementById("addBarangModal"));
                     addBarangModal.hide();
+                    toggleGaransiInputs();
 
                     // Reset window.lastCreatedBarangId
                     window.lastCreatedBarangId = null;
@@ -601,7 +626,8 @@
                 console.error("Error creating Transaksi Penitipan:", error);
                 alert("An error occurred while creating the Transaksi Penitipan.");
             }
-            fetchPegawai()
+            fetchPegawai();
+            toggleHunterSelect();
         });
 
             async function fetchPenitip(selectedUsername = null) {
@@ -940,7 +966,97 @@
                 document.getElementById('idBarang').value = prefix + '1';
             }
             });
+            const haveHunterSelect = document.getElementById('haveHunter');
+            const hunterSelect = document.getElementById('idPegawai2');
+            function toggleHunterSelect() {
+                console.log("have Hunter value func : ", haveHunterSelect.value);
+            if (haveHunterSelect.value === 1) { // 'Ya'
+                hunterSelect.disabled = false;
+                hunterSelect.required = true;
+            } else  {
+                hunterSelect.disabled = true;
+                hunterSelect.required = false;
+                hunterSelect.value = ""; // reset selection if disabled
+            }
+            }
 
+            // Initial toggle on page load
+            toggleHunterSelect();
+
+            // Listen for changes on haveHunter select
+            haveHunterSelect.addEventListener('change', toggleHunterSelect);
+
+
+            const kategoriSelect = document.getElementById("kategori");
+            const garansiDiv = document.querySelector('label[for="garansiBarang"]').parentElement;
+            const periodeDiv = document.querySelector('label[for="periodeGaransi"]').parentElement;
+            const garansiSelect = document.getElementById("garansiBarang");
+            const periodeInput = document.getElementById("periodeGaransi");
+
+            function toggleGaransiInputs() {
+                
+                if (kategoriSelect.value === "Elektronik & Gadget") {
+                garansiDiv.style.display = "block";
+                periodeDiv.style.display = "block";
+                garansiSelect.disabled = false;
+                // Make garansiBarang required
+                garansiSelect.required = true;
+
+                // Enable/disable periode based on garansiBarang value
+                togglePeriodeInput();
+
+                // Periode input required only if garansi is "Ya" (1)
+                periodeInput.required = (garansiSelect.value === '1');
+                } else {
+
+                garansiDiv.style.display = "none";
+                periodeDiv.style.display = "none";
+                garansiSelect.disabled = true;
+                garansiSelect.required = false;
+                periodeInput.disabled = true;
+                periodeInput.required = false;
+                garansiSelect.value = "";
+                periodeInput.value = "";
+                }
+            }
+
+            function togglePeriodeInput() {
+                if (garansiSelect.value === '0') {
+                periodeInput.disabled = true;
+                periodeInput.required = false;
+                periodeInput.value = "";
+                } else {
+                periodeInput.disabled = false;
+                // periodeInput.required = true;  // Handled in toggleGaransiInputs
+                }
+            }
+
+            // Initial run
+            toggleGaransiInputs();
+
+            // Event listeners
+            kategoriSelect.addEventListener("change", toggleGaransiInputs);
+            garansiSelect.addEventListener("change", function() {
+                togglePeriodeInput();
+                // Adjust required attribute on periodeInput accordingly
+                periodeInput.required = (garansiSelect.value === '1');
+            });
+            function resetImagePreview() {
+            // Clear the preview thumbnails container
+                const preview = document.getElementById('preview');
+                preview.innerHTML = '';
+
+                // Clear your file tracking arrays
+                filesArray = [];
+                fileNamesArray = [];
+
+                // Reset the actual file input element
+                const fileInput = document.getElementById('image');
+                fileInput.value = '';
+
+                // Show the drop area again if you hide it
+                toggleDropAreaVisibility();
+            }
 
             // Initial fetch when the page loads
             fetchPenitip();
