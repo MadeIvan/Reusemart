@@ -143,7 +143,7 @@
                 <form id="addBarangDetailForm">
                 <div class="mb-3">
                     <label for="idBarang" class="form-label">ID Barang</label>
-                    <input type="text" class="form-control" id="idBarang" required>
+                    <input type="text" class="form-control" id="idBarang" disabled>
                 </div>
                 <!-- <div class="mb-3">
                     <label for="idTransaksiDonasi" class="form-label">ID Transaksi Donasi</label>
@@ -155,7 +155,23 @@
                 </div>
                 <div class="mb-3">
                     <label for="beratBarang" class="form-label">Berat Barang</label>
-                    <input type="number" class="form-control" id="beratBarang" required>
+                    <input type="number" step="0.01" min ="0" class="form-control" id="beratBarang" required>
+                </div>
+                <div class="mb-3">
+                    <label for="kategori" class="form-label">Kategori</label>
+                    <select class="form-select" id="kategori" required>
+                        <option value="">---</option>
+                        <option value="Elektronik & Gadget">Elektronik & Gadget</option>
+                        <option value="Pakaian & Aksesori">Pakaian & Aksesori</option>
+                        <option value="Perabotan Rumah Tangga">Perabotan Rumah Tangga</option>
+                        <option value="Buku, Alat Tulis, & Peralatan Sekolah">Buku, Alat Tulis, & Peralatan Sekolah</option>
+                        <option value="Hobi, Mainan, & Koleksi">Hobi, Mainan, & Koleksi</option>
+                        <option value="Perlengkapan Bayi & Anak">Perlengkapan Bayi & Anak</option>
+                        <option value="Otomotif & Aksesori">Otomotif & Aksesori</option>
+                        <option value="Perlengkapan Taman & Outdoor">Perlengkapan Taman & Outdoor</option>
+                        <option value="Peralatan Kantor & Industri">Peralatan Kantor & Industri</option>
+                        <option value="Kosmetik & Perawatan Diri">Kosmetik & Perawatan Diri</option>
+                    </select>
                 </div>
                 <div class="mb-3">
                     <label for="garansiBarang" class="form-label">Garansi Barang</label>
@@ -164,13 +180,14 @@
                     <option value="0">Tidak</option>
                     </select>
                 </div>
+                
                 <div class="mb-3">
                     <label for="periodeGaransi" class="form-label">Periode Garansi (bulan)</label>
-                    <input type="number" class="form-control" id="periodeGaransi">
+                    <input type="date" class="form-control" id="periodeGaransi">
                 </div>
                 <div class="mb-3">
                     <label for="hargaBarang" class="form-label">Harga Barang</label>
-                    <input type="number" class="form-control" id="hargaBarang" required>
+                    <input type="number" class="form-control" min ="0" id="hargaBarang" required>
                 </div>
                 <div class="mb-3">
                     <label for="haveHunter" class="form-label">Barang dengan Hunter?</label>
@@ -197,10 +214,7 @@
                     <div id="preview" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 10px;"></div>
 
                 </div>
-                <div class="mb-3">
-                    <label for="kategori" class="form-label">Kategori</label>
-                    <input type="text" class="form-control" id="kategori" required>
-                </div>
+                
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary">Next</button>
@@ -251,6 +265,7 @@
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token from meta tag
             let currentEditItem = null;
             const tableBody = document.getElementById("tableBody");
+            const formData = new FormData();
             // const searchInput = document.getElementById("searchInput");
             // const form = document.getElementById("PegawaiForm");
             // const registerButton = document.getElementById("registerButton");
@@ -261,6 +276,22 @@
             // let currentPegawaiId = null;
             
             // SEARCH
+            let fileNamesArray = [];
+            let selectedHunterId = null;
+            const hunterSelected = document.getElementById('idPegawai2');
+                hunterSelected.addEventListener('change', function() {
+                selectedHunterId = this.value;
+                console.log('Selected Hunter ID:', selectedHunterId);
+            });
+
+            
+
+
+            const penitipSelect = document.getElementById('idPenitip');
+            penitipSelect.addEventListener('change', function() {
+                selectedPenitipId = this.value;
+                console.log('Selected Penitip ID:', selectedPenitipId);
+            });
             const searchInput = document.getElementById("searchInput");
             let pegawaiData = []; // to store fetched data globally
             function deepSearch(obj, searchTerm) {
@@ -362,7 +393,8 @@
             const addBarangModal = new bootstrap.Modal(document.getElementById("addBarangModal"));
             const addBarangForm = document.getElementById("addBarangForm");
             const namaPegawai = pegawai.namaPegawai
-            const idPegawai = pegawai.idPegawai   
+            const idPegawai = pegawai.idPegawai 
+            let barangData={};  
 
             console.log("Retrieved namaPegawai:", namaPegawai);
             console.log("Retrieved IdPegawai:", idPegawai);
@@ -402,9 +434,15 @@
             window.lastCreatedBarangId = null;
             addBarangButton.addEventListener("click", function () {
                 const addBarangDetailModal = new bootstrap.Modal(document.getElementById("addBarangDetailModal"));
+                addBarangDetailForm.reset();
+                let kategoriSelect ='';
+                // toggleGaransiInputs();
+                resetImagePreview();
+                // addBarangDetailModal.reset();
                 addBarangDetailModal.show();
             });
             const addBarangDetailForm = document.getElementById("addBarangDetailForm");
+            
             addBarangDetailForm.addEventListener("submit", async function (e) {
             e.preventDefault();
             if (currentEditItem) {
@@ -414,15 +452,44 @@
                 document.getElementById("tanggalPenitipan").value = currentEditItem.tanggalPenitipanSelesai || '';
                 // etc, fill all needed fields
             }
-            
+            if (filesArray.length < 2 || filesArray.length > 5 ) {
+                e.preventDefault();
+                alert('Please upload at least 2 images and no more than 5 images :D');
+                return false;
+            }
+            console.log("idBarang value b4 form : ",  document.getElementById("idBarang").value )
+                
+            barangData = {
+                idBarang: document.getElementById("idBarang").value,
+                namaBarang: document.getElementById("namaBarang").value,
+                beratBarang: document.getElementById("beratBarang").value,
+                garansiBarang: document.getElementById("garansiBarang").value,
+                periodeGaransi: document.getElementById("periodeGaransi").value,
+                hargaBarang: document.getElementById("hargaBarang").value,
+                haveHunter: document.getElementById("haveHunter").value,
+                statusBarang: document.getElementById("statusBarang").value,
+                kategori: document.getElementById("kategori").value,
+                garansiBarang: document.getElementById("garansiBarang").value,
+            };
+            window.lastCreatedBarangId = document.getElementById("idBarang").value;
+            console.log("data barang", barangData);
+
             const firstModal = bootstrap.Modal.getInstance(document.getElementById("addBarangDetailModal"));
             firstModal.hide();
+            toggleHunterSelect();
+            // let hunterSelect = document.getElementById("haveHunter").value;
+            addBarangDetailForm.reset();
+            resetImagePreview();
+           
 
             const addBarangModal = new bootstrap.Modal(document.getElementById("addBarangModal"));
             document.getElementById("idPegawai1").value = namaPegawai || '';
             const today = new Date();
             const plus30Days = new Date(today);
             plus30Days.setDate(today.getDate() + 30);
+
+            
+            
 
             document.getElementById("tanggalPenitipan").value = plus30Days.toISOString().split("T")[0];
             fetchHunters();
@@ -454,39 +521,34 @@
             // Handle form submission (when the user clicks 'Save')
             addBarangForm.addEventListener("submit", async function (e) {
             e.preventDefault();
-
+            resetImagePreview();
+            addBarangForm.reset();
+            
+            
             const confirmed = window.confirm("Yakin?");
             if (!confirmed) {
                 // User clicked Cancel, stop here
+                addBarangDetailModal.close();
                 return;
             }
-            const formData = new FormData();
-            formData.append("idBarang", document.getElementById("idBarang").value);
-            // formData.append("idTransaksiDonasi", document.getElementById("idTransaksiDonasi").value);
-            formData.append("namaBarang", document.getElementById("namaBarang").value);
-             console.log("Form Data:", document.getElementById("namaBarang").value);
-            formData.append("beratBarang", document.getElementById("beratBarang").value);
-            formData.append("garansiBarang", document.getElementById("garansiBarang").value);
-            formData.append("periodeGaransi", document.getElementById("periodeGaransi").value);
-            formData.append("hargaBarang", document.getElementById("hargaBarang").value);
-            formData.append("haveHunter", document.getElementById("haveHunter").value);
-            formData.append("statusBarang", document.getElementById("statusBarang").value);
-            formData.append("kategori", document.getElementById("kategori").value);
-            console.log("Form Data:", formData);
-            console.log("id barang : ", lastCreatedBarangId)
-            try {
+            
+            // Log all formData entries
+            
 
+            try {
+                console.log("barang data : ",barangData);
                 const response = await fetch("http://127.0.0.1:8000/api/barang", {
                     method: "POST",
                     headers: {
+                        "Content-Type": "application/json",
                         "Authorization": `Bearer ${localStorage.getItem('auth_token')}`,
                         "X-CSRF-TOKEN": csrfToken
                     },
-                    body: formData
+                    body: JSON.stringify(barangData),
                 });
 
                 const result = await response.json();
-
+                
                 if (response.ok && result.status) {
                     // alert("Barang created successfully!");
 
@@ -496,6 +558,7 @@
                     // Close Barang modal
                     const addBarangDetailModal = bootstrap.Modal.getInstance(document.getElementById("addBarangDetailModal"));
                     addBarangDetailModal.hide();
+                    toggleGaransiInputs();
 
                     // Open Transaksi Penitipan modal
                     
@@ -504,7 +567,7 @@
                 } else {
                     alert("Failed to create Barang.");
                     console.error(result.message || "Unknown error");
-                    console.log(formData);
+                    // console.log(formData);
                 }
             } catch (error) {
                 console.log("Form Data:", formData);
@@ -529,13 +592,17 @@
                 
                 idPegawai1: pegawai.idPegawai,
                 // idPegawai2: idPegawai2Value !== "" ? idPegawai2Value : null,
-                idPenitip: document.getElementById("idPenitip").value,
+                idPenitip: selectedPenitipId,
                 // tanggalPenitipan: tanggalPenitipan,
                 // tanggalPenitipanSelesai: tanggalPenitipanSelesai,
-                totalHarga: document.getElementById("hargaBarang").value,
+                totalHarga:barangData.hargaBarang,
                 idBarang: window.lastCreatedBarangId,
             };
-            const idBarangValue = document.getElementById("idBarang").value;
+            if (selectedHunterId && selectedHunterId.trim() !== '') {
+                transaksiData.idPegawai2 = selectedHunterId;
+            }       
+            const idBarangValue = window.lastCreatedBarangId;
+           
             console.log("Transaksi Data:", transaksiData);
             try {
                 const response = await fetch("http://127.0.0.1:8000/api/addTransaksiPenitipan", {
@@ -558,7 +625,7 @@
                     image4: fileNamesArray[3] || null,
                     image5: fileNamesArray[4] || null,
                 };
-
+                console.log("list image on payload : ",payload);
                 // Send POST request using fetch API
                 fetch('http://127.0.0.1:8000/api/addimages', {
                 method: 'POST',
@@ -584,6 +651,7 @@
                     // Close modal
                     const addBarangModal = bootstrap.Modal.getInstance(document.getElementById("addBarangModal"));
                     addBarangModal.hide();
+                    toggleGaransiInputs();
 
                     // Reset window.lastCreatedBarangId
                     window.lastCreatedBarangId = null;
@@ -596,11 +664,13 @@
                 console.error("Error creating Transaksi Penitipan:", error);
                 alert("An error occurred while creating the Transaksi Penitipan.");
             }
-            fetchPegawai()
+            fetchPegawai();
+            toggleHunterSelect();
         });
 
             async function fetchPenitip(selectedUsername = null) {
                 const penitipSelect = document.getElementById("idPenitip");
+                console.log("penitip id 1 :", penitipSelect.value);
                 penitipSelect.innerHTML = `<option value="">Pilih Penitip</option>`;
                 try {
                     const response = await fetch("http://127.0.0.1:8000/api/getpenitip", {
@@ -626,6 +696,8 @@
 
                         if (selectedUsername) {
                             penitipSelect.value = selectedUsername;
+                            console.log("penitip id 2 :", penitipSelect);
+                            
                         }
                     } else {
                         console.warn("No Penitip available");
@@ -641,7 +713,7 @@
             
 
             let filesArray = []; // Store selected files here
-            let fileNamesArray = [];
+            // let fileNamesArray = [];
             dropArea.addEventListener('click', () => fileInput.click());
             fileInput.addEventListener('change', () => {
                 handleFiles(fileInput.files);
@@ -682,6 +754,7 @@
                 }
                 filesArray.push(file);
                 fileNamesArray.push(file.name); 
+                console.log("list patn : ", fileNamesArray);
                 previewFile(file);
                 }
                 toggleDropAreaVisibility();
@@ -791,6 +864,7 @@
 
             
             function openEditModal(item) {
+                document.getElementById('preview').innerHTML = '';
                 currentEditItem = item;
                 console.log(currentEditItem);
                 console.log("openEditModal called with item:", item);
@@ -898,6 +972,133 @@
                 container.appendChild(btn);
                 preview.appendChild(container);
         }
+        function generateIdBarangPrefix(namaBarang) {
+  // Get first letters of each word in uppercase
+            return namaBarang.trim().charAt(0).toUpperCase();
+            // return namaBarang
+            //     .split(' ')
+            //     .map(word => word.charAt(0).toUpperCase())
+            //     .join('');
+        }
+        document.getElementById('namaBarang').addEventListener('input', async function () {
+            const namaBarang = this.value.trim();
+            if (namaBarang.length === 0) {
+                document.getElementById('idBarang').value = '';
+                return;
+            }
+
+            const prefix = generateIdBarangPrefix(namaBarang);
+
+            // Call backend to get next available number for this prefix
+            try {
+                const response = await fetch(`http://127.0.0.1:8000/api/generate-idbarang?prefix=${prefix}`, {
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem('auth_token')}`,
+                }
+                });
+                const data = await response.json();
+
+                if (data.nextId) {
+                document.getElementById('idBarang').value = data.nextId; // e.g. MB1, MB2, etc.
+                } else {
+                document.getElementById('idBarang').value = prefix + '1'; // fallback
+                }
+            } catch (error) {
+                console.error('Error fetching next idBarang:', error);
+                document.getElementById('idBarang').value = prefix + '1';
+            }
+            });
+            const haveHunterSelect = document.getElementById('haveHunter');
+            const hunterSelect = document.getElementById('idPegawai2');
+            function toggleHunterSelect() {
+                console.log("have Hunter value func inside : ", haveHunterSelect.value);
+            if (haveHunterSelect.value === '1') { // 'Ya'
+                hunterSelect.disabled = false;
+                hunterSelect.required = true;
+            } else  {
+                hunterSelect.disabled = true;
+                hunterSelect.required = false;
+                hunterSelect.value = ""; // reset selection if disabled
+            }
+            }
+
+            // Initial toggle on page load
+            toggleHunterSelect();
+
+            // Listen for changes on haveHunter select
+            haveHunterSelect.addEventListener('change', toggleHunterSelect);
+
+
+            const kategoriSelect = document.getElementById("kategori");
+            const garansiDiv = document.querySelector('label[for="garansiBarang"]').parentElement;
+            const periodeDiv = document.querySelector('label[for="periodeGaransi"]').parentElement;
+            const garansiSelect = document.getElementById("garansiBarang");
+            const periodeInput = document.getElementById("periodeGaransi");
+
+            function toggleGaransiInputs() {
+                
+                if (kategoriSelect.value === "Elektronik & Gadget") {
+                garansiDiv.style.display = "block";
+                periodeDiv.style.display = "block";
+                garansiSelect.disabled = false;
+                // Make garansiBarang required
+                garansiSelect.required = true;
+
+                // Enable/disable periode based on garansiBarang value
+                togglePeriodeInput();
+
+                // Periode input required only if garansi is "Ya" (1)
+                periodeInput.required = (garansiSelect.value === '1');
+                } else {
+
+                garansiDiv.style.display = "none";
+                periodeDiv.style.display = "none";
+                garansiSelect.disabled = true;
+                garansiSelect.required = false;
+                periodeInput.disabled = true;
+                periodeInput.required = false;
+                garansiSelect.value = "0";
+                periodeInput.value = "";
+                }
+            }
+
+            function togglePeriodeInput() {
+                if (garansiSelect.value === '0') {
+                periodeInput.disabled = true;
+                periodeInput.required = false;
+                periodeInput.value = "";
+                } else {
+                periodeInput.disabled = false;
+                // periodeInput.required = true;  // Handled in toggleGaransiInputs
+                }
+            }
+
+            // Initial run
+            toggleGaransiInputs();
+
+            // Event listeners
+            kategoriSelect.addEventListener("change", toggleGaransiInputs);
+            garansiSelect.addEventListener("change", function() {
+                togglePeriodeInput();
+                // Adjust required attribute on periodeInput accordingly
+                periodeInput.required = (garansiSelect.value === '1');
+            });
+            function resetImagePreview() {
+            // Clear the preview thumbnails container
+                const preview = document.getElementById('preview');
+                preview.innerHTML = '';
+
+                // Clear your file tracking arrays
+                filesArray = [];
+                // fileNamesArray = [];
+
+                // Reset the actual file input element
+                const fileInput = document.getElementById('image');
+                fileInput.value = '';
+
+                // Show the drop area again if you hide it
+                toggleDropAreaVisibility();
+            }
 
             // Initial fetch when the page loads
             fetchPenitip();
