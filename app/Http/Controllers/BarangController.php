@@ -27,6 +27,9 @@ class BarangController extends Controller
             ], 500);  // 500 Internal Server Error
         }
     }
+
+
+
     public function indexall()
 {
     try {

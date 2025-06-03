@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\TransaksiPenitipan;
 use App\Models\DetailTransaksiPenitipan;
+use Carbon\Carbon;
 class TransaksiPenitipanController extends Controller
 {
 public function store(Request $request)
@@ -72,4 +73,67 @@ public function store(Request $request)
         ], 500);
     }
 }
+
+
+
+public function getAllByPenitip($idPenitip)
+{
+    // Eager load imagesbarang for each barang
+    $transaksi = \App\Models\TransaksiPenitipan::with([
+        'detailTransaksiPenitipan.barang.imagesbarang'
+    ])
+    ->where('idPenitip', $idPenitip)
+    ->orderBy('tanggalPenitipan', 'desc')
+    ->get();
+
+    // Map the response to include all images for each barang (from ImagesBarang table)
+    $result = $transaksi->map(function($tp) {
+        $tpArr = $tp->toArray();
+        $tpArr['detailTransaksiPenitipan'] = collect($tp->detailTransaksiPenitipan)->map(function($detail) {
+            $barang = $detail->barang;
+            // If images are in the related imagesbarang table
+            $images = [
+                'image1' => $barang->imagesbarang->image1 ?? null,
+                'image2' => $barang->imagesbarang->image2 ?? null,
+                'image3' => $barang->imagesbarang->image3 ?? null,
+                'image4' => $barang->imagesbarang->image4 ?? null,
+                'image5' => $barang->imagesbarang->image5 ?? null,
+            ];
+            $detailArr = $detail->toArray();
+            $detailArr['imagesBarang'] = $images;
+            return $detailArr;
+        });
+        unset($tpArr['detailTransaksiPenitipan']);
+        return $tpArr;
+    });
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Get successful',
+        'data' => $result
+    ], 200);
+}
+
+
+    public function perpanjangPenitipan($idTransaksiPenitipan)
+    {
+        $transaksi = TransaksiPenitipan::find($idTransaksiPenitipan);
+        if (!$transaksi) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Transaksi penitipan tidak ditemukan.'
+            ], 404);
+        }
+
+        // Tambah 30 hari dari tanggal hari ini
+        $newDate = Carbon::now()->addDays(30)->toDateString();
+        $transaksi->tanggalPenitipanSelesai = $newDate;
+        $transaksi->save();
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Tanggal penitipan selesai berhasil diperpanjang.',
+            'tanggalPenitipanSelesai' => $newDate
+        ]);
+    }
 }

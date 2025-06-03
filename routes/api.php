@@ -22,6 +22,8 @@ use App\Http\Controllers\TransaksiPembelianController;
 use App\Http\Controllers\PointRedemptionController;
 use App\Http\Controllers\ImagesBarangController;
 
+use App\Http\Controllers\KomisiController;
+
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
@@ -113,6 +115,8 @@ Route::middleware(['auth:penitip'])->group(function () {
     Route::get('/penitip/profile', [PenitipController::class, 'myData']);
     Route::post('/logout', [LoginController::class, 'logout']);
     Route::get('/penitip/history', [PenitipController::class, 'loadBarang']);
+    Route::post('/perpanjang-penitipan/{idTransaksiPenitipan}', [TransaksiPenitipanController::class, 'perpanjangPenitipan']);
+
 });
 
 // === Barang, Diskusi, RequestDonasi, Donasi, etc. ===
@@ -166,6 +170,8 @@ Route::get('/indexall',[BarangController::class,'indexall']);
 Route::post('/addimages', [ImagesBarangController::class, 'store']);
 Route::get('/generate-idbarang', [BarangController::class, 'generateIdBarang']);
 
+Route::get('/transaksi-penitipan/penitip/{idPenitip}', [TransaksiPenitipanController::class, 'getAllByPenitip']);
 
 
-
+Route::post('/komisi-reusemart/{noNota}', [KomisiController::class, 'komisiReuseMart']);
+Route::get('/dompet/pegawai/{idPegawai}', [DompetController::class, 'getDompetByPegawai']);

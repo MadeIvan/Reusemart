@@ -1,332 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reusemart</title>
-    <!-- Bootstrap CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
-    <!-- Toastify CSS -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Toastify JS -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-
+    <title>Riwayat Penitipan</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body {
-            background-color: #f4f6f9;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .card {
-            border: none;
-            border-radius: 1rem;
-            background-color: #ffffff;
-            transition: transform 0.3s ease;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .card:hover {
-            transform: scale(1.01);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .img-circle {
-            border: 4px solid #4caf50;
-            padding: 2px;
-        }
-
-        h6, h4 {
-            font-weight: 600;
-            margin-bottom: 0.3rem;
-        }
-
+        body { background-color: #f4f6f9; font-family: 'Poppins', sans-serif; }
+        .card { border: none; border-radius: 1rem; background-color: #fff; transition: transform 0.3s; box-shadow: 0 6px 20px rgba(0,0,0,0.1);}
+        .card:hover { transform: scale(1.01); box-shadow: 0 6px 20px rgba(0,0,0,0.1);}
+        .carousel-image { width: 100%; height: 300px; object-fit: cover; border-radius: 8px; cursor: pointer; transition: transform 0.2s;}
+        .carousel-image:hover { transform: scale(1.02);}
+        .fullscreen-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.9); display: flex; justify-content: center; align-items: center; z-index: 9999; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s;}
+        .fullscreen-modal.active { opacity: 1; visibility: visible;}
+        .fullscreen-image { max-width: 90%; max-height: 90%; object-fit: contain; border-radius: 8px; box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);}
+        .close-fullscreen { position: absolute; top: 20px; right: 30px; color: white; font-size: 40px; font-weight: bold; cursor: pointer; z-index: 10000; transition: color 0.2s;}
+        .close-fullscreen:hover { color: #ccc;}
+        .carousel-thumbnails { display: flex; justify-content: center; gap: 10px; margin-top: 15px; flex-wrap: wrap;}
+        .thumbnail { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: border-color 0.2s, transform 0.2s;}
+        .thumbnail:hover { transform: scale(1.1); border-color: #007bff;}
+        .thumbnail.active { border-color: #007bff;}
     </style>
-
 </head>
 <body>
+@include('layouts.navbar')
 
-    <!-- ////////////////////INI MODAL DETAIL///////////////////////////// -->
-    <!-- <div class="modal fade" id="detailBarang" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="modal-title fs-5" id="exampleModalLabel"><strong>Detail Barang</strong></h2>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <strong>Nama Barang : </strong><span id="namaBarang" name="namaBarang"></span>
-                    </div>
-                    <div class="mb-3">
-                        <strong>Berat Barang : </strong><span id="beratBarang" name="beratBarang"></span>
-                    </div>
-                    <div class="mb-3">
-                        <strong>Harga Barang : </strong><span id="harga" name="harga"></span>
-                    </div>
-                    <div class="mb-3">
-                        <strong>Tanggal Penitipan Barang : </strong><span id="tanggalPenitipan" name="tanggalPenitipan"></span>
-                    </div>
-                    <div class="mb-3">
-                        <strong>Tanggal Penitipan Selesai : </strong><span id="tanggalPenitipanSelesai" name="tanggalPenitipanSelesai"></span>
-                    </div>
-                    <div class="mb-3">
-                        <strong>Kategori Barang : </strong><span id="kategori" name="kategori"></span>
-                    </div>
-                    <div class="mb-3">
-                        <strong>Status Barang : </strong><span id="status" name="status"></span>
-                    </div>
-                    <div class="mb-3">
-                        <strong>Tanggal Barang Terjual : </strong><span id="tanggalTerjual" name="tanggalTerjual"></span>
-                    </div>
-
-                </div>
-            </div>
+<div class="container mb-4 mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <input type="text" id="searchInput" class="form-control" placeholder="Cari barang, kategori, status, dll...">
         </div>
-    </div> -->
+    </div>
+</div>
 
-    <div class="modal fade" id="detailBarang" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+<div id="loadingIndicator" class="container my-4">
+    <div class="text-center">
+        <div class="spinner-border text-success" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2 text-muted">Memuat data...</p>
+    </div>
+</div>
+
+<h3 class="text-center mb-4 mt-4" style="color:rgb(0, 138, 57); font-family: 'Bagel Fat One', system-ui;">
+    Riwayat Penitipan Barang
+</h3>
+<div id="barangContainer" class="row g-3 px-5"></div>
+
+<!-- Modal Detail Barang -->
+<div class="modal fade" id="detailBarang" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title fs-5" id="exampleModalLabel"><strong>Detail Barang</strong></h2>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="mb-3">
-                    <strong>Nama Barang: </strong><span id="namaBarang"></span>
+                <div id="barangCarousel" class="carousel slide mb-3" data-bs-ride="carousel">
+                    <div class="carousel-inner" id="carouselImages"></div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#barangCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon"></span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#barangCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon"></span>
+                    </button>
                 </div>
-                <div class="mb-3">
-                    <strong>Berat Barang: </strong><span id="beratBarang"></span>
-                </div>
-                <div class="mb-3">
-                    <strong>Harga Barang: </strong><span id="hargaBarang"></span>
-                </div>
-                <div class="mb-3">
-                    <strong>Tanggal Penitipan Barang: </strong><span id="tanggalPenitipan"></span>
-                </div>
-                <div class="mb-3">
-                    <strong>Tanggal Penitipan Selesai: </strong><span id="tanggalPenitipanSelesai"></span>
-                </div>
-                <div class="mb-3">
-                    <strong>Kategori Barang: </strong><span id="kategori"></span>
-                </div>
-                <div class="mb-3">
-                    <strong>Status Barang: </strong><span id="statusBarang"></span>
-                </div>
-                <div class="mb-3">
-                    <strong>Tanggal Barang Terjual: </strong><span id="tanggalTerjual"></span>
+                <div id="carouselThumbnails" class="carousel-thumbnails"></div>
+                <div class="mb-3"><strong>Nama Barang: </strong><span id="namaBarang"></span></div>
+                <div class="mb-3"><strong>Berat Barang: </strong><span id="beratBarang"></span></div>
+                <div class="mb-3"><strong>Harga Barang: </strong><span id="hargaBarang"></span></div>
+                <div class="mb-3"><strong>Tanggal Penitipan Barang: </strong><span id="tanggalPenitipan"></span></div>
+                <div class="mb-3"><strong>Tanggal Penitipan Selesai: </strong><span id="tanggalPenitipanSelesai"></span></div>
+                <div class="mb-3"><strong>Kategori Barang: </strong><span id="kategori"></span></div>
+                <div class="mb-3"><strong>Status Barang: </strong><span id="statusBarang"></span></div>
+                <div class="mb-3"><strong>Tanggal Barang Terjual: </strong><span id="tanggalTerjual"></span></div>
+                <div class="mb-3 text-end">
+                    <button id="btnPerpanjangPenitipan" class="btn btn-success">
+                        Perpanjang Penitipan +30 Hari
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-    <!-- Navbar dengan container -->
-    <!-- <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
-        <div class="container-fluid">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
+<!-- Fullscreen Image Modal -->
+<div id="fullscreenModal" class="fullscreen-modal">
+    <span class="close-fullscreen">&times;</span>
+    <img id="fullscreenImage" class="fullscreen-image" src="" alt="Fullscreen Image">
+</div>
 
-            <div class="collapse navbar-collapse" id="navbarNav"> -->
-                <!-- Nav-bar kiri -->
-                <!-- <ul class="navbar-nav me-auto">
-                    <li class="nav-item d-flex align-items-center">
-                        <img src="{{ asset('logoReUseMart.png') }}" alt="Logo Reusemart" style="width:50px;">
-                    </li>
-                    <li class="nav-item d-flex align-items-center">
-                        <a class="nav-link text-black" href="{{url('/penitip/dashboard')}}">
-                            <strong>Home</strong>
-                        </a>
-                    </li>
-                    <li class="nav-item d-flex align-items-center">
-                        <a class="nav-link text-black" href="{{url('/penitip/history')}}">
-                            <strong>History Transaksi</strong>
-                        </a>
-                    </li>
-                </ul> -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 
-                <!-- Nav-bar kanan -->
-                <!-- <ul class="navbar-nav ms-auto mb-2 mb-lg-0 profile-menu"> 
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <div class="profile-pic d-inline">
-                                <img src="{{ asset('img/pp.png') }}" alt="Profile Picture" style="width:35px;" class="rounded-circle">
-                            </div>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="{{url('/penitip/profile')}}"><i class="fas fa-sliders-h fa-fw"></i> Profile</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" id="logoutLink"><i class="fas fa-sign-out-alt fa-fw" ></i> Log Out</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-    <hr style="margin: 0; border: 2px solid #dee2e6;"/> -->
-    @include('layouts.navbar')
+<script>
 
-    <!--//////////////////////////////////////////// Main Content//////////////////////////////////// -->
-    <h3 class="text-center mb-4 mt-4" style="color:rgb(0, 138, 57); font-family: 'Bagel Fat One', system-ui;">
-        Riwayat Penitipan Barang
-    </h3>
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+}
 
-    <div id="barangContainer" class="row g-3 px-5"></div>
+// Get CSRF token from cookie and decode it
+function getCSRFToken() {
+    const xsrfToken = getCookie('XSRF-TOKEN');
+    if (xsrfToken) {
+        // Decode the URL-encoded token
+        return decodeURIComponent(xsrfToken);
+    }
+    // Fallback to meta tag
+    const metaToken = document.querySelector('meta[name="csrf-token"]');
+    return metaToken ? metaToken.getAttribute('content') : null;
+}
 
-    <script>
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token from meta tag
-        const token = localStorage.getItem("auth_token");
-        console.log("Token yang digunakan:", token);
-			if (!token) {
-				window.location.href = "{{ url('/UsersLogin') }}";
-			}
+// Use the token in your fetch requests
+const csrfToken = getCSRFToken();
+const token = localStorage.getItem("auth_token");
+if (!token) window.location.href = "{{ url('/UsersLogin') }}";
 
-        document.addEventListener("DOMContentLoaded", function(){
-            const barangContainer = document.getElementById("barangContainer");   
-            let idDetail = null;         
-            fetchBarang();
+function openFullscreenPreview(src) {
+    const modal = document.getElementById('fullscreenModal');
+    const img = document.getElementById('fullscreenImage');
+    img.src = src;
+    modal.classList.add('active');
+}
+function closeFullscreenPreview() {
+    document.getElementById('fullscreenModal').classList.remove('active');
+}
+document.getElementById('fullscreenModal').addEventListener('click', function(e) {
+    if (e.target === this || e.target.classList.contains('close-fullscreen')) closeFullscreenPreview();
+});
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeFullscreenPreview();
+});
 
-            ////////////////////////SHOW barang///////////////////////////////////
-            function fetchBarang(){
-                fetch("http://127.0.0.1:8000/api/penitip/history", {
-                    method: "GET",
-                    headers: {
-                        "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
-                        'Accept': 'application/json',
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": csrfToken,
-                    },
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // barangData = data.data;
-                    // renderBarang(data.data);
-                    if (data.status && Array.isArray(data.data)) {
-                        renderBarang(data.data);
-                    } else {
-                        console.error("Respon tidak valid atau kosong:", data);
-                    }
-                })
-                .catch(error => console.error("Error fetching barang:", error));
-            }
+let allBarangData = [];
+let currentIdTransaksiPenitipan = null;
 
-            ////////////////////////CARD barang///////////////////////////////////
-            function renderBarang(data) {
-                barangContainer.innerHTML = "";
-                data.forEach(item => {
-                    item.detail_transaksi_penitipan.forEach(transaksi => {
-                        const barang = transaksi.barang;
-
-                        // Cek apakah ada transaksi pembelian jika status barang adalah "terjual"
-                        let tanggalTerjual = "-";
-                        if (barang.statusBarang.toLowerCase() === "terjual" && barang.detail_transaksi_pembelian.length > 0) {
-                            // Akses tanggalWaktuPembelian jika ada transaksi pembelian
-                            const pembelian = barang.detail_transaksi_pembelian[0].transaksi_pembelian;
-                            tanggalTerjual = pembelian.tanggalWaktuPembelian; // Ambil tanggalWaktuPembelian
-                        }
-
-                        const tanggalPenitipan = transaksi.tanggalPenitipan || item.tanggalPenitipan;
-                        const tanggalPenitipanSelesai = transaksi.tanggalPenitipanSelesai || item.tanggalPenitipanSelesai;
-                        let statusClass = "";
-                        switch (barang.statusBarang.toLowerCase()) {
-                            case "dikembalikan":
-                                statusClass = "text-danger"; // merah
-                                break;
-                            case "didonasikan":
-                                statusClass = "text-primary"; // biru
-                                break;
-                            case "terjual":
-                                statusClass = "text-success"; // hijau
-                                break;
-                            case "tersedia":
-                                statusClass = "text-secondary"; // default/abu
-                        }
-                        const card = `
-                            <div class="col-md-3 p-2">
-                                <div class="card">
-                                    <img src="/img/${barang.image}" class="card-img-top" alt="Foto Produk">
-                                    <div class="card-body position-relative">
-                                        <div class="d-flex align-items-center gap-2">
-                                            <h5 class="card-title mb-2 text-justify"><strong>${barang.namaBarang}</strong></h5>
-                                        </div>
-                                        <div class="d-flex justify-content-between align-items-center mt-2">
-                                            <p class="card-subtitle ${statusClass} mt-2 ">${barang.statusBarang}</p>
-                                            <button type="button" class="btn btn-detail btn-outline-primary mt-3" 
-                                                data-id="${barang.idBarang}" 
-                                                data-namaBarang="${barang.namaBarang}"
-                                                data-beratBarang="${barang.beratBarang}"
-                                                data-hargaBarang="${barang.hargaBarang}"
-                                                data-kategori="${barang.kategori}"
-                                                data-tanggalPenitipan="${tanggalPenitipan}"
-                                                data-tanggalPenitipanSelesai="${tanggalPenitipanSelesai}"
-                                                data-statusBarang="${barang.statusBarang}"
-                                                data-tanggalPembelian="${tanggalTerjual}" 
-                                                data-bs-toggle="modal" data-bs-target="#detailBarang">
-                                                Lihat Detail
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                        barangContainer.innerHTML += card;
-                    });
-                });
-            }
-
-
-            
-        });
-            // searchInput.addEventListener("input", () => {
-            //     const query = searchInput.value.toLowerCase();
-            //     fetch(`http://127.0.0.1:8000/api/pembeli/alamat/search?q=${query}`, {
-            //         headers: { 
-            //             "Authorization": `Bearer ${localStorage.getItem('token')}` },
-            //     })
-            //         .then(response => response.json())
-            //         .then(data => renderAlamat(data.data))
-            //         .catch(error => console.error("Error searching alamat:", error));
-            // });
-
-        // document.querySelectorAll(".btn-detail").forEach(button => {
-            document.addEventListener("click", function (e) {
-                if (e.target.classList.contains("btn-detail")) {
-                    const button = e.target;
-                    const namaBarang = button.getAttribute("data-namaBarang");
-                    const beratBarang = button.getAttribute("data-beratBarang");
-                    const hargaBarang = button.getAttribute("data-hargaBarang");
-                    const kategori = button.getAttribute("data-kategori");
-                    const tanggalPenitipan = button.getAttribute("data-tanggalPenitipan");
-                    const tanggalPenitipanSelesai = button.getAttribute("data-tanggalPenitipanSelesai");
-                    const statusBarang = button.getAttribute("data-statusBarang");
-                    const tanggalTerjual = button.getAttribute("data-tanggalPembelian");
-
-                    // Isi modal
-                    document.getElementById("namaBarang").textContent = namaBarang;
-                    document.getElementById("beratBarang").textContent = beratBarang;
-                    document.getElementById("hargaBarang").textContent = hargaBarang;
-                    document.getElementById("kategori").textContent = kategori;
-                    document.getElementById("tanggalPenitipan").textContent = tanggalPenitipan;
-                    document.getElementById("tanggalPenitipanSelesai").textContent = tanggalPenitipanSelesai;
-                    document.getElementById("statusBarang").textContent = statusBarang;
-                    document.getElementById("tanggalTerjual").textContent = tanggalTerjual; // Perbaikan di sini
-                }
-    });
-
-        // });
-
-        /////////////////////buat profile/////////////////////
-        // const auth_token = localStorage.getItem('auth_token');
-
+document.addEventListener("DOMContentLoaded", function(){
+    function hideLoading() {
+        document.getElementById('loadingIndicator').style.display = 'none';
+    }
+    function showError(message) {
+        hideLoading();
+        document.getElementById("barangContainer").innerHTML = `<div class='col-12 text-center text-danger'>${message}</div>`;
+    }
     fetch('http://localhost:8000/api/penitip/profile', {
         method: 'GET',
         headers: {
-            "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
+            "Authorization": `Bearer ${token}`,
             'Accept': 'application/json',
             "Content-Type": "application/json",
             "X-CSRF-TOKEN": csrfToken,
@@ -335,66 +159,241 @@
     .then(response => response.json())
     .then(data => {
         if (data.status) {
-            const user = data.data;
-            function ubahFormat(angka) {
-                return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(angka);
-            }
-
-            // Update data dan hilangkan "Loading..."
-            document.getElementById('namaPenitip').textContent = user.namaPenitip ?? '-';
-            document.getElementById('nik').textContent = user.nik ?? '-';
-            document.getElementById('username').textContent = user.username ?? '-';
-            document.getElementById('alamat').textContent = user.alamat ?? '-';
-            document.getElementById('poin').textContent = user.poin ? `${user.poin} Poin` : '0 Poin';
-            document.getElementById('saldo').textContent = user.dompet && user.dompet.saldo != null ? ubahFormat(user.dompet.saldo) : '-';
-            
-            // Sembunyikan teks "Loading..." yang ada sebelumnya
-            document.getElementById('namaPenitip').classList.remove('text-muted');
-            document.getElementById('nik').classList.remove('text-muted');
-            document.getElementById('username').classList.remove('text-muted');
-            document.getElementById('alamat').classList.remove('text-muted');
-            document.getElementById('poin').classList.remove('text-muted');
-            document.getElementById('saldo').classList.remove('text-muted');
+            fetchBarang(data.data.idPenitip);
         } else {
-            console.error('Gagal ambil data user');
+            showError('Gagal mengambil data profil');
         }
     })
     .catch(error => {
-        console.error('Error:', error);
+        showError('Error mengambil data profil');
     });
 
-    /////////////////////buat logout///////////////////////
-        document.getElementById('logoutLink').addEventListener('click', function (e) {
-            e.preventDefault();
-
-            const auth_token = localStorage.getItem('auth_token');
-
-            if (auth_token) {
-                fetch('http://localhost:8000/api/logout', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer ' + auth_token,
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data.message); // opsional: tampilkan pesan sukses logout
-                })
-                .catch(error => {
-                    console.error('Logout error:', error);
-                })
-                .finally(() => {
-                    // Bersihkan token & redirect ke halaman awal
-                    localStorage.removeItem('token');
-                    window.location.href = '/';
-                });
+    function fetchBarang(idPenitip){
+        fetch(`http://localhost:8000/api/transaksi-penitipan/penitip/${idPenitip}`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                'Accept': 'application/json',
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": csrfToken,
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoading();
+            if (data.status && Array.isArray(data.data)) {
+                allBarangData = data.data;
+                displayBarang(allBarangData);
             } else {
-                // Jika token tidak ada, langsung redirect
-                window.location.href = '/';
+                document.getElementById("barangContainer").innerHTML = "<div class='col-12 text-center text-muted'>Tidak ada data barang ditemukan.</div>";
             }
+        })
+        .catch(error => {
+            hideLoading();
+            document.getElementById("barangContainer").innerHTML = "<div class='col-12 text-center text-danger'>Gagal memuat data: " + error.message + "</div>";
         });
-    </script>
+    }
 
+    function displayBarang(data) {
+        const barangContainer = document.getElementById("barangContainer");
+        barangContainer.innerHTML = "";
+        if (data.length === 0) {
+            barangContainer.innerHTML = "<div class='col-12 text-center text-muted'>Belum ada barang yang dititipkan.</div>";
+            return;
+        }
+        data.forEach(item => {
+            const details = item.detail_transaksi_penitipan;
+            details.forEach(detail => {
+                if (!detail || !detail.barang) return;
+                const barang = detail.barang;
+                const images = detail.barang.imagesbarang || barang.imagesbarang || {};
+                const imageList = [images.image1, images.image2, images.image3, images.image4, images.image5].filter(Boolean);
+                let statusClass = "";
+                switch ((barang.statusBarang ?? "").toLowerCase()) {
+                    case "dikembalikan": statusClass = "text-danger"; break;
+                    case "didonasikan": statusClass = "text-primary"; break;
+                    case "terjual": statusClass = "text-success"; break;
+                    case "tersedia": statusClass = "text-secondary"; break;
+                    default: statusClass = "text-muted"; break;
+                }
+                const formatCurrency = (amount) => {
+                    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(amount);
+                };
+                const card = `
+                    <div class="col-lg-3 col-md-4 col-sm-6 p-2">
+                        <div class="card h-100">
+                            <img src="http://127.0.0.1:8000/${imageList[0] ? imageList[0] : 'no-image.png'}"
+                                class="card-img-top"
+                                alt="${imageList[0] ? imageList[0] : 'No Image'}"
+                                style="height: 200px; object-fit: cover;">
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title mb-2"><strong>${barang.namaBarang}</strong></h5>
+                                <p class="card-text text-muted mb-2">${formatCurrency(barang.hargaBarang)}</p>
+                                <p class="card-text text-muted mb-2">${barang.beratBarang} kg</p>
+                                <p class="card-text ${statusClass} mb-3"><strong>${barang.statusBarang}</strong></p>
+                                <div class="mt-auto">
+                                    <button type="button" class="btn btn-detail btn-outline-primary w-100"
+                                        data-namaBarang="${barang.namaBarang}"
+                                        data-beratBarang="${barang.beratBarang} kg"
+                                        data-hargaBarang="${formatCurrency(barang.hargaBarang)}"
+                                        data-kategori="${barang.kategori}"
+                                        data-tanggalPenitipan="${item.tanggalPenitipan}"
+                                        data-tanggalPenitipanSelesai="${item.tanggalPenitipanSelesai}"
+                                        data-statusBarang="${barang.statusBarang}"
+                                        data-tanggalTerjual="${barang.statusBarang && barang.statusBarang.toLowerCase() === 'terjual' && barang.detail_transaksi_pembelian && barang.detail_transaksi_pembelian.length > 0 ? barang.detail_transaksi_pembelian[0].transaksi_pembelian.tanggalWaktuPembelian : '-'}"
+                                        data-images='${JSON.stringify(imageList)}'
+                                        data-idtransaksipenitipan="${item.idTransaksiPenitipan}"
+                                        data-bs-toggle="modal" data-bs-target="#detailBarang">
+                                        Lihat Detail
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                barangContainer.innerHTML += card;
+            });
+        });
+    }
+
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('input', function() {
+        const keyword = this.value.trim().toLowerCase();
+        if (!keyword) {
+            displayBarang(allBarangData);
+            return;
+        }
+        const filtered = allBarangData.filter(item =>
+            item.detail_transaksi_penitipan.some(detail => {
+                const b = detail.barang;
+                return (
+                    (b.namaBarang && b.namaBarang.toLowerCase().includes(keyword)) ||
+                    (b.kategori && b.kategori.toLowerCase().includes(keyword)) ||
+                    (b.statusBarang && b.statusBarang.toLowerCase().includes(keyword)) ||
+                    (b.hargaBarang && b.hargaBarang.toString().includes(keyword)) ||
+                    (b.beratBarang && b.beratBarang.toString().includes(keyword))
+                );
+            })
+        );
+        displayBarang(filtered);
+    });
+
+    // Modal detail handler with carousel and thumbnails
+    document.addEventListener("click", function (e) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        if (e.target.classList.contains("btn-detail")) {
+            const button = e.target;
+            document.getElementById("namaBarang").textContent = button.getAttribute("data-namaBarang");
+            document.getElementById("beratBarang").textContent = button.getAttribute("data-beratBarang");
+            document.getElementById("hargaBarang").textContent = button.getAttribute("data-hargaBarang");
+            document.getElementById("kategori").textContent = button.getAttribute("data-kategori");
+            document.getElementById("tanggalPenitipan").textContent = button.getAttribute("data-tanggalPenitipan");
+            document.getElementById("tanggalPenitipanSelesai").textContent = button.getAttribute("data-tanggalPenitipanSelesai");
+            document.getElementById("statusBarang").textContent = button.getAttribute("data-statusBarang");
+            document.getElementById("tanggalTerjual").textContent = button.getAttribute("data-tanggalTerjual");
+            currentIdTransaksiPenitipan = button.getAttribute("data-idtransaksipenitipan");
+
+            const imageList = JSON.parse(button.getAttribute("data-images") || "[]");
+            const carouselImages = document.getElementById("carouselImages");
+            const carouselThumbnails = document.getElementById("carouselThumbnails");
+            carouselImages.innerHTML = "";
+            carouselThumbnails.innerHTML = "";
+
+            if (imageList.length === 0) {
+                carouselImages.innerHTML = `
+                    <div class="carousel-item active">
+                        <img src="/img/no-image.png" class="d-block carousel-image" alt="No Image" onclick="openFullscreenPreview('/img/no-image.png')">
+                    </div>
+                `;
+            } else {
+                imageList.forEach((img, idx) => {
+                    const imgSrc = `http://127.0.0.1:8000/${img}`;
+                    carouselImages.innerHTML += `
+                        <div class="carousel-item ${idx === 0 ? 'active' : ''}">
+                            <img src="${imgSrc}" class="d-block carousel-image" alt="Barang Image ${idx+1}" onclick="openFullscreenPreview('${imgSrc}')">
+                        </div>
+                    `;
+                });
+                imageList.forEach((img, idx) => {
+                    const imgSrc = `http://127.0.0.1:8000/${img}`;
+                    const thumbnail = document.createElement('img');
+                    thumbnail.src = imgSrc;
+                    thumbnail.className = `thumbnail ${idx === 0 ? 'active' : ''}`;
+                    thumbnail.alt = `Thumbnail ${idx+1}`;
+                    thumbnail.onclick = () => {
+                        const carousel = bootstrap.Carousel.getInstance(document.getElementById('barangCarousel'));
+                        carousel.to(idx);
+                        document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+                        thumbnail.classList.add('active');
+                    };
+                    carouselThumbnails.appendChild(thumbnail);
+                });
+                const carouselElement = document.getElementById('barangCarousel');
+                carouselElement.addEventListener('slide.bs.carousel', function (e) {
+                    const thumbnails = document.querySelectorAll('.thumbnail');
+                    thumbnails.forEach(t => t.classList.remove('active'));
+                    if (thumbnails[e.to]) {
+                        thumbnails[e.to].classList.add('active');
+                    }
+                });
+            }
+        }
+
+        // Perpanjang Penitipan Handler
+        if (e.target.id === "btnPerpanjangPenitipan") {
+            if (!currentIdTransaksiPenitipan) {
+                alert("ID Transaksi tidak ditemukan.");
+                return;
+            }
+            if (!confirm("Perpanjang tanggal penitipan selesai 30 hari dari tanggal saat ini?")) return;
+            fetch(`http://localhost:8000/api/perpanjang-penitipan/${currentIdTransaksiPenitipan}`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": csrfToken,
+                }
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.status) {
+                    alert("Tanggal penitipan selesai berhasil diperpanjang!");
+                    location.reload();
+                } else {
+                    alert(res.message || "Gagal memperpanjang penitipan.");
+                }
+            })
+            .catch(() => alert("Terjadi kesalahan saat memperpanjang penitipan."));
+        }
+    });
+
+    // Logout handler
+    document.getElementById('logoutLink')?.addEventListener('click', function (e) {
+        e.preventDefault();
+        if (token) {
+            fetch('http://localhost:8000/api/logout', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                localStorage.removeItem('auth_token');
+                window.location.href = '/';
+            })
+            .catch(() => {
+                localStorage.removeItem('auth_token');
+                window.location.href = '/';
+            });
+        } else {
+            window.location.href = '/';
+        }
+    });
+});
+</script>
 </body>
 </html>

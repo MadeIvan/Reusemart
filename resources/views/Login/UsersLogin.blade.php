@@ -149,6 +149,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (status == 'penitip'  && resData.penitip) {
                 localStorage.setItem('auth_token', resData.penitip.token);
+                localStorage.setItem('userData', JSON.stringify(resData.penitip));
+
                 localStorage.setItem('user_role', 'penitip');
                 window.location.href = 'http://127.0.0.1:8000/penitip/dashboard';
             } else if (status == 'pembeli') {

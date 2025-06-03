@@ -115,4 +115,27 @@ class DompetController extends Controller
             ], 500);
         }
     }
+public function getDompetByPegawai($idPegawai)
+{
+    if (empty($idPegawai)) {
+        return response()->json([
+            'status' => false,
+            'message' => 'idPegawai is required'
+        ], 400);
+    }
+    $dompet = \App\Models\Dompet::where('idPegawai', $idPegawai)->first();
+    
+    \Log::info('Raw idPegawai: ' . json_encode($idPegawai));
+    if ($dompet) {
+        return response()->json([
+            'status' => true,
+            'data' => $dompet
+        ]);
+    } else {
+        return response()->json([
+            'status' => false,
+            'message' => 'Dompet not found for employee: ' . $idPegawai
+        ], 404);
+    }
+}
 }

@@ -40,7 +40,7 @@ Route::get('/UsersLogin', function () {
 });
 
 // Code 1:
-Route::get('/PegawaiLogin', function () {
+Route::get('/Pegawailogin', function () {
     return view('Login.loginPegawai');
 });
 // Code 2:
@@ -90,9 +90,9 @@ Route::get('/lupa-password/{token}', function (string $token) {
     return view('auth.reset-password', ['token' => $token]);
 })->middleware('guest')->name('password.reset');
 
-// Route::get('/pegawaiView', function () {
-//     return view('pegawaiView');
-// });
+Route::get('/pegawaiview', function () {
+    return view('pegawaiView');
+});
 
 Route::get('/penitip/profile', function () {
     return view('Penitip.profilePenitip');

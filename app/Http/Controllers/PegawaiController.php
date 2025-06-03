@@ -470,4 +470,9 @@ class PegawaiController extends Controller
             "data" => $kurir
         ], 200);
     }}
+
+
+    public function BagiKomisi(Request $request){
+        
+    }
 }
