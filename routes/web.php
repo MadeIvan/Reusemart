@@ -138,6 +138,9 @@ Route::get('/pembeli/MyProfile', function () {
     return view('Pembeli.profilePembeli');
 });
 
+Route::get('/merchandise', function () {
+    return view('Pegawai.Merch');
+});
 
 
 // Route::get('/products', [BarangController::class, 'index']);

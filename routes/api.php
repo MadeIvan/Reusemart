@@ -22,6 +22,7 @@ use App\Http\Controllers\TransaksiPembelianController;
 use App\Http\Controllers\PointRedemptionController;
 use App\Http\Controllers\ImagesBarangController;
 use App\Http\Controllers\RatingController;
+use App\Http\Controllers\ClaimMerchandiseController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
      return response()->json($request->user());
@@ -172,6 +173,7 @@ Route::get('/rating/average/{idTarget}', [RatingController::class, 'getAverageRa
 Route::get('/livecode/{id}', [TransaksiPenitipanController::class, 'getallbyid']);
 
 Route::get('/add30/{id}', [TransaksiPenitipanController::class, 'add30']);
+Route::get('/getClaim', [ClaimMerchandiseController::class, 'index']);
 
 
 
