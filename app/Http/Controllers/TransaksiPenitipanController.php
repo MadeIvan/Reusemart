@@ -74,6 +74,36 @@ public function store(Request $request)
         ], 500);
     }
 }
+
+public function add30($id){
+    $tanggalMulai = new \DateTime($id);
+
+     $tanggalSelesai = (clone $tanggalMulai)->modify('+30 days');
+    return $tanggalSelesai;
+
+}
+
+public function getallbyid($id){
+    try {
+        // Try to find the barang by its ID
+       
+        $barang = TransaksiPenitipan::where('tanggalPenitipanSelesai', $id)->get();
+
+        // If the barang is found, return it as JSON
+        if ($barang) {
+            return response()->json($barang);
+        } else {
+            // If the barang is not found, return a 404 error with a custom message
+            return response()->json(['message' => 'Barang not found'], 404);
+        }
+    } catch (\Exception $e) {
+        // Catch any exception and return a 500 internal server error
+        return response()->json([
+            'error' => 'An error occurred while fetching the product.',
+            'message' => $e->getMessage(), // Include the exception message for debugging
+        ], 500);
+    }
+}
 public function notaPenitipanPdf($id)
 {
     $idTransaksi=$id;

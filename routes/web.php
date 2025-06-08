@@ -7,7 +7,7 @@ use App\Http\Controllers\TransaksiPembelianController;
 
 
 Route::get('/', function () {
-    return view('utama');
+    return view('PegawaiGudang.p3llivecode3');
 });
 Route::get('/home', function () {
     return view('home');

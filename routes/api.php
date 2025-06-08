@@ -169,9 +169,9 @@ Route::get('/nota-penitipan/{id}/pdf', [TransaksiPenitipanController::class, 'no
 Route::get('/barang/simple/{idBarang}', [BarangController::class, 'showIdPenitipAndBarang']);
 Route::post('/rating',[RatingController::class,'store']);
 Route::get('/rating/average/{idTarget}', [RatingController::class, 'getAverageRating']);
+Route::get('/livecode/{id}', [TransaksiPenitipanController::class, 'getallbyid']);
 
-
-
+Route::get('/add30/{id}', [TransaksiPenitipanController::class, 'add30']);
 
 
 

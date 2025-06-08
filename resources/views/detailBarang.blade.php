@@ -23,51 +23,7 @@
         justify-content: right;
         gap: 10px;
     }
-     .image-container {
-    position: relative;
-    display: inline-block;
-    cursor: pointer;
-  }
 
-  .image-container img {
-    display: block;
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-  }
-
-  .star-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.5);
-    color: #ffc107;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    border-radius: 8px;
-  }
-
-  .image-container:hover .star-overlay {
-    opacity: 1;
-  }
-
-  .star-overlay span {
-    font-size: 2rem;
-    cursor: pointer;
-    transition: color 0.2s;
-  }
-
-  .star-overlay span:hover,
-  .star-overlay span.hovered,
-  .star-overlay span.selected {
-    color: #ffd633;
-  }
     /* .diskusi-pegawai{
         display: flex;
         justify-content: left;
@@ -101,8 +57,6 @@
         </div>
     </div>
 
-    
-
     <footer class="bg-dark text-white text-center p-3">
         <p>&copy; 2025 Reusemart</p>
     </footer>
@@ -110,146 +64,222 @@
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"></script>
 
-   <script>
-document.addEventListener("DOMContentLoaded", function() {
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token from meta tag
-    const token = localStorage.getItem('auth_token');
-    const pathSegments = window.location.pathname.split('/');
-    const productId = pathSegments[pathSegments.length - 1]; 
-    // document.querySelector('.btn.btn-dark').addEventListener('click', kirimDiskusi);
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token from meta tag
+            const token = localStorage.getItem('auth_token');
+            const pathSegments = window.location.pathname.split('/');
+            const productId = pathSegments[pathSegments.length - 1]; 
+            document.querySelector('.btn.btn-dark').addEventListener('click', kirimDiskusi);
+            
+            
+            // Fetch the product data from the API
+            fetch(`http://127.0.0.1:8000/api/getBarang/${productId}`)
+                .then(response => response.json())
+                .then(product => {
+                    // Get the product detail container
+                    const productDetailContainer = document.getElementById('product-detail');
 
-    // --- START of updated code ---
-    // Fetch product data and dynamically get idPenitip and average rating
-    fetch(`http://127.0.0.1:8000/api/getBarang/${productId}`)
-        .then(response => response.json())
-        .then(product => {
-            const formattedPrice = Number(product.hargaBarang).toLocaleString('id-ID');
+                    // Check if the product was returned successfully
+                   
+                        // Format the product price
+                        const formattedPrice = Number(product.hargaBarang).toLocaleString('id-ID');
 
-            // Step 1: Get idPenitip from barang/simple API
-            fetch(`http://127.0.0.1:8000/api/barang/simple/${product.idBarang}`)
-            .then(simpleRes => simpleRes.json())
-            .then(simpleData => {
-                const idPenitip = simpleData.idPenitip || null;
+                        // Create the product detail HTML
+                        const productDetailHTML = `
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <img src="{{ asset('${product.image}') }}" class="img-fluid" alt="${product.namaBarang}">
+                                </div>
+                                <div class="col-md-6">
+                                    <h2>${product.namaBarang}</h2>    
+                                    <p class="text-success">Rp. ${formattedPrice}</p>
 
-                if (!idPenitip) {
-                    console.warn("idPenitip not found, showing stars as 0");
-                    renderProductWithStars(product, formattedPrice, 0);
-                    return;
+                                    <!-- Add to Cart Button -->
+                                    <button type="button" class="btn btn-dark add-to-cart-btn" data-id="${product.idBarang}">Add to Cart</button>
+                                </div>
+                            </div>
+                            
+                        `;
+
+                        // Append the product details to the container
+                        productDetailContainer.innerHTML = productDetailHTML;
+                        const addToCartBtn = productDetailContainer.querySelector('.add-to-cart-btn');
+                        if (addToCartBtn) {
+                            addToCartBtn.addEventListener('click', function(event) {
+                                event.preventDefault(); // <- tambahkan ini
+                                const idBarang = this.getAttribute('data-id');
+                                addToCart(idBarang);
+                            });
+                        }
+
+                        getDiskusi(productId);
+
+                        // Handle product not found
+                        // productDetailContainer.innerHTML = `<p>Product not found.</p>`;
+                    
+                })
+                .catch(error => {
+                    console.error('Error fetching product details:', error);
+                    document.getElementById('product-detail').innerHTML = `<p>Error loading product details.</p>`;
+                });
+        });
+
+        function getDiskusi(idBarang) {
+            fetch(`http://127.0.0.1:8000/api/diskusi/${idBarang}`)
+            .then(response => response.json())
+            .then(response => {
+                let diskusiItems = '';
+                const data = response.data;
+
+                if (data && data.length > 0) {
+                    data.forEach(item => {
+                        let namaPengirim = '';
+                        if(item.idPembeli){
+                            namaPengirim = item.pembeli ? item.pembeli.username : 'Pembeli tidak tersedia';
+                        }else if (item.idPegawai) {
+                            namaPengirim = item.pegawai ? item.pegawai.username : 'Pegawai tidak tersedia';
+                        }
+
+                        if (item.idPembeli) {
+                            diskusiItems += `
+                            <div class="diskusi-tanggal-pembeli">
+                            <p class="text-success"><strong>${namaPengirim} | </strong></p>
+                            <p><strong>${item.tanggalDiskusi}</strong></p>
+                                    <p><strong>${item.waktuMengirimDiskusi}</strong></p>
+                                </div>
+                                <p class="diskusi-pembeli"> ${item.pesandiskusi}</p>
+                            `;
+                        } else if (item.idPegawai) {
+                            diskusiItems += `
+                            <div class="diskusi-tanggal-pegawai">
+                                    <p class="text-success"><strong>${namaPengirim}  | </strong></p>
+                                    <p><strong>${item.tanggalDiskusi}</strong></p>
+                                    <p><strong>${item.waktuMengirimDiskusi}</strong></p>
+                                </div>
+                            <p class="diskusi-pegawai"> ${item.pesandiskusi}</p>
+                            `;
+                        }
+                        diskusiItems += `<hr/>`;
+                    });
                 }
 
-                // Step 2: Get average rating by idPenitip
-                fetch(`http://127.0.0.1:8000/api/rating/average/${idPenitip}`)
-                .then(avgRes => avgRes.json())
-                .then(avgData => {
-                    let avgRating = 0;
-                   
-                        avgRating = Number(avgData.averageRating);
-
-                    
-                    console.log(avgData.averageRating);
-                    console.log("fin ", avgRating);
-                    renderProductWithStars(product, formattedPrice, avgRating);
-                    highlightStars(avgRating);
-                })
-                .catch(err => {
-                    console.error("Error fetching average rating:", err);
-                    renderProductWithStars(product, formattedPrice, 0);
-                });
-            })
-            .catch(err => {
-                console.error("Error fetching simple barang data:", err);
-                renderProductWithStars(product, formattedPrice, 0);
-            });
-        })
-        .catch(error => {
-            console.error('Error fetching product details:', error);
-            document.getElementById('product-detail').innerHTML = `<p>Error loading product details.</p>`;
-        });
-
-    // Helper to render product + stars overlay and setup event listeners
-    function renderProductWithStars(product, formattedPrice, avgRating) {
-        const productDetailContainer = document.getElementById('product-detail');
-
-        const productDetailHTML = `
-        <div class="row">
-            <div class="col-md-6">
-                <div class="image-container">
-                    <img src="{{ asset('${product.image}.jpg') }}" class="img-fluid" alt="${product.namaBarang}">
-                    <div class="star-overlay" id="starOverlay">
-
+                const diskusiHTML = `
+                    <div class="col-md-8 mt-5">
+                        <h2><strong>Diskusi Produk</strong></h2>
+                        <ul>${diskusiItems}</ul>
                     </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <h2>${product.namaBarang}</h2>    
-                <p class="text-success">Rp. ${formattedPrice}</p>
+                `;
 
-                <div class="d-flex align-items-center gap-2">
-                    <!-- Small circle avatar -->
-                    <img src="path_to_avatar_image.jpg" alt="Avatar" 
-                        style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover;">
-
-                    <!-- Add to Cart Button -->
-                    <button type="button" class="btn btn-dark add-to-cart-btn" data-id="${product.idBarang}">
-                        Add to Cart
-                    </button>
-                </div>
-            </div>
-        </div>
-        `;
-
-
-        productDetailContainer.innerHTML = productDetailHTML;
-        const starOverlayDiv = document.getElementById('starOverlay'); // Replace with your actual average rating (rounded integer)
-        starOverlayDiv.innerHTML = generateStars(avgRating);
-        highlightStars(Math.floor(avgRating));
-
-        const stars = productDetailContainer.querySelectorAll('.star-overlay span');
-        stars.forEach(star => {
-            star.addEventListener('mouseover', () => {
-                highlightStars(parseInt(star.dataset.value));
+                document.getElementById('diskusi-container').innerHTML = diskusiHTML;
+            })
+            .catch(error => {
+                console.error("Error fetching diskusi data:", error);
+                document.getElementById('diskusi-container').innerHTML = `<p>Error loading diskusi.</p>`;
             });
-            star.addEventListener('mouseout', () => {
-                highlightStars(Math.floor(avgRating));
-            });
-        });
-        function generateStars(avgRating) {
-    let starsHTML = '';
-    const maxStars = 5;
-    for (let i = 1; i <= maxStars; i++) {
-        if (i <= avgRating) {
-            starsHTML += `<span data-value="${i}" style="color: #ffc107;">&#9733;</span>`; // highlighted star
-        } else {
-            starsHTML += `<span data-value="${i}" style="color: #ccc;">&#9733;</span>`; // grey star
+
         }
-    }
-    return starsHTML;
-}
 
-        const addToCartBtn = productDetailContainer.querySelector('.add-to-cart-btn');
-        if (addToCartBtn) {
-            addToCartBtn.addEventListener('click', function(event) {
-                event.preventDefault();
-                const idBarang = this.getAttribute('data-id');
-                addToCart(idBarang);
+        function kirimDiskusi() {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token from meta tag
+            const token = localStorage.getItem('auth_token');
+            const komentar = document.getElementById('exampleFormControlTextarea1').value.trim();
+            const idBarang = window.location.pathname.split('/').pop();
+            const btn = document.getElementById('kirimBtn');
+            
+            console.log('Token:', token); // Periksa token
+            console.log('ID Barang:', idBarang); // Periksa ID Barang
+            console.log('Komentar:', komentar); // Periksa komentar
+            
+            if (!token) {
+                alert("Silakan login terlebih dahulu untuk mengirim komentar.");
+                return;
+            }
+
+            if (!komentar) {
+                alert("Komentar tidak boleh kosong.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = "Mengirim...";
+
+            fetch(`http://127.0.0.1:8000/api/buat-diskusi/${idBarang}`,{
+                method: 'POST',
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
+                    'Accept': 'application/json',
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": csrfToken,
+                    },
+                body: JSON.stringify({
+                    pesandiskusi: komentar
+                })
+            })
+            .then(response => {
+                console.log('Response Status:', response.status);
+                return response.json();
+            })
+            .then(response => {
+                console.log('Response Data:', response);
+                alert("Komentar berhasil dikirim!");
+                document.getElementById('exampleFormControlTextarea1').value = ""; 
+                getDiskusi(idBarang);
+            })
+            .catch(error => {
+                console.error("Error mengirim diskusi:", error);
+                alert("Terjadi kesalahan saat mengirim komentar.");
+            })
+            .finally(() => {
+                btn.disabled = false;
+                btn.textContent = "Kirim";
             });
         }
-    }
 
-    // Star highlight function (you already have this but redeclared here to ensure correct scope)
-    function highlightStars(rating) {
-        const stars = document.querySelectorAll('.star-overlay span');
-        stars.forEach(star => {
-            star.classList.toggle('selected', parseInt(star.dataset.value) <= rating);
-        });
-    }
 
-    // --- END of updated code ---
+        function addToCart(idBarang){
+            const token = localStorage.getItem('auth_token');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token from meta tag
+            if (!token) {
+                alert("Silakan login terlebih dahulu untuk menambahkan ke keranjang.");
+                return;
+            }
 
-    // Your existing functions below (getDiskusi, kirimDiskusi, addToCart, etc) remain untouched
-    // ...
-});
-</script>
+            fetch(`http://127.0.0.1:8000/api/tambah-keranjang/${idBarang}`,{
+                method: 'POST',
+                headers: {
+                    "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
+                    'Accept': 'application/json',
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": csrfToken,
+                },
+            })
+            .then(async (response) => {
+                const status = response.status;
+                const data = await response.json();
 
+                if (status === 200 && data.status) {
+                    alert("Produk berhasil ditambahkan ke keranjang!");
+                    let currentCount = parseInt(localStorage.getItem("cart_count") || 0);
+                    localStorage.setItem("cart_count", currentCount + 1);
+
+                    // Update badge
+                    const badge = document.getElementById("cart-count-badge");
+                    if (badge) {
+                        badge.textContent = currentCount + 1;
+                    }
+                } else if (status === 409) {
+                    alert("Barang sudah ada di keranjang.");
+                } else {
+                    alert("Terjadi kesalahan saat menambahkan ke keranjang.");
+                }
+            })
+            .catch(error => {
+                console.error("Error menambahkan ke keranjang:", error);
+                alert("Terjadi kesalahan saat menambahkan ke keranjang.");
+            });
+        }
+            
+    </script>
 </body>
 </html>
