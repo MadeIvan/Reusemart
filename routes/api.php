@@ -21,8 +21,8 @@ use App\Http\Controllers\TransaksiPenitipanController;
 use App\Http\Controllers\TransaksiPembelianController;
 use App\Http\Controllers\PointRedemptionController;
 use App\Http\Controllers\ImagesBarangController;
-
 use App\Http\Controllers\KomisiController;
+
 
 
 
@@ -175,3 +175,5 @@ Route::get('/transaksi-penitipan/penitip/{idPenitip}', [TransaksiPenitipanContro
 
 Route::post('/komisi-reusemart/{noNota}', [KomisiController::class, 'komisiReuseMart']);
 Route::get('/dompet/pegawai/{idPegawai}', [DompetController::class, 'getDompetByPegawai']);
+Route::get('/komisi', [KomisiController::class, 'index']);
+Route::post('/komisi/store', [KomisiController::class, 'store']);

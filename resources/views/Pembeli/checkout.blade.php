@@ -405,7 +405,7 @@
                         const konversi = user.poin * 100; // 1 poin = Rp100
                         const totalHargaBarang =dataCheck.totalhargabarang;
                         const ongkir = Number(dataCheck?.ongkir || 0);
-                        const totalAwal = totalHargaBarang;
+                        let totalAwal = dataCheck.total_harga;
 
                         
                         if(totalHargaBarang > 500000){
@@ -434,10 +434,12 @@
                         localStorage.setItem('sisaPoin', user.poin + totalPoin);
 
                         const inputPoin = document.getElementById("inputPoin");
-                        const hasilKonversi = document.getElementById("hasilKonversi");
+                        // const hasilKonversi = document.getElementById("hasilKonversi");
                         const sisaPoinText = document.getElementById("sisaPoinSetelahTransaksi");
 
                         inputPoin.addEventListener("input", () => {
+                            const hasilKonversi = document.getElementById("hasilKonversi");
+                            const maksimalPoinDitukar = Math.floor((totalHargaBarang + ongkir));
                             let nilaiPoin = parseInt(inputPoin.value) || 0;
                             
                             if (nilaiPoin > user.poin) {
@@ -445,7 +447,12 @@
                                 inputPoin.value = user.poin;
                             }
 
-                            const rupiah = nilaiPoin * 100;
+                            let rupiah = nilaiPoin * 100;
+                            if(rupiah > maksimalPoinDitukar){
+                                nilaiPoin = maksimalPoinDitukar/100;
+                                inputPoin.value = maksimalPoinDitukar/100;
+                                rupiah = nilaiPoin * 100;
+                            }
                             hasilKonversi.innerHTML  = `<strong> Rp ${rupiah.toLocaleString('id-ID')}</strong>`;
                             hasilKonversi.classList.toggle("text-black", nilaiPoin > 0);
                             hasilKonversi.classList.toggle("text-muted", nilaiPoin === 0);
@@ -582,8 +589,13 @@
         }
 
         // Redirect right away after checkout success
-        window.location.href = `/pembayaran/${noNota}`;
-        hapusKeranjang();
+            if( parseFloat(localStorage.getItem('totalSetelahPoin')) !== 0){
+                window.location.href =` /pembayaran/${noNota}`;
+                hapusKeranjang();
+            }else{
+                window.location.href =`/home`;
+                hapusKeranjang();
+            }
 
         Toastify({
             text: "Berhasil Membuat Pesanan",

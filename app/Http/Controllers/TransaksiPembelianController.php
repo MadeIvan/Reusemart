@@ -31,7 +31,7 @@ class TransaksiPembelianController extends Controller
 
     return response()->json($pembelians);
 }
-    public function showfornota(){
+public function showfornota(){
     $pembelians = TransaksiPembelian::with([
         'detailTransaksiPembelian.barang',
         'pegawai',
@@ -41,7 +41,7 @@ class TransaksiPembelianController extends Controller
         'pembeli.alamat',
         
     ])
-    ->whereIn('status', ['Lunas Siap Diambil', 'Lunas Siap Diantarkan'])
+    ->whereIn('status', ['Lunas Siap Diambil','Lunas Siap Diantarkan'])
     ->get();
 
     return response()->json($pembelians);
@@ -70,7 +70,7 @@ public function notaPembelianPdf($idTransaksiPenitipan)
 }
 
 
-    public function store(Request $request){
+  public function store(Request $request){
         try {
             \Log::info('Data masuk:', $request->all());
 
@@ -114,14 +114,26 @@ public function notaPembelianPdf($idTransaksiPenitipan)
             \Log::info("ID yang akan digunakan sebagai noNota:", [$newId]);
 
             // Simpan transaksi utama
-            $transaksiPembelian = TransaksiPembelian::create([
-                'noNota' => $newId,
-                'idPembeli' => $pembeli->idPembeli,
-                'idAlamat' => $validated['idAlamat'],
-                'tanggalWaktuPembelian' => $validated['tanggalWaktuPembelian'],
-                'status' => "Menunggu Pembayaran",
-                'totalHarga' => $validated['totalHarga']
-            ]);
+            if($validated['totalHarga'] === 0){
+                $transaksiPembelian = TransaksiPembelian::create([
+                    'noNota' => $newId,
+                    'idPembeli' => $pembeli->idPembeli,
+                    'idAlamat' => $validated['idAlamat'],
+                    'tanggalWaktuPembelian' => $validated['tanggalWaktuPembelian'],
+                    'status' => "Lunas Belum Dijadwalkan",
+                    'totalHarga' => $validated['totalHarga']
+                ]);
+                
+            }else{
+                $transaksiPembelian = TransaksiPembelian::create([
+                    'noNota' => $newId,
+                    'idPembeli' => $pembeli->idPembeli,
+                    'idAlamat' => $validated['idAlamat'],
+                    'tanggalWaktuPembelian' => $validated['tanggalWaktuPembelian'],
+                    'status' => "Menunggu Pembayaran",
+                    'totalHarga' => $validated['totalHarga']
+                ]);
+            }
 
             \Log::info("transaksiPembelian", [$transaksiPembelian]);
 
@@ -212,11 +224,11 @@ public function updatePenjadwalan(Request $request, $noNota)
         ]);
     }
 
-    public function buktiBayar(Request $request, $id){
+public function buktiBayar(Request $request, $id){
         try {
             $validated = $request->validate([
                 'tanggalWaktuPelunasan' => 'required|date_format:Y-m-d H:i:s',
-                'buktiPembayaran' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048'
+                'buktiPembayaran' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
             ]);
 
             $pembeli = auth('pembeli')->user();
@@ -476,7 +488,7 @@ public function tolakVerifikasi(Request $request, $noNota)
                 if($totalHarga >= 500000){
                     $poinBelanja = $totalHarga / 10000;
                     $poinBonus = $poinBelanja * 0.2;
-                    $selisihHarga = abs($totalHarga - ($transaksi->totalHarga - 100000));
+                    $selisihHarga = abs($totalHarga - ($transaksi->totalHarga));
                     $poinTukar = $selisihHarga / 100;
                     $poinAkhir = $pembeli->poin;
                     \Log::info("=== DEBUG ===");
@@ -490,7 +502,7 @@ public function tolakVerifikasi(Request $request, $noNota)
                     $transaksi->save();
                 }else{
                     $poinBelanja = $totalHarga / 10000;
-                    $selisihHarga = abs($totalHarga - ($transaksi->totalHarga - 100000));
+                    $selisihHarga = abs($totalHarga - ($transaksi->totalHarga));
                     $poinTukar = $selisihHarga / 100;
                     $poinAkhir = $pembeli->poin;
                     \Log::info("=== DEBUG ===");
@@ -531,6 +543,7 @@ public function tolakVerifikasi(Request $request, $noNota)
             ], 500);
         }
     }
+
 
 public function updateStatus(Request $request, $noNota)
 {

@@ -27,13 +27,7 @@
 <body>
 @include('layouts.navbar')
 
-<div class="container mb-4 mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <input type="text" id="searchInput" class="form-control" placeholder="Cari barang, kategori, status, dll...">
-        </div>
-    </div>
-</div>
+
 
 <div id="loadingIndicator" class="container my-4">
     <div class="text-center">
@@ -43,7 +37,13 @@
         <p class="mt-2 text-muted">Memuat data...</p>
     </div>
 </div>
-
+<div class="container mb-4 mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <input type="text" id="searchInput" class="form-control" placeholder="Cari barang, kategori, status, dll...">
+        </div>
+    </div>
+</div>
 <h3 class="text-center mb-4 mt-4" style="color:rgb(0, 138, 57); font-family: 'Bagel Fat One', system-ui;">
     Riwayat Penitipan Barang
 </h3>
