@@ -138,12 +138,13 @@
             
             async function fetchPegawai() {
                 try {
-                    const response = await fetch("http://127.0.0.1:8000/api/claimMerch", {
+                    const response = await fetch("http://127.0.0.1:8000/api/getClaim", {
                         method: "GET",
                         headers: { "Authorization": `Bearer ${localStorage.getItem('auth_token')}` },
                     });
                     
                     const data = await response.json();
+                    
                     console.log("Raw response:", response);
                     console.log("Response JSON:", data);    
                     console.log("Token:", localStorage.getItem('auth_token'));
@@ -163,13 +164,13 @@
 
             function renderTable(data) {
                 tableBody.innerHTML = ""; // Clear the table before rendering new data
-                data.forEach(item => {
+                data.forEach(claims => {
                     const row = document.createElement("tr");
                     row.innerHTML = `
                         <td id="${item.idClaim}">${item.idClaim}</td>
-                        <td>${item.idPegawai || '-'}</td>
-                        <td>${item.idMerchandise || '-'}</td>
-                        <td>${item.idPembeli}</td>
+                        <td>${item.pegawai ? item.pegawai.namaPegawai : '-'}</td>
+                        <td>${item.merchandise ? item.merchandise.nama : '-'}</td>
+                        <td>${item.pembeli ? item.pembeli.namaPembeli : '-'}</td>
                         <td>${item.tanggalAmbil || '-'}</td>
                     `;
                     row.addEventListener("click", () => {

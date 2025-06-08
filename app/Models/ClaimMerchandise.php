@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ClaimMerchandise extends Model
 {
-    protected $table = 'claim';
+    protected $table = 'claimMerchandise';
     protected $primaryKey = 'idClaim';
     public $incrementing = false;
     protected $keyType = 'string';
