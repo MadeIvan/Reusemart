@@ -23,6 +23,7 @@ use App\Http\Controllers\PointRedemptionController;
 use App\Http\Controllers\ImagesBarangController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ClaimMerchandiseController;
+use App\Http\Controllers\MerchandiseController;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
      return response()->json($request->user());
@@ -174,6 +175,6 @@ Route::get('/livecode/{id}', [TransaksiPenitipanController::class, 'getallbyid']
 
 Route::get('/add30/{id}', [TransaksiPenitipanController::class, 'add30']);
 Route::get('/getClaim', [ClaimMerchandiseController::class, 'index']);
-
-
+Route::get('/getMerch', [MerchandiseController::class, 'index']);
+Route::put('/saveClaim/{id}', [ClaimMerchandiseController::class, 'update']);
 

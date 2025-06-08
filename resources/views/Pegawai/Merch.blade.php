@@ -73,6 +73,36 @@
     </style>
 </head>
 <body>
+    @include('layouts.navbar')
+
+    <div class="modal fade" id="addClaimModal" tabindex="-1" aria-labelledby="addClaimModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addClaimModalLabel">Detail Claim Merchandise</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addClaimForm">
+                    <div class="mb-3">
+                        <label for="idPegawai1" class="form-label">Petugas Gudang</label> 
+                        <input type="text" class="form-control" id="idPegawai1" disabled>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="tanggalPenitipan" class="form-label">Tanggal Claim</label>
+                        <input type="date" class="form-control" id="tanggalClaim" disabled>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary"  id="saveButton">Save</button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="container mt-4">
         <h2>Data Merchandise</h2>
@@ -109,14 +139,27 @@
     </div>
 
     <div class="container mt-4">
-        <h3>Data Claim Merchandise</h3>
-        <input type="text" id="searchInput" class="form-control mb-3" placeholder="Search by username or name">
+        <h3 id="tableTitle">Data Claim Merchandise</h3>
+        <!-- <select id="searchInput" class="form-select mb-3">
+            <option value="Semua">Semua</option>
+            <option value="BelumDiambil">BelumDiambil</option>
+        </select> -->
+        <div class="btn-group mb-3">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                Filter
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item filter-option" data-filter="Semua">Semua</a></li>
+                <li><a class="dropdown-item filter-option" data-filter="BelumDiambil">BelumDiambil</a></li>
+            </ul>
+        </div>
 
         <div id="pegawaiTableContainer">
             <table class="table table-bordered" id="pegawaiTable">
                 <thead>
                     <tr>
                         <th>ID Claim</th>
+                        <th>Nama PJ</th>
                         <th>Nama Merchandise</th>
                         <th>Nama Pembeli</th>
                         <th>Tanggal Ambil</th>
@@ -134,7 +177,13 @@
         document.addEventListener("DOMContentLoaded", function () {
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token from meta tag
             console.log("namaPegawai : ", localStorage.getItem('namaPegawai'));
+            console.log("idPegawai : ", localStorage.getItem('idPegawai'));
             const tableBody = document.getElementById("tableBody");
+            const merchTableBody = document.getElementById("merchTableBody");
+            let currentItem;
+            let currentItemId;
+            const addClaimModal = new bootstrap.Modal(document.getElementById('addClaimModal'));
+
             
             async function fetchPegawai() {
                 try {
@@ -161,10 +210,10 @@
                     alert("An error occurred while fetching data. Check the console for details.");
                 }
             }
-
+            
             function renderTable(data) {
                 tableBody.innerHTML = ""; // Clear the table before rendering new data
-                data.forEach(claims => {
+                data.forEach(item => {
                     const row = document.createElement("tr");
                     row.innerHTML = `
                         <td id="${item.idClaim}">${item.idClaim}</td>
@@ -175,15 +224,167 @@
                     `;
                     row.addEventListener("click", () => {
                         currentItem = item;  // full item for edit modal
-                        currentItemId = item.transaksiPenitipan.idTransaksiPenitipan; // id for printing
+                        currentItemId = item.idClaim; // id for printing
                         console.log("selected item:", currentItem);
-                        actionModal.show();
+                        document.getElementById("idPegawai1").value = item.pegawai ? item.pegawai.namaPegawai : '-';
+                        document.getElementById("tanggalClaim").value = item.tanggalAmbil || '-';
+                        const idPegawai = item.idPegawai;
+                        const tanggalAmbil = item.tanggalAmbil;
+
+                        const idPegawaiField = document.getElementById("idPegawai1");
+                        const tanggalClaimField = document.getElementById("tanggalClaim");
+                        const saveButton = document.getElementById("saveButton");
+
+                        if (!idPegawai && !tanggalAmbil) {
+                            idPegawaiField.required = false;
+                            tanggalClaimField.required = true;
+                            idPegawaiField.disabled = true;
+                            tanggalClaimField.disabled = false;
+                            saveButton.style.display = "inline-block";
+                            if (!idPegawai) {
+                                idPegawaiField.value = ''; // clear any existing value
+                                idPegawaiField.placeholder = localStorage.getItem("namaPegawai") || "Nama Pegawai";
+                            } else {
+                                idPegawaiField.value = item.pegawai ? item.pegawai.namaPegawai : '-'; // populate value
+                                idPegawaiField.placeholder = ''; // remove placeholder
+                            }
+                        } else {
+                            idPegawaiField.required = false;
+                            tanggalClaimField.required = false;
+                            idPegawaiField.disabled = true;
+                            tanggalClaimField.disabled = true;
+                            saveButton.style.display = "none";
+
+                            
+                        }
+                        addClaimModal.show();
                     });
                     tableBody.appendChild(row);
                 });
             }
+            document.querySelectorAll('.filter-option').forEach(item => {
+                item.addEventListener('click', function(event) {
+                    event.preventDefault(); // prevent default anchor behavior
+                    const selectedFilter = this.getAttribute('data-filter');
+                    console.log("Selected filter:", selectedFilter);
 
-            renderTable();
+                    
+                    const tableTitle = document.getElementById('tableTitle');
+                    if (selectedFilter === 'BelumDiambil') {
+                        tableTitle.textContent = "Data Claim Merchandise (Belum diverifikasi)";
+                    } else {
+                        tableTitle.textContent = "Semua Data Claim Merchandise";
+                    }
+
+                    let filteredData;
+                    if (selectedFilter === 'BelumDiambil') {
+                        filteredData = pegawaiData.filter(item => !item.tanggalAmbil);
+                    } else {
+                        filteredData = pegawaiData;
+                    }
+                    renderTable(filteredData);
+                });
+            });
+
+            async function fetchMerch() {
+                try {
+                    const response = await fetch("http://127.0.0.1:8000/api/getMerch", {
+                        method: "GET",
+                        headers: { "Authorization": `Bearer ${localStorage.getItem('auth_token')}` },
+                    });
+                    
+                    const data = await response.json();
+                    
+                    console.log("Raw response:", response);
+                    console.log("Response JSON:", data);    
+                    console.log("Token:", localStorage.getItem('auth_token'));
+
+                    if (Array.isArray(data) && data.length > 0) {
+                        pegawaiData = data;
+                        renderTableMerch(pegawaiData);
+                    } else {
+                        alert("Gagal memuat data Merch.");
+                        console.error("Error loading data:", data);
+                    }
+                } catch (error) {
+                    console.error("Error fetching Merch data:", error);
+                    alert("An error occurred while fetching data. Check the console for details.");
+                }
+            }
+            
+            function renderTableMerch(data) {
+                merchTableBody.innerHTML = ""; // Clear the table before rendering new data
+                data.forEach(item => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td id="${item.idMerchandise}">${item.idMerchandise}</td>
+                        <td>${item.nama}</td>
+                        <td>${item.jumlahSatuan}</td>
+
+                    `;
+                    row.addEventListener("click", () => {
+                        currentItem = item;  // full item for edit modal
+                        currentItemId = item.idClaim; // id for printing
+                        console.log("selected item:", currentItem);
+                        // actionModal.show();
+                    });
+                    merchTableBody.appendChild(row);
+                });
+            }
+            async function updateClaimMerchandise(idClaim, idPegawai, tanggalAmbil) {
+                try {
+                    const token = localStorage.getItem('auth_token');
+                    const response = await fetch(`http://127.0.0.1:8000/api/saveClaim/${idClaim}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`,
+                            "X-CSRF-TOKEN": csrfToken
+                        },
+                        body: JSON.stringify({
+                            idPegawai: idPegawai,
+                            tanggalAmbil: tanggalAmbil
+                        })
+                    });
+
+                    const result = await response.json();
+                    if (response.ok) {
+                        console.log("Claim Merchandise updated successfully:", result);
+                        fetchPegawai(); // reload data
+                        // showSuccessToast("Claim Merchandise updated successfully!");
+                    } else {
+                        console.error("Error updating Claim Merchandise:", result);
+                        alert("Failed to update Claim Merchandise.");
+                    }
+                } catch (error) {
+                    console.error("Error updating Claim Merchandise:", error);
+                    alert("An error occurred while updating Claim Merchandise.");
+                }
+            }
+            document.getElementById("addClaimForm").addEventListener("submit", function(event) {
+                event.preventDefault();
+                const idPegawai = localStorage.getItem("idPegawai");
+                const tanggalAmbil = document.getElementById("tanggalClaim").value;
+                if (!currentItemId) {
+                    alert("No selected Claim Merchandise.");
+                    return;
+                }
+                const confirmUpdate = confirm("Are you sure you want to update this Claim Merchandise?");
+                if (confirmUpdate) {
+                    updateClaimMerchandise(currentItemId, idPegawai, tanggalAmbil);
+                    addClaimModal.hide();
+                    fetchMerch();
+                    fetchPegawai();
+                } else {
+                    addClaimModal.hide();
+                    console.log("Update cancelled by user.");
+                }
+            });
+
+
+            fetchMerch();
+            fetchPegawai();
+            // renderTable(data);
         });
     </script>
 

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ClaimMerchandise;
 use Illuminate\Http\Request;
-
+use App\Models\Merchandise;
 class ClaimMerchandiseController extends Controller
 {
     /**
@@ -59,19 +59,36 @@ class ClaimMerchandiseController extends Controller
         $claim = ClaimMerchandise::find($id);
 
         if (!$claim) {
-            return response()->json(['message' => 'Claim not found'], 404);
+            return response()->json(['message' => 'Claim Merchandise not found'], 404);
         }
 
         $validated = $request->validate([
-            'idPegawai' => 'sometimes|required|exists:pegawai,idPegawai',
-            'idMerchandise' => 'sometimes|required|exists:merchandise,idMerchandise',
-            'idPembeli' => 'sometimes|required|exists:pembeli,idPembeli',
-            'tanggalAmbil' => 'nullable|date',
+            'idPegawai' => 'required|exists:pegawai,idPegawai',
+            'tanggalAmbil' => 'required|date',
         ]);
 
+        // Find related Merchandise
+        $merchandise = Merchandise::find($claim->idMerchandise);
+        if (!$merchandise) {
+            return response()->json(['message' => 'Merchandise not found'], 404);
+        }
+
+        // Check jumlahSatuan
+        if ($merchandise->jumlahSatuan <= 0) {
+            return response()->json([
+                'message' => 'Cannot update claim. Merchandise stock is already depleted.'
+            ], 400);
+        }
+
+        // Decrease jumlahSatuan by 1
+        $merchandise->jumlahSatuan -= 1;
+        $merchandise->save();
+
+        // Update the claim
         $claim->update($validated);
+
         return response()->json([
-            'message' => 'Claim updated successfully',
+            'message' => 'Claim Merchandise updated successfully.',
             'data' => $claim
         ]);
     }
