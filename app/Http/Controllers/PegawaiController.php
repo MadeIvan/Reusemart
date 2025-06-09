@@ -471,8 +471,15 @@ class PegawaiController extends Controller
         ], 200);
     }}
 
+public function myData(){
+        $pegawai = auth('pegawai')->user()->load('dompet', 'jabatan');
 
-    public function BagiKomisi(Request $request){
-        
-    }
+    return response()->json([
+        "status" => true,
+        "message" => "User retrieved successfully",
+        "data" => $pegawai
+    ]);
+}
+
+    
 }

@@ -22,10 +22,16 @@ use App\Http\Controllers\TransaksiPembelianController;
 use App\Http\Controllers\PointRedemptionController;
 use App\Http\Controllers\ImagesBarangController;
 use App\Http\Controllers\KomisiController;
+use App\Http\Controllers\FCMTokenController;
+use App\Http\Controllers\ClaimMerchandiseController;
+use App\Http\Controllers\MerchandiseController;
 
 
 
 
+Route::middleware('auth:pegawai')->post('/pegawai/register-fcm-token', [FCMTokenController::class, 'registerFcmToken']);
+Route::middleware('auth:penitip')->post('/penitip/register-fcm-token', [FCMTokenController::class, 'registerFcmToken']);
+Route::middleware('auth:pembeli')->post('/pembeli/register-fcm-token', [FCMTokenController::class, 'registerFcmToken']);
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
      return response()->json($request->user());
 });
@@ -177,6 +183,13 @@ Route::post('/komisi-reusemart/{noNota}', [KomisiController::class, 'komisiReuse
 Route::get('/dompet/pegawai/{idPegawai}', [DompetController::class, 'getDompetByPegawai']);
 Route::get('/komisi', [KomisiController::class, 'index']);
 Route::post('/komisi/store', [KomisiController::class, 'store']);
-Route::get('/laporan-per-kategori-barang', [TransaksiPembelianController::class, 'laporanPerKategoriBarang']);
+Route::get('/pegawai/getData', [PegawaiController::class, 'myData']);
+Route::get('/histori-komisi-hunter/{idHunter}', [TransaksiPembelianController::class, 'showHistoriKomisiHunter']);
 
-Route::get('/laporan-penitipan-habis', [\App\Http\Controllers\TransaksiPenitipanController::class, 'laporanPenitipanHabis']);
+Route::get('/getClaim', [ClaimMerchandiseController::class, 'index']);
+Route::get('/getMerch', [MerchandiseController::class, 'index']);
+Route::put('/saveClaim/{id}', [ClaimMerchandiseController::class, 'update']);
+Route::post('/store/claim', [ClaimMerchandiseController::class, 'store']);
+
+
+Route::get('/show-umum-barang', [BarangController::class, 'ShowUmum']);

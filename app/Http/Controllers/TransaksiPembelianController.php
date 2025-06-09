@@ -618,6 +618,7 @@ public function laporanPerKategoriBarang(Request $request)
     $terjual = \App\Models\DetailTransaksiPembelian::whereHas('transaksiPembelian', function($q) use ($tahun) {
         $q->whereYear('tanggalWaktuPembelian', $tahun)
           ->where('status', 'Barang Diterima');
+          
     })
     ->with('barang')
     ->get()
@@ -680,4 +681,52 @@ public function laporanPerKategoriBarang(Request $request)
     ]);
     return $pdf->stream('laporan-penjualan-per-kategori-barang.pdf');
 }
+
+public function showHistoriKomisiHunter($idHunter)
+{
+    // Get all TransaksiPenitipan where idPegawai2 == $idHunter and status == 'Terjual'
+    $transaksis = \App\Models\TransaksiPenitipan::with([
+        'detailTransaksiPenitipan.barang'
+    ])
+    ->where('idPegawai2', $idHunter)
+    ->whereHas('detailTransaksiPenitipan.barang', function($q) {
+        $q->where('statusBarang', 'Terjual');
+    })
+    ->get();
+
+    $result = [];
+    foreach ($transaksis as $tp) {
+        foreach ($tp->detailTransaksiPenitipan as $detail) {
+            $barang = $detail->barang;
+            if (!$barang || $barang->statusBarang !== 'Terjual') continue;
+
+            // Find Komisi by idBarang and noNota (from transaksi pembelian)
+            $noNota = optional($barang->detailTransaksiPembelian->first())->noNota ?? null;
+            $komisi = null;
+            if ($noNota) {
+                $komisi = \App\Models\Komisi::where('idBarang', $barang->idBarang)
+                    ->where('noNota', $noNota)
+                    ->whereNotNull('komisiHunter')
+                    ->first();
+            }
+
+            $result[] = [
+                'idTransaksiPenitipan' => $tp->idTransaksiPenitipan,
+                'namaBarang' => $barang->namaBarang,
+                'hargaBarang' => $barang->hargaBarang,
+                'noNota' => $noNota,
+                'komisiHunter' => $komisi ? $komisi->komisiHunter : null,
+            ];
+        }
+    }
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Histori Komisi Hunter',
+        'data' => $result
+    ]);
+}
+
+
+
 }
