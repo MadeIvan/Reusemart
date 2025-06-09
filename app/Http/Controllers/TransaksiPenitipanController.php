@@ -136,4 +136,52 @@ public function getAllByPenitip($idPenitip)
             'tanggalPenitipanSelesai' => $newDate
         ]);
     }
+
+
+    
+public function laporanPenitipanHabis(Request $request)
+{
+    $now = now()->toDateString();
+
+    // Ambil semua transaksi penitipan yang sudah habis masa penitipannya
+    $transaksis = \App\Models\TransaksiPenitipan::with([
+        'detailTransaksiPenitipan.barang',
+        'penitip'
+    ])
+    ->where('tanggalPenitipanSelesai', '<', $now)
+    ->get();
+
+    $rows = [];
+    foreach ($transaksis as $tp) {
+        foreach ($tp->detailTransaksiPenitipan as $detail) {
+            $barang = $detail->barang;
+            if (!$barang) continue;
+            $rows[] = [
+                'kode_produk' => $barang->idBarang,
+                'nama_produk' => $barang->namaBarang,
+                'id_penitip' => $tp->penitip->idPenitip ?? '',
+                'nama_penitip' => $tp->penitip->namaPenitip ?? '',
+                'tanggal_masuk' => \Carbon\Carbon::parse($tp->tanggalPenitipan)->format('d/m/Y'),
+                'tanggal_akhir' => \Carbon\Carbon::parse($tp->tanggalPenitipanSelesai)->format('d/m/Y'),
+                'batas_ambil' => \Carbon\Carbon::parse($tp->tanggalPenitipanSelesai)->addDays(7)->format('d/m/Y'),
+            ];
+        }
+    }
+
+    // Untuk API
+    if ($request->wantsJson()) {
+        return response()->json([
+            'tanggalCetak' => now()->format('d F Y'),
+            'data' => $rows,
+        ]);
+    }
+
+    // Untuk PDF
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('nota.pdf.laporanPenitipanHabis', [
+        'rows' => $rows,
+        'tanggalCetak' => now()->format('d F Y'),
+    ]);
+    return $pdf->stream('laporan-penitipan-habis.pdf');
+}
+
 }

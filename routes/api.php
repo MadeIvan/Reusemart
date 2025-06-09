@@ -177,3 +177,6 @@ Route::post('/komisi-reusemart/{noNota}', [KomisiController::class, 'komisiReuse
 Route::get('/dompet/pegawai/{idPegawai}', [DompetController::class, 'getDompetByPegawai']);
 Route::get('/komisi', [KomisiController::class, 'index']);
 Route::post('/komisi/store', [KomisiController::class, 'store']);
+Route::get('/laporan-per-kategori-barang', [TransaksiPembelianController::class, 'laporanPerKategoriBarang']);
+
+Route::get('/laporan-penitipan-habis', [\App\Http\Controllers\TransaksiPenitipanController::class, 'laporanPenitipanHabis']);

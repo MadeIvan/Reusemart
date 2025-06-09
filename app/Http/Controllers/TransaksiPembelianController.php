@@ -595,4 +595,89 @@ public function index(){
 
     ], 200);
 }
+
+public function laporanPerKategoriBarang(Request $request)
+{
+    $tahun = $request->input('tahun', date('Y'));
+
+    // List kategori sesuai gambar
+    $kategoriList = [
+        'Elektronik & Gadget',
+        'Pakaian & Aksesoris',
+        'Perabotan Rumah Tangga',
+        'Buku, Alat Tulis, & Peralatan Sekolah',
+        'Hobi, Mainan, & Koleksi',
+        'Perlengkapan Bayi & Anak',
+        'Otomotif & Aksesoris',
+        'Perlengkapan Taman & Outdoor',
+        'Peralatan Kantor & Industri',
+        'Kosmetik & Perawatan Diri',
+    ];
+
+    // Hitung jumlah item terjual per kategori (status: Barang Diterima)
+    $terjual = \App\Models\DetailTransaksiPembelian::whereHas('transaksiPembelian', function($q) use ($tahun) {
+        $q->whereYear('tanggalWaktuPembelian', $tahun)
+          ->where('status', 'Barang Diterima');
+    })
+    ->with('barang')
+    ->get()
+    ->groupBy(function($item) {
+        return $item->barang->kategori ?? 'Lainnya';
+    })
+    ->map(function($group) {
+        return $group->count();
+    });
+
+    // Hitung jumlah item gagal terjual per kategori (status: Dibatalkan (Tidak dibayar))
+    $gagal = \App\Models\DetailTransaksiPembelian::whereHas('transaksiPembelian', function($q) use ($tahun) {
+        $q->whereYear('tanggalWaktuPembelian', $tahun)
+          ->where('status', 'Dibatalkan (Tidak dibayar)');
+    })
+    ->with('barang')
+    ->get()
+    ->groupBy(function($item) {
+        return $item->barang->kategori ?? 'Lainnya';
+    })
+    ->map(function($group) {
+        return $group->count();
+    });
+
+    // Gabungkan data kategori sesuai urutan di gambar
+    $dataKategori = [];
+    foreach ($kategoriList as $namaKategori) {
+        $dataKategori[] = [
+            'nama' => $namaKategori,
+            'terjual' => $terjual[$namaKategori] ?? '...',
+            'gagal' => $gagal[$namaKategori] ?? '...',
+        ];
+    }
+
+    // Hitung total (hanya angka, bukan ...)
+    $totalTerjual = 0;
+    $totalGagal = 0;
+    foreach ($dataKategori as $row) {
+        $totalTerjual += is_numeric($row['terjual']) ? $row['terjual'] : 0;
+        $totalGagal += is_numeric($row['gagal']) ? $row['gagal'] : 0;
+    }
+
+    // Untuk API
+    if ($request->wantsJson()) {
+        return response()->json([
+            'tahun' => $tahun,
+            'data' => $dataKategori,
+            'total_terjual' => $totalTerjual,
+            'total_gagal' => $totalGagal,
+        ]);
+    }
+
+    // Untuk PDF
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('nota.pdf.notaPerKategoriBarang', [
+        'dataKategori' => $dataKategori,
+        'tahun' => $tahun,
+        'tanggalCetak' => now()->format('d F Y'),
+        'totalTerjual' => $totalTerjual,
+        'totalGagal' => $totalGagal,
+    ]);
+    return $pdf->stream('laporan-penjualan-per-kategori-barang.pdf');
+}
 }

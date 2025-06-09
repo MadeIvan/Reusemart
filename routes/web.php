@@ -137,5 +137,7 @@ Route::get('/pembeli/MyProfile', function () {
     return view('Pembeli.profilePembeli');
 });
 
+Route::get('/laporan-per-kategori-barang', [TransaksiPembelianController::class, 'laporanPerKategoriBarang']);
 
+Route::get('/laporan-penitipan-habis', [\App\Http\Controllers\TransaksiPenitipanController::class, 'laporanPenitipanHabis']);
 // Route::get('/products', [BarangController::class, 'index']);
