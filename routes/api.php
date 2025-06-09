@@ -25,7 +25,7 @@ use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ClaimMerchandiseController;
 use App\Http\Controllers\MerchandiseController;
 use App\Models\TransaksiPembelian;
-
+use App\Http\Controllers\FCMTokenController;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
      return response()->json($request->user());
 });
@@ -184,4 +184,6 @@ Route::get('/penjualanBulanan', [TransaksiPembelianController::class, 'sumTotalH
 // Route::middleware(['auth:pegawai','role:1'])->group(function () {
 //     Route::get('/requestDonasi', [RequestDonasiController::class, 'request']);
 // });
-
+Route::middleware('auth:pegawai')->post('/pegawai/register-fcm-token', [FCMTokenController::class, 'registerFcmToken']);
+Route::middleware('auth:penitip')->post('/penitip/register-fcm-token', [FCMTokenController::class, 'registerFcmToken']);
+Route::middleware('auth:pembeli')->post('/pembeli/register-fcm-token', [FCMTokenController::class, 'registerFcmToken']);
