@@ -54,4 +54,8 @@ class TransaksiPembelian extends Model
     public function pointRedemption(){
         return $this->belongsTo(PointRedemption::class,'noNota','transaction_id');
     }
+    public function komisi(){
+        return $this->belongsTo(Komisi::class,'noNota','noNota');
+    }
+    
 }

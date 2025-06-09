@@ -4,7 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BarangController;
 use Illuminate\Support\Facades\Password;
 use App\Http\Controllers\TransaksiPembelianController;
-
+use App\Http\Controllers\RequestDonasiController;
+use App\Models\TransaksiPembelian;
 
 Route::get('/', function () {
     return view('PegawaiGudang.p3llivecode3');
@@ -142,5 +143,24 @@ Route::get('/merchandise', function () {
     return view('Pegawai.Merch');
 });
 
+Route::get('/requestDonasi', function () {
+    return view('Owner.laporanReqDonasi');
+});
+Route::get('/laporanRequestDonasi/pdf', [RequestDonasiController::class, 'notaReqPdf'])->name('nota.pdf.laporanrequestdonasi');
 
+
+Route::get('/laporanStok', function () {
+    return view('Owner.LaporanStok');
+});
+Route::get('/laporanStok/pdf', [BarangController::class, 'notaReqPdf'])->name('nota.pdf.barang');
+// Route::get('/laporanStok/pdf', [BarangController::class, 'notaReqPdf'])->name('nota.pdf.laporanrequestdonasi');
+// Route::get('/laporanRequestDonasi/pdf', [RequestDonasiController::class, 'notaReqPdf'])->name('nota.pdf.laporanrequestdonasi');
+Route::get('/laporanKomisi', function () {
+    return view('Owner.Komisi');
+});
+Route::get('/laporanKomisi/pdf', [BarangController::class, 'notaReqPdf2'])->name('nota.pdf.laporanKomisi');
 // Route::get('/products', [BarangController::class, 'index']);
+Route::get('/laporanPenjualan', function () {
+    return view('Owner.Penjualan');
+});
+Route::get('/laporanPenjualan/pdf', [TransaksiPembelianController::class, 'notaReqPdf'])->name('nota.pdf.laporanPenjualan');

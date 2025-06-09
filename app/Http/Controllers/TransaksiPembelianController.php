@@ -31,6 +31,40 @@ class TransaksiPembelianController extends Controller
 
     return response()->json($pembelians);
 }
+
+public function sumTotalHargaPerMonth()
+    {
+        // Fetch and group the transactions by month, using tanggalWaktuPelunasan
+        $result = TransaksiPembelian::select(
+                DB::raw('MONTH(tanggalWaktuPelunasan) as month'),
+                DB::raw('YEAR(tanggalWaktuPelunasan) as year'),
+                DB::raw('SUM(totalHarga) as total_sum')
+            )
+            ->whereYear('tanggalWaktuPelunasan', 2025)
+            ->groupBy(DB::raw('YEAR(tanggalWaktuPelunasan), MONTH(tanggalWaktuPelunasan)'))
+            ->orderBy(DB::raw('YEAR(tanggalWaktuPelunasan), MONTH(tanggalWaktuPelunasan)'))
+            ->get();
+
+        // Return the results in JSON format
+        return response()->json($result);
+    }
+
+public function notaReqPdf()
+{
+    $result = TransaksiPembelian::select(
+                DB::raw('MONTH(tanggalWaktuPelunasan) as month'),
+                DB::raw('YEAR(tanggalWaktuPelunasan) as year'),
+                DB::raw('SUM(totalHarga) as total_sum')
+            )
+            ->whereYear('tanggalWaktuPelunasan', 2025)
+            ->groupBy(DB::raw('YEAR(tanggalWaktuPelunasan), MONTH(tanggalWaktuPelunasan)'))
+            ->orderBy(DB::raw('YEAR(tanggalWaktuPelunasan), MONTH(tanggalWaktuPelunasan)'))
+            ->get();
+            
+    return Pdf::loadView('nota.pdf.laporanPenjualan', compact('result'))
+            ->setPaper('a4', 'landscape')
+            ->stream("Laporan Penjualan.pdf");
+}
     public function showfornota(){
     $pembelians = TransaksiPembelian::with([
         'detailTransaksiPembelian.barang',
@@ -72,7 +106,7 @@ public function notaPembelianPdf($idTransaksiPenitipan)
 
     public function store(Request $request){
         try {
-            \Log::info('Data masuk:', $request->all());
+            // \Log::info('Data masuk:', $request->all());
 
             $validated = $request->validate([
                 'idAlamat' => 'nullable|string',
@@ -93,7 +127,7 @@ public function notaPembelianPdf($idTransaksiPenitipan)
                 ], 400);
             }
             
-            \Log::info('sisaPoin value:', ['value' => $request->input('sisaPoin'), 'type' => gettype($request->input('sisaPoin'))]);
+            // \Log::info('sisaPoin value:', ['value' => $request->input('sisaPoin'), 'type' => gettype($request->input('sisaPoin'))]);
 
             DB::beginTransaction();
             $yearMonth = date('Y.m');
@@ -111,7 +145,7 @@ public function notaPembelianPdf($idTransaksiPenitipan)
             }
             $newId = $yearMonth . '.' . ($lastNumber + 1);
 
-            \Log::info("ID yang akan digunakan sebagai noNota:", [$newId]);
+            // \Log::info("ID yang akan digunakan sebagai noNota:", [$newId]);
 
             // Simpan transaksi utama
             $transaksiPembelian = TransaksiPembelian::create([
@@ -123,12 +157,12 @@ public function notaPembelianPdf($idTransaksiPenitipan)
                 'totalHarga' => $validated['totalHarga']
             ]);
 
-            \Log::info("transaksiPembelian", [$transaksiPembelian]);
+            // \Log::info("transaksiPembelian", [$transaksiPembelian]);
 
             $idBarangs = $validated['id_barang'];
             // Simpan detail barang
             foreach ($validated['id_barang'] as $idBarang) {
-                \Log::info("ID Barang:", [$idBarang]);
+                // \Log::info("ID Barang:", [$idBarang]);
                 
 
                 DB::table('detailtransaksipembelian')->insert([
@@ -155,7 +189,7 @@ public function notaPembelianPdf($idTransaksiPenitipan)
 
         } catch (Exception $e) {
             DB::rollBack();
-            \Log::error('Error saat simpan transaksi: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
+            // \Log::error('Error saat simpan transaksi: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
 
             return response()->json([
                 "status" => false,
@@ -286,7 +320,7 @@ public function updatePenjadwalan(Request $request, $noNota)
             $idBarangs = $validated['id_barang'];
             // Simpan detail barang
             foreach ($validated['id_barang'] as $idBarang) {
-                \Log::info("ID Barang:", [$idBarang]);
+                // \Log::info("ID Barang:", [$idBarang]);
 
                 DB::table('barang')->where('idBarang', $idBarang)->update([
                     'statusBarang' => 'Tersedia'
@@ -397,11 +431,11 @@ public function tolakVerifikasi(Request $request, $noNota)
             $totalHarga = 0;
 
             foreach ($detailBarang as $detail) {
-                \Log::info("Detail ID Barang: " . $detail->idBarang);
+                // \Log::info("Detail ID Barang: " . $detail->idBarang);
                 $barang = Barang::where('idBarang', $detail->idBarang)->first();
 
                 if ($barang) {
-                    \Log::info("Barang ditemukan: " . $barang->idBarang . " | Harga: " . $barang->hargaBarang);
+                    // \Log::info("Barang ditemukan: " . $barang->idBarang . " | Harga: " . $barang->hargaBarang);
                     $totalHarga += $barang->hargaBarang;
                     $barang->update([
                         'statusBarang' => 'Tersedia'
@@ -420,7 +454,7 @@ public function tolakVerifikasi(Request $request, $noNota)
                 $selisihHarga = abs($totalHarga - $transaksi->totalHarga);
                 $poinTukar = $selisihHarga / 100;
                 $poinAkhir = $pembeli->poin;
-                \Log::info("poinAkhir: " . $pembeli->poin);
+                // \Log::info("poinAkhir: " . $pembeli->poin);
     
                 $poinAwal = $poinAkhir - $poinBonus - $poinBelanja + $poinTukar;
                 
@@ -428,11 +462,11 @@ public function tolakVerifikasi(Request $request, $noNota)
                 $pembeli->save();
                 $transaksi->status = 'Dibatalkan (Bukti Tidak Valid)';
                 $transaksi->save();
-                \Log::info("=== DEBUG ===");
-                \Log::info("poinAwal: $poinAwal");
-                \Log::info("poinBelanja: $poinBelanja");
-                \Log::info("poinBonus: $poinBonus");
-                \Log::info("poinTukar: $poinTukar");
+                // \Log::info("=== DEBUG ===");
+                // \Log::info("poinAwal: $poinAwal");
+                // \Log::info("poinBelanja: $poinBelanja");
+                // \Log::info("poinBonus: $poinBonus");
+                // \Log::info("poinTukar: $poinTukar");
             }else if(($alamat === null && $totalHarga < 1500000)){
                 if($totalHarga >= 500000){
                     $poinBelanja = $totalHarga / 10000;
@@ -440,8 +474,8 @@ public function tolakVerifikasi(Request $request, $noNota)
                     $selisihHarga = abs($totalHarga - ($transaksi->totalHarga));
                     $poinTukar = $selisihHarga / 100;
                     $poinAkhir = $pembeli->poin;
-                    \Log::info("=== DEBUG ===");
-                    \Log::info("poinAkhir: " . $pembeli->poin);
+                    // \Log::info("=== DEBUG ===");
+                    // \Log::info("poinAkhir: " . $pembeli->poin);
 
                     $poinAwal = $poinAkhir - $poinBonus - $poinBelanja + $poinTukar;
                     
@@ -454,8 +488,8 @@ public function tolakVerifikasi(Request $request, $noNota)
                     $selisihHarga = abs($totalHarga - ($transaksi->totalHarga));
                     $poinTukar = $selisihHarga / 100;
                     $poinAkhir = $pembeli->poin;
-                    \Log::info("=== DEBUG ===");
-                    \Log::info("poinAkhir: " . $pembeli->poin);
+                    // \Log::info("=== DEBUG ===");
+                    // \Log::info("poinAkhir: " . $pembeli->poin);
     
                     $poinAwal = $poinAkhir - $poinBelanja + $poinTukar;
                     
@@ -465,13 +499,13 @@ public function tolakVerifikasi(Request $request, $noNota)
                     $transaksi->save();
                 }
                 //($alamat !== null && $totalHarga < 1500000) || 
-                \Log::info("poinAwal: $poinAwal");
-                \Log::info("totalHargaBarang: " .  $totalHarga);
-                \Log::info("totalHarga: $transaksi->totalHarga");
-                \Log::info("selisihHarga:  $selisihHarga");
-                \Log::info("poinAkhir: " . $pembeli->poin);
-                \Log::info("poinBelanja: $poinBelanja");
-                \Log::info("poinTukar: $poinTukar");
+                // \Log::info("poinAwal: $poinAwal");
+                // \Log::info("totalHargaBarang: " .  $totalHarga);
+                // \Log::info("totalHarga: $transaksi->totalHarga");
+                // \Log::info("selisihHarga:  $selisihHarga");
+                // \Log::info("poinAkhir: " . $pembeli->poin);
+                // \Log::info("poinBelanja: $poinBelanja");
+                // \Log::info("poinTukar: $poinTukar");
             }else if($alamat !== null && $totalHarga < 1500000){
                 if($totalHarga >= 500000){
                     $poinBelanja = $totalHarga / 10000;
@@ -479,8 +513,8 @@ public function tolakVerifikasi(Request $request, $noNota)
                     $selisihHarga = abs($totalHarga - ($transaksi->totalHarga - 100000));
                     $poinTukar = $selisihHarga / 100;
                     $poinAkhir = $pembeli->poin;
-                    \Log::info("=== DEBUG ===");
-                    \Log::info("poinAkhir: " . $pembeli->poin);
+                    // \Log::info("=== DEBUG ===");
+                    // \Log::info("poinAkhir: " . $pembeli->poin);
 
                     $poinAwal = $poinAkhir - $poinBonus - $poinBelanja + $poinTukar;
                     
@@ -493,8 +527,8 @@ public function tolakVerifikasi(Request $request, $noNota)
                     $selisihHarga = abs($totalHarga - ($transaksi->totalHarga - 100000));
                     $poinTukar = $selisihHarga / 100;
                     $poinAkhir = $pembeli->poin;
-                    \Log::info("=== DEBUG ===");
-                    \Log::info("poinAkhir: " . $pembeli->poin);
+                    // \Log::info("=== DEBUG ===");
+                    // \Log::info("poinAkhir: " . $pembeli->poin);
     
                     $poinAwal = $poinAkhir - $poinBelanja + $poinTukar;
                     
@@ -504,13 +538,13 @@ public function tolakVerifikasi(Request $request, $noNota)
                     $transaksi->save();
                 }
                 //($alamat !== null && $totalHarga < 1500000) || 
-                \Log::info("poinAwal: $poinAwal");
-                \Log::info("totalHargaBarang: " .  $totalHarga);
-                \Log::info("totalHarga: $transaksi->totalHarga");
-                \Log::info("selisihHarga:  $selisihHarga");
-                \Log::info("poinAkhir: " . $pembeli->poin);
-                \Log::info("poinBelanja: $poinBelanja");
-                \Log::info("poinTukar: $poinTukar");
+                // \Log::info("poinAwal: $poinAwal");
+                // \Log::info("totalHargaBarang: " .  $totalHarga);
+                // \Log::info("totalHarga: $transaksi->totalHarga");
+                // \Log::info("selisihHarga:  $selisihHarga");
+                // \Log::info("poinAkhir: " . $pembeli->poin);
+                // \Log::info("poinBelanja: $poinBelanja");
+                // \Log::info("poinTukar: $poinTukar");
             }
 
 
@@ -574,12 +608,10 @@ public function showAllTransaksiPembeli()
 }
 
 public function index(){
-  $transaksi= TransaksiPembelian::all();
+  $barang= TransaksiPembelian::all();
     return response()->json($barang);
-    return response()->json([
-        "status" => true,
-        "message" => "Get successful",
 
-    ], 200);
 }
+
+
 }

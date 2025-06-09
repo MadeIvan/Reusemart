@@ -5,22 +5,22 @@ namespace App\Http\Controllers;
 use App\Models\ReqDonasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use Barryvdh\DomPDF\Facade\Pdf;
 class RequestDonasiController extends Controller
 {
     // Middleware to ensure that the user is authenticated
     public function __construct()
     {
-        $this->middleware('auth:organisasi'); // Apply authentication to all actions
+        $this->middleware('auth:organisasi')->except('request', 'notaReqPdf'); // Apply authentication to all actions
     }
 
     // Fetch all ReqDonasi data for authenticated user
     public function index(Request $request)
     {
-        \Log::info('Bearer Token:', ['token' => $request->bearerToken()]);
+        // \Log::info('Bearer Token:', ['token' => $request->bearerToken()]);
 
         $user = Auth::user();
-        \Log::info('Authenticated User:', ['user' => $user]);
+        // \Log::info('Authenticated User:', ['user' => $user]);
 
         if (!$user) {
             return response()->json([
@@ -135,7 +135,7 @@ class RequestDonasiController extends Controller
                 'data' => $reqDonasi
             ]);
         } catch (\Exception $e) {
-            Log::error('Error updating request donasi: ' . $e->getMessage());
+            // Log::error('Error updating request donasi: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to update request: ' . $e->getMessage()
@@ -182,11 +182,38 @@ class RequestDonasiController extends Controller
                 'message' => 'Request for donation deleted successfully!'
             ]);
         } catch (\Exception $e) {
-            Log::error('Error deleting request donasi: ' . $e->getMessage());
+            // Log::error('Error deleting request donasi: ' . $e->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to delete request: ' . $e->getMessage()
             ], 500);
         }
     }
+    public function request(){
+        $requestDonasi = ReqDonasi::with([
+            'transaksiDonasi.barang',
+            'organisasi',
+        ])
+        ->where('status', 'Pending')
+        ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $requestDonasi
+        ]);
+    }
+
+
+    public function notaReqPdf()
+    {
+        $reqDonasi = ReqDonasi::with([
+            'transaksiDonasi.barang',
+            'organisasi',
+        ])->where('status', 'Pending')->get();
+
+        return Pdf::loadView('nota.pdf.laporanRequestDonasi', compact('reqDonasi'))
+            ->setPaper('a4', 'landscape')
+            ->stream("Laporan Request Donasi.pdf");
+    }
+    
 }

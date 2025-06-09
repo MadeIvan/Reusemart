@@ -187,6 +187,15 @@
             leftMenu.appendChild(createItem("/pegawai/penjadwalan", "Penjadwalan Barang"));
             leftMenu.appendChild(createItem("/pegawai/ViewNota", "Nota Pembelian Barang"));
             rightMenu.appendChild(createLogout());   
+            }else if (role==="owner"){
+                leftMenu.appendChild(createItem("/pegawaidata", "Profile"));
+                leftMenu.appendChild(createItem("/requestDonasi", "Request Donasi"));
+                leftMenu.appendChild(createItem("/donasi", "Donasi"));
+                leftMenu.appendChild(createItem("/laporanPenitip", "Penitip"));
+                leftMenu.appendChild(createItem("/laporanPenjualan", "Penjualan"));
+                leftMenu.appendChild(createItem("/laporanKomisi", "Komisi"));
+                leftMenu.appendChild(createItem("/laporanStok", "Gudang"));
+                rightMenu.appendChild(createLogout());  
             }
         }
     });

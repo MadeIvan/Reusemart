@@ -24,6 +24,7 @@ use App\Http\Controllers\ImagesBarangController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ClaimMerchandiseController;
 use App\Http\Controllers\MerchandiseController;
+use App\Models\TransaksiPembelian;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
      return response()->json($request->user());
@@ -164,6 +165,7 @@ Route::get('/pegawaiGethunters', [PegawaiController::class, 'getHunters']);
 Route::get('/getpenitip', [PenitipController::class, 'getPenitip']);
 Route::post('/barang',[BarangController::class,'store']);
 Route::get('/indexall',[BarangController::class,'indexall']);
+Route::get('/indexall2',[BarangController::class,'indexall2']);
 
 Route::post('/addimages', [ImagesBarangController::class, 'store']);
 Route::get('/generate-idbarang', [BarangController::class, 'generateIdBarang']);
@@ -177,4 +179,9 @@ Route::get('/add30/{id}', [TransaksiPenitipanController::class, 'add30']);
 Route::get('/getClaim', [ClaimMerchandiseController::class, 'index']);
 Route::get('/getMerch', [MerchandiseController::class, 'index']);
 Route::put('/saveClaim/{id}', [ClaimMerchandiseController::class, 'update']);
+Route::get('/requestDonasi', [RequestDonasiController::class, 'request']);
+Route::get('/penjualanBulanan', [TransaksiPembelianController::class, 'sumTotalHargaPerMonth']);
+// Route::middleware(['auth:pegawai','role:1'])->group(function () {
+//     Route::get('/requestDonasi', [RequestDonasiController::class, 'request']);
+// });
 
