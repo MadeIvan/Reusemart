@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
     <title>Reusemart - Laporan Penjualan</title>
     <style>
         body { font-family: Arial, sans-serif; font-size: 13px; }
@@ -14,7 +14,7 @@
         .chart {
             display: flex;
             align-items: flex-end;
-            height: 300px; /* Increased height to accommodate larger values */
+            height: 300px; /* Adjust height to accommodate larger values */
             margin-top: 20px;
             margin-bottom: 20px;
         }
@@ -47,8 +47,10 @@
         <div style="margin-bottom: 12px;">Jl. Green Eco Park No. 456 Yogyakarta</div>
 
         <div class="header" style="text-decoration: underline;">Laporan Penjualan Bulanan </div>
-        <div style="margin-bottom: 12px;">Tanggal cetak: {{ now()->locale('id')->translatedFormat('d F Y')}}</div>
+        <div>Tahun :  {{ now()->locale('id')->translatedFormat('Y') }}</div>
+        <div style="margin-bottom: 12px;">Tanggal cetak: {{ now()->locale('id')->translatedFormat('d F Y') }}</div>
 
+        <!-- Table displaying sales data -->
         <table style="border-collapse: collapse; width: 100%;" border="1" cellspacing="0" cellpadding="6">
             <thead>
                 <tr>
@@ -60,28 +62,24 @@
             <tbody>
                 @foreach ($result as $bar)
                     <tr>
-                        <td>{{ $bar['month'] }}</td>
+                        <td>{{ \Carbon\Carbon::createFromFormat('m', $bar['month'])->format('F') }}</td>
                         <td>{{ $bar['jumlah'] ?? '-' }}</td>
-                        <td>{{ $bar['total_sum'] }}</td>
+                        <td>{{ number_format($bar['total_sum'], 0, ',', '.') }}</td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
-    </div>
 
-    <div class="chart">
-        @foreach ($result as $bar)
-            <!-- Adjusting the bar height by scaling the total_sum value -->
-            <div class="bar" style="height: {{ $bar['total_sum'] / 200000 }}px;">
-                <span>{{ number_format($bar['total_sum'], 0, ',', '.') }}</span>
-            </div>
-        @endforeach
-    </div>
+        <!-- Bar chart displaying total_sum per month -->
+        <div class="chart">
+            @foreach ($result as $bar)
+                <div class="bar" style="height: {{ $bar['total_sum'] / 200000 }}px;">
+                    <span>{{ $bar['total_sum'] }}</span>
+                </div>
+            @endforeach
+        </div>
 
-    <div style="display: flex; justify-content: space-between;">
-        @foreach ($result as $bar)
-            <div class="month-label">{{ $bar['month'] }}</div>
-        @endforeach
+        
     </div>
 </body>
 </html>

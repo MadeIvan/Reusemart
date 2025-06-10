@@ -26,6 +26,9 @@ use App\Http\Controllers\ClaimMerchandiseController;
 use App\Http\Controllers\MerchandiseController;
 use App\Models\TransaksiPembelian;
 use App\Http\Controllers\FCMTokenController;
+use App\Models\TopSeller;
+use App\Http\Controllers\TopSellerController;
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
      return response()->json($request->user());
 });
@@ -98,6 +101,7 @@ Route::middleware(['auth:sanctum', 'auth.pembeli'])->group(function () {
     
     Route::post('/buat-diskusi/{id}', [DiskusiController::class, 'store']);
     Route::get('/pembeli/getData', [PembeliController::class, 'getData']);
+    
     Route::put('/updatePoin', [PembeliController::class, 'updatePoin']);
     Route::post('/tambah-keranjang/{id}', [PembeliController::class, 'addToCart']);
     Route::get('/keranjang', [PembeliController::class, 'getCart']);
@@ -115,6 +119,7 @@ Route::middleware(['auth:penitip'])->group(function () {
     Route::get('/penitip/profile', [PenitipController::class, 'myData']);
     Route::post('/logout', [LoginController::class, 'logout']);
     Route::get('/penitip/history', [PenitipController::class, 'loadBarang']);
+    Route::get('/penitip/getData', [PenitipController::class, 'getData']);
 });
 
 // === Barang, Diskusi, RequestDonasi, Donasi, etc. ===
@@ -166,6 +171,9 @@ Route::get('/getpenitip', [PenitipController::class, 'getPenitip']);
 Route::post('/barang',[BarangController::class,'store']);
 Route::get('/indexall',[BarangController::class,'indexall']);
 Route::get('/indexall2',[BarangController::class,'indexall2']);
+Route::get('/indexall3',[BarangController::class,'indexall3']);
+Route::get('/indexall3/{idBarang}',[BarangController::class,'indexByIdBarang']);
+Route::get('/generate-pdf/{idBarang}', [BarangController::class, 'createpdfbyid']);
 
 Route::post('/addimages', [ImagesBarangController::class, 'store']);
 Route::get('/generate-idbarang', [BarangController::class, 'generateIdBarang']);
@@ -187,3 +195,5 @@ Route::get('/penjualanBulanan', [TransaksiPembelianController::class, 'sumTotalH
 Route::middleware('auth:pegawai')->post('/pegawai/register-fcm-token', [FCMTokenController::class, 'registerFcmToken']);
 Route::middleware('auth:penitip')->post('/penitip/register-fcm-token', [FCMTokenController::class, 'registerFcmToken']);
 Route::middleware('auth:pembeli')->post('/pembeli/register-fcm-token', [FCMTokenController::class, 'registerFcmToken']);
+
+Route::get('/topSeller/get', [TopSellerController::class, 'index']);

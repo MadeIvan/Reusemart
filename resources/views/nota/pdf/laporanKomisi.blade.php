@@ -21,6 +21,8 @@
         <div style="margin-bottom: 12px;">Jl. Green Eco Park No. 456 Yogyakarta</div>
 
         <div class="header"  style="text-decoration: underline;">Laporan Komisi</div>
+        <div >Bulan: {{ now()->locale('id')->translatedFormat('F') }}</div>
+        <div >Tahun: {{ now()->year }}</div>
         <div style="margin-bottom: 12px;">Tanggal cetak: {{ now()->locale('id')->translatedFormat('d F Y')}}</div>
 
         <table style="border-collapse: collapse; width: 100%; " border="1" cellspacing="0" cellpadding="6">
@@ -37,19 +39,43 @@
                 </tr>
             </thead>
             <tbody>
+                @php
+                    $totalHarga = 0;
+                    $totalKomisiHunter = 0;
+                    $totalKomisiMart = 0;
+                    $totalBonusPenitip = 0;
+                @endphp
+
                 @foreach ($result as $bar)
+                    @php
+                        $totalHarga += $bar['hargaBarang'];
+                        $totalKomisiHunter += $bar['komisiHunter'] ?? 0;
+                        $totalKomisiMart += $bar['komisiMart'];
+                        $totalBonusPenitip += $bar['bonusPenitip'] ?? 0;
+                    @endphp
 
                     <tr>
                         <td>{{ $bar['idBarang'] }}</td>
                         <td>{{ $bar['namaBarang'] }}</td>
-                        <td>{{ $bar['hargaBarang'] }}</td>
+                        <td>{{ number_format($bar['hargaBarang'], 0, ',', '.') }}</td>
                         <td>{{ $bar['tanggalMasuk'] }}</td>
                         <td>{{ $bar['tanggalLaku'] }}</td>
-                        <td>{{ $bar['komisiHunter'] ?? '0' }}</td>
-                        <td>{{ $bar['komisiMart'] }}</td>
-                        <td>{{ $bar['bonusPenitip'] ?? '0' }}</td>
+                        <td>{{ number_format($bar['komisiHunter'], 0, ',', '.') }} </td>
+                        <td>{{ number_format($bar['komisiMart'], 0, ',', '.') }}</td>
+                        <td>{{ number_format($bar['bonusPenitip'], 0, ',', '.') }}</td>
                     </tr>
                 @endforeach
+
+                <tr>
+                    <td></td>
+                    <td>Total</td>
+                    <td>{{ number_format($totalHarga, 0, ',', '.') }}</td>
+                    <td></td>
+                    <td></td>
+                    <td>{{ number_format($totalKomisiHunter, 0, ',', '.') }}</td>
+                    <td>{{ number_format($totalKomisiMart, 0, ',', '.') }}</td>
+                    <td>{{ number_format($totalBonusPenitip, 0, ',', '.') }}</td>
+                </tr>
             </tbody>
         </table>
     </div>

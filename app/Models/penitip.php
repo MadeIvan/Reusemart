@@ -25,7 +25,8 @@ class Penitip extends Authenticatable
         'namaPenitip',
         'idPenitip',
         'deleted_at',
-        'alamat'
+        'alamat',
+        'email'
     ];
 
     protected $hidden = [

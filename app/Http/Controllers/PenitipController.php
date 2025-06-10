@@ -47,7 +47,17 @@ class PenitipController extends Controller
             ],
         ]);
     }
-
+    public function getData(Request $request)    
+    {
+        // $penitip = $request->user();
+        $penitip = auth('penitip')->user()->load('dompet');
+        
+        return response()->json([
+            "status" => true,
+            "message" => "User retrieved successfully",
+            "data" => $penitip
+        ]);
+    }
     // Get all penitip data
     public function getAllPenitip()
     {
@@ -65,6 +75,7 @@ class PenitipController extends Controller
             'password' => 'required|string|min:6',
             'namaPenitip' => 'required|string|max:255',
             'nik' => 'required|string|size:16',
+            "email"=>'required|string'
         ]);
 
         if ($validator->fails()) {
@@ -79,11 +90,11 @@ class PenitipController extends Controller
             $lastPenitip = DB::select("SELECT MAX(CAST(SUBSTRING(idPenitip, 2) AS UNSIGNED)) AS last_id FROM penitip");
             $lastPenitip = $lastPenitip[0]->last_id;
             $newId = $lastPenitip ? 'T' . ($lastPenitip + 1) : 'T1';
-            \Log::info("Created new penitip ID: {$newId}");
+            // \Log::info("Created new penitip ID: {$newId}");
             $dompet = (new DompetController)->createDompetPenitip(null);
             $idDompet = (string) $dompet->idDompet;
 
-            \Log::info("Created new dompet with ID: {$idDompet}");
+            // \Log::info("Created new dompet with ID: {$idDompet}");
             $penitip = Penitip::create([
                 'idPenitip' => $newId,
                 'username' => $request->username,
@@ -181,7 +192,7 @@ public function deletePenitip($id){
     public function myData(Request $request)    
     {
         // $penitip = $request->user();
-         $penitip = auth('penitip')->user()->load('dompet');
+$penitip = auth('penitip')->user()->load('dompet');
 
         return response()->json([
             "status" => true,

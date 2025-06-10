@@ -7,8 +7,11 @@ use App\Http\Controllers\TransaksiPembelianController;
 use App\Http\Controllers\RequestDonasiController;
 use App\Models\TransaksiPembelian;
 
+// Route::get('/', function () {
+//     return view('Pegawai.Merch');
+// });
 Route::get('/', function () {
-    return view('PegawaiGudang.p3llivecode3');
+    return view('Pegawai.Merch');
 });
 Route::get('/home', function () {
     return view('home');

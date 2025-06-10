@@ -193,6 +193,312 @@ public function indexall2()
         ], 500);
     }
 }
+public function indexall3()
+{
+    try {
+        $currentYear = Carbon::now()->year;
+        $currentMonth = Carbon::now()->month;
+
+        // Fetch barang with necessary relationships, filtered by the current month and year
+        $barang = Barang::with('detailTransaksiPenitipan.transaksiPenitipan.penitip', 
+                                'detailTransaksiPenitipan.transaksiPenitipan.pegawai', 
+                                'detailTransaksiPenitipan.transaksiPenitipan.pegawai2',
+                                'detailTransaksiPembelian.transaksiPembelian',
+                                'detailTransaksiPembelian.transaksiPembelian.komisi')
+                        ->where('statusBarang', 'Terjual')
+                        ->whereHas('detailTransaksiPenitipan.transaksiPenitipan', function($query) {
+                            // Only include items where idPegawai2 is not null in transaksiPenitipan
+                            $query->whereNotNull('idPegawai2');
+                        })
+                        
+                        ->get();
+
+    $result = $barang->map(function($item) {
+        // Get transaksiPenitipan instance safely
+        $transaksi = optional($item->detailTransaksiPenitipan)->transaksiPenitipan;
+        $pembelian = $item->detailTransaksiPembelian->first();
+        // Access the main pegawai (idPegawai1) from transaksiPenitipan
+        $namaPegawai = optional(optional($transaksi)->pegawai)->namaPegawai;
+        $tanggalLaku = optional(optional($pembelian)->transaksiPembelian)->tanggalWaktuPelunasan;
+        // Access the second pegawai (idPegawai2) if it exists
+        $namaHunter = optional(optional($transaksi)->pegawai2)->namaPegawai;
+
+    // If namaHunter is null, return null to filter out this item later
+        if (is_null($namaHunter)) {
+            return null; // Filter out this item if namaHunter is null
+        }
+        if (!$namaHunter) {
+        return null; // Filter out this item if namaHunter is null
+        }
+        $status = 'Tidak'; // Default status
+        $tanggalPenitipan = optional($transaksi)->tanggalPenitipan;
+        $tanggalPenitipanSelesai = optional($transaksi)->tanggalPenitipanSelesai;
+        $komisiHunter = optional(optional($pembelian)->transaksiPembelian)->komisi->komisiHunter;
+        if(!$komisiHunter){
+            return null;
+        }
+        $komisiMart = 0.20 * $item->hargaBarang;
+        $bonusPenitip = 0;
+
+        // Calculate the difference between tanggalMasuk and tanggalLaku
+        $tanggalMasuk = optional($item)->tanggalMasuk;
+        if ($tanggalMasuk && $tanggalLaku) {
+            $diffInDays = Carbon::parse($tanggalLaku)->diffInDays(Carbon::parse($tanggalMasuk));
+
+            if ($diffInDays < 7) {
+                // If the difference is less than 7 days, give 25% of komisiMart as bonusPenitip
+                $bonusPenitip = 0.25 * $komisiMart;
+                // Reduce komisiMart to 15% of hargaBarang
+                $komisiMart = 0.15 * $item->hargaBarang;
+            }
+        }
+        if ($tanggalPenitipan && $tanggalPenitipanSelesai) {
+            $diffInDays = (new \DateTime($tanggalPenitipanSelesai))->diff(new \DateTime($tanggalPenitipan))->days;
+            if ($diffInDays > 30) {
+                $status = 'Ya'; // Set status to 'Ya' if the difference is greater than 30 days
+            }
+        }
+
+        return [
+            'idBarang' => $item->idBarang,
+            'namaBarang' => $item->namaBarang,
+            'beratBarang' => $item->beratBarang,
+            'garansiBarang' => $item->garansiBarang,
+            'periodeGaransi' => $item->periodeGaransi,
+            'hargaBarang' => $item->hargaBarang,
+            'haveHunter' => $item->haveHunter,
+            'statusBarang' => $item->statusBarang,
+            'image' => $item->image,
+            'kategori' => $item->kategori,
+            'komisiHunter' => $komisiHunter,
+            'komisi' => optional(optional($pembelian)->transaksiPembelian)->komisi,
+            'tanggalMasuk' => optional($transaksi)->tanggalPenitipan,
+            'tanggalPenitipanSelesai' => optional($transaksi)->tanggalPenitipanSelesai,
+            'namaPenitip' => optional(optional($transaksi)->penitip)->namaPenitip,
+            'idPenitip' => optional(optional($transaksi)->penitip)->idPenitip,
+            'namaPegawai' => $namaPegawai, // Set namaHunter from pegawai's namaPegawai
+            'namaHunter' => $namaHunter,
+            'tanggalLaku' => $tanggalLaku,
+            'komisiMart' => $komisiMart,
+            'bonusPenitip' => $bonusPenitip,
+            'status'=> $status, // Set namaHunter2 from pegawai2's namaPegawai if idPegawai2 exists
+            // Include all transaksiPenitipan attributes as a nested array
+            
+            
+        ];
+    });
+    
+
+    return response()->json($result);
+} catch (\Exception $e) {
+        return response()->json([
+            'error' => 'An error occurred while fetching the products.',
+            'message' => $e->getMessage(),
+            'status' => true
+        ], 500);
+    }
+}
+
+public function indexByIdBarang($idBarang)
+{
+    try {
+        // Fetch barang with necessary relationships, filtered by idBarang
+        // Additionally, filter by idBarang and idPegawai2 (namaHunter)
+        $barang = Barang::with('detailTransaksiPenitipan.transaksiPenitipan.penitip', 
+                                'detailTransaksiPenitipan.transaksiPenitipan.pegawai', 
+                                'detailTransaksiPenitipan.transaksiPenitipan.pegawai2',
+                                'detailTransaksiPembelian.transaksiPembelian',
+                                'detailTransaksiPembelian.transaksiPembelian.komisi')
+                        ->where('statusBarang', 'Terjual')
+                        ->where('idBarang', $idBarang) // Filter by the specified idBarang
+                        ->whereHas('detailTransaksiPenitipan.transaksiPenitipan', function($query) {
+                            // Only include items where idPegawai2 is not null in transaksiPenitipan
+                            $query->whereNotNull('idPegawai2');
+                        })
+                        ->get();
+
+        $result = $barang->map(function($item) {
+            // Get transaksiPenitipan instance safely
+            $transaksi = optional($item->detailTransaksiPenitipan)->transaksiPenitipan;
+            $pembelian = $item->detailTransaksiPembelian->first();
+            // Access the main pegawai (idPegawai1) from transaksiPenitipan
+            $namaPegawai = optional(optional($transaksi)->pegawai)->namaPegawai;
+            $tanggalLaku = optional(optional($pembelian)->transaksiPembelian)->tanggalWaktuPelunasan;
+            // Access the second pegawai (idPegawai2) if it exists
+            $namaHunter = optional(optional($transaksi)->pegawai2)->namaPegawai;
+
+            // If namaHunter is null, return null to filter out this item later
+            if (is_null($namaHunter)) {
+                return null; // Filter out this item if namaHunter is null
+            }
+
+            $status = 'Tidak'; // Default status
+            $tanggalPenitipan = optional($transaksi)->tanggalPenitipan;
+            $tanggalPenitipanSelesai = optional($transaksi)->tanggalPenitipanSelesai;
+            $komisiHunter = optional(optional($pembelian)->transaksiPembelian)->komisi->komisiHunter;
+            if (!$komisiHunter) {
+                return null;
+            }
+            $komisiMart = 0.20 * $item->hargaBarang;
+            $bonusPenitip = 0;
+
+            // Calculate the difference between tanggalMasuk and tanggalLaku
+            $tanggalMasuk = optional($item)->tanggalMasuk;
+            if ($tanggalMasuk && $tanggalLaku) {
+                $diffInDays = Carbon::parse($tanggalLaku)->diffInDays(Carbon::parse($tanggalMasuk));
+
+                if ($diffInDays < 7) {
+                    // If the difference is less than 7 days, give 25% of komisiMart as bonusPenitip
+                    $bonusPenitip = 0.25 * $komisiMart;
+                    // Reduce komisiMart to 15% of hargaBarang
+                    $komisiMart = 0.15 * $item->hargaBarang;
+                }
+            }
+
+            if ($tanggalPenitipan && $tanggalPenitipanSelesai) {
+                $diffInDays = (new \DateTime($tanggalPenitipanSelesai))->diff(new \DateTime($tanggalPenitipan))->days;
+                if ($diffInDays > 30) {
+                    $status = 'Ya'; // Set status to 'Ya' if the difference is greater than 30 days
+                }
+            }
+
+            return [
+                'idBarang' => $item->idBarang,
+                'namaBarang' => $item->namaBarang,
+                'beratBarang' => $item->beratBarang,
+                'garansiBarang' => $item->garansiBarang,
+                'periodeGaransi' => $item->periodeGaransi,
+                'hargaBarang' => $item->hargaBarang,
+                'haveHunter' => $item->haveHunter,
+                'statusBarang' => $item->statusBarang,
+                'image' => $item->image,
+                'kategori' => $item->kategori,
+                'komisiHunter' => $komisiHunter,
+                'komisi' => optional(optional($pembelian)->transaksiPembelian)->komisi,
+                'tanggalMasuk' => optional($transaksi)->tanggalPenitipan,
+                'tanggalPenitipanSelesai' => optional($transaksi)->tanggalPenitipanSelesai,
+                'namaPenitip' => optional(optional($transaksi)->penitip)->namaPenitip,
+                'idPenitip' => optional(optional($transaksi)->penitip)->idPenitip,
+                'namaPegawai' => $namaPegawai,
+                'namaHunter' => $namaHunter,
+                'tanggalLaku' => $tanggalLaku,
+                'komisiMart' => $komisiMart,
+                'bonusPenitip' => $bonusPenitip,
+                'status' => $status,
+            ];
+        });
+
+        return response()->json($result);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'An error occurred while fetching the products.',
+            'message' => $e->getMessage(),
+            'status' => true
+        ], 500);
+    }
+}
+
+public function createpdfbyid($idBarang)
+{
+    try {
+        // Fetch barang with necessary relationships, filtered by idBarang
+        // Additionally, filter by idBarang and idPegawai2 (namaHunter)
+        $barang = Barang::with('detailTransaksiPenitipan.transaksiPenitipan.penitip', 
+                                'detailTransaksiPenitipan.transaksiPenitipan.pegawai', 
+                                'detailTransaksiPenitipan.transaksiPenitipan.pegawai2',
+                                'detailTransaksiPembelian.transaksiPembelian',
+                                'detailTransaksiPembelian.transaksiPembelian.komisi')
+                        ->where('statusBarang', 'Terjual')
+                        ->where('idBarang', $idBarang) // Filter by the specified idBarang
+                        ->whereHas('detailTransaksiPenitipan.transaksiPenitipan', function($query) {
+                            // Only include items where idPegawai2 is not null in transaksiPenitipan
+                            $query->whereNotNull('idPegawai2');
+                        })
+                        ->get();
+
+        $result = $barang->map(function($item) {
+            // Get transaksiPenitipan instance safely
+            $transaksi = optional($item->detailTransaksiPenitipan)->transaksiPenitipan;
+            $pembelian = $item->detailTransaksiPembelian->first();
+            // Access the main pegawai (idPegawai1) from transaksiPenitipan
+            $namaPegawai = optional(optional($transaksi)->pegawai)->namaPegawai;
+            $tanggalLaku = optional(optional($pembelian)->transaksiPembelian)->tanggalWaktuPelunasan;
+            // Access the second pegawai (idPegawai2) if it exists
+            $namaHunter = optional(optional($transaksi)->pegawai2)->namaPegawai;
+
+            // If namaHunter is null, return null to filter out this item later
+            if (is_null($namaHunter)) {
+                return null; // Filter out this item if namaHunter is null
+            }
+
+            $status = 'Tidak'; // Default status
+            $tanggalPenitipan = optional($transaksi)->tanggalPenitipan;
+            $tanggalPenitipanSelesai = optional($transaksi)->tanggalPenitipanSelesai;
+            $komisiHunter = optional(optional($pembelian)->transaksiPembelian)->komisi->komisiHunter;
+            if (!$komisiHunter) {
+                return null;
+            }
+            $komisiMart = 0.20 * $item->hargaBarang;
+            $bonusPenitip = 0;
+
+            // Calculate the difference between tanggalMasuk and tanggalLaku
+            $tanggalMasuk = optional($item)->tanggalMasuk;
+            if ($tanggalMasuk && $tanggalLaku) {
+                $diffInDays = Carbon::parse($tanggalLaku)->diffInDays(Carbon::parse($tanggalMasuk));
+
+                if ($diffInDays < 7) {
+                    // If the difference is less than 7 days, give 25% of komisiMart as bonusPenitip
+                    $bonusPenitip = 0.25 * $komisiMart;
+                    // Reduce komisiMart to 15% of hargaBarang
+                    $komisiMart = 0.15 * $item->hargaBarang;
+                }
+            }
+
+            if ($tanggalPenitipan && $tanggalPenitipanSelesai) {
+                $diffInDays = (new \DateTime($tanggalPenitipanSelesai))->diff(new \DateTime($tanggalPenitipan))->days;
+                if ($diffInDays > 30) {
+                    $status = 'Ya'; // Set status to 'Ya' if the difference is greater than 30 days
+                }
+            }
+
+            return [
+                'idBarang' => $item->idBarang,
+                'namaBarang' => $item->namaBarang,
+                'beratBarang' => $item->beratBarang,
+                'garansiBarang' => $item->garansiBarang,
+                'periodeGaransi' => $item->periodeGaransi,
+                'hargaBarang' => $item->hargaBarang,
+                'haveHunter' => $item->haveHunter,
+                'statusBarang' => $item->statusBarang,
+                'image' => $item->image,
+                'kategori' => $item->kategori,
+                'komisiHunter' => $komisiHunter,
+                'komisi' => optional(optional($pembelian)->transaksiPembelian)->komisi,
+                'tanggalMasuk' => optional($transaksi)->tanggalPenitipan,
+                'tanggalPenitipanSelesai' => optional($transaksi)->tanggalPenitipanSelesai,
+                'namaPenitip' => optional(optional($transaksi)->penitip)->namaPenitip,
+                'idPenitip' => optional(optional($transaksi)->penitip)->idPenitip,
+                'namaPegawai' => $namaPegawai,
+                'namaHunter' => $namaHunter,
+                'tanggalLaku' => $tanggalLaku,
+                'komisiMart' => $komisiMart,
+                'bonusPenitip' => $bonusPenitip,
+                'status' => $status,
+            ];
+        });
+
+        return Pdf::loadView('nota.pdf.laporantest', compact('result'))
+            ->setPaper('a4', 'landscape')
+            ->stream("Laporan Stok Barang.pdf");
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'An error occurred while fetching the products.',
+            'message' => $e->getMessage(),
+            'status' => true
+        ], 500);
+    }
+}
+
 public function notaReqPdf()
 {
     $barang = Barang::with('detailTransaksiPenitipan.transaksiPenitipan.penitip', 

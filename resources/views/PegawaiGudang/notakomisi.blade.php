@@ -265,11 +265,9 @@
             <table class="table table-bordered" id="pegawaiTable">
                 <thead>
                     <tr>
-                        <th>ID Barang</th>
+                        
                         <th>Nama Barang</th>
-                        <th>Nama Penitip</th>
-                        <th>Status</th>
-                        <th>Tanggal kadaluarsa</th>
+                   
                         <!-- <th>Password</th>  -->
                     </tr>
                 </thead>
@@ -363,7 +361,7 @@
             // Fetch Pegawai Data
             async function fetchPegawai() {
                 try {
-                    const response = await fetch("http://127.0.0.1:8000/api/livecode/2025-06-03", {
+                    const response = await fetch("http://127.0.0.1:8000/api/indexall3", {
                         method: "GET",
                         headers: { "Authorization": `Bearer ${localStorage.getItem('auth_token')}` },
                     });
@@ -397,21 +395,34 @@
                 data.forEach(item => {
                     const row = document.createElement("tr");
                     row.innerHTML = `
-                        <td>${item.idTransaksiPenitipan}</td>
-                        <td>${item.namaBarang || '-'}</td>
-                        <td>${item.namaPenitip || '-'}</td>
-                        <td>Tersedia</td>
-                        <td>${item.tanggalPenitipanSelesai || '-'}</td>
+                        <td>${item.namaHunter}</td>
+
                     `;
                     row.addEventListener("click", () => {
-                        currentItem = item;  // full item for edit modal
-                        currentItemId = item.idTransaksiPenitipan; // id for printing
-                        console.log("selected item:", currentItem);
-                        
-                        const tanggalSelesai=item.tanggalPenitipanSelesai;
-                        console.log(tanggalSelesai);
-                        // actionModal.show();
-                    });
+    // Get the idBarang from the clicked row item
+    const currentItem = item.idBarang; // id for printing
+    console.log("selected item:", currentItem);
+
+    // Call the backend (Laravel) function to generate the PDF
+    fetch(`http://127.0.0.1:8000/api/generate-pdf/${currentItem}`, { // Adjust the URL to match your route
+        method: 'GET',
+        headers: {
+            'Accept': 'application/pdf',
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.blob())  // Read the response as a blob
+    .then(blob => {
+        // Create an object URL for the blob and trigger download or display
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `Laporan_Stok_Barang_${currentItem}.pdf`;  // Set the desired filename
+        link.click();  // Simulate a click to start the download
+    })
+    .catch(error => {
+        console.error("Error generating PDF:", error);
+    });
+});
                     tableBody.appendChild(row);
                 });
             }
@@ -445,13 +456,13 @@
             console.log("Retrieved rolei:", user_role);
             async function fetchHunters() {
                 try {
-                    const response = await fetch("http://127.0.0.1:8000/api/pegawaiGethunters", {
+                    const response = await fetch("http://127.0.0.1:8000/api/indexall3", {
                         method: "GET",
                         headers: {
                             "Authorization": `Bearer ${localStorage.getItem('auth_token')}`
                         }
                     });
-
+                    
                     const data = await response.json();
                     console.log("Fetched Hunters:", data);
 

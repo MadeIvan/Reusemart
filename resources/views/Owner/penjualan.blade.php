@@ -133,16 +133,27 @@
                     const differenceInDays = differenceInMilliseconds / (1000 * 3600 * 24);
                     const status = differenceInDays > 30 ? "Ya" : "Tidak";
                     row.innerHTML = `
-                        <td>${item.month|| '-'}</td>
-                        <td>${item.Jumlah|| '-'}</td>
-                        <td>${item.total_sum|| '0'}</td>
+                        <td>${getMonthName(item.month) || '-'}</td>
+                        <td>${item.Jumlah || '-'}</td>
+                        <td>${formatDecimal(item.total_sum) || '0'}</td>
 
                     `;
                     
                     bodyRequest.appendChild(row);
                 });
     }
+    function getMonthName(month) {
+    const months = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+    return months[month - 1]; // months are 0-indexed, so subtract 1
+}
 
+// Function to format total_sum as a decimal with thousand separators
+function formatDecimal(number) {
+    return new Intl.NumberFormat('id-ID', { style: 'decimal', maximumFractionDigits: 2 }).format(number);
+}
         function showLoading(show) {
             const bodyRequest = document.getElementById('dataTable');
             if (show) {
