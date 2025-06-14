@@ -7,10 +7,8 @@
     <title>Reusemart</title>
 
     <script>
-    // Cek token saat halaman dimuat
         document.addEventListener("DOMContentLoaded", function() {
             if (!localStorage.getItem("auth_token")) {
-                // Jika token tidak ada, redirect ke halaman login
                 window.location.href = "{{ url('/UsersLogin') }}";
             }
         });
@@ -259,8 +257,7 @@
             
           
             fetchAlamat();
-
-
+            
             const kecamatanData = {
                 bantul: ["Bambanglipuro", "Bantul", "Banguntapan", "Jetis", "Kasihan", "Pajangan", "Pandak", "Sanden", "Sedayu", "Sewon", "Pleret", "Imogiri"],
                 sleman: ["Depok", "Gamping", "Godean", "Minggir", "Mlati", "Ngaglik", "Ngemplak", "Pakem", "Prambanan", "Seyegan", "Tempel", "Turi"],

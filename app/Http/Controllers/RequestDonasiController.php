@@ -3,15 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\ReqDonasi;
+use App\Models\RequestDonasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class RequestDonasiController extends Controller
 {
     // Middleware to ensure that the user is authenticated
     public function __construct()
     {
-        $this->middleware('auth:organisasi'); // Apply authentication to all actions
+        $this->middleware('auth:organisasi')->except('request', 'notaReqPdf'); // Apply authentication to all actions
     }
 
     // Fetch all ReqDonasi data for authenticated user
@@ -188,5 +190,32 @@ class RequestDonasiController extends Controller
                 'message' => 'Failed to delete request: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function request(){
+        $requestDonasi = ReqDonasi::with([
+            'transaksiDonasi.barang',
+            'organisasi',
+        ])
+        ->where('status', 'Pending')
+        ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $requestDonasi
+        ]);
+    }
+
+
+    public function notaReqPdf()
+    {
+        $reqDonasi = ReqDonasi::with([
+            'transaksiDonasi.barang',
+            'organisasi',
+        ])->where('status', 'Pending')->get();
+
+        return Pdf::loadView('nota.pdf.laporanRequestDonasi', compact('reqDonasi'))
+            ->setPaper('a4', 'landscape')
+            ->stream("Laporan Request Donasi.pdf");
     }
 }

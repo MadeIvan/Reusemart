@@ -245,16 +245,36 @@ class PegawaiController extends Controller
         ]);
     }
 
-    function resetPassword($id){
-        $pegawai = Pegawai::find($id);
-
-        $pegawai->password =  Hash::make($pegawai->tanggalLahir);
-        $pegawai->update();
-
-        return response()->json([
-            'message' => 'Berhasil',
-        ]);
+    public function resetPassword($id){
+        try{
+            \Log::info("Resetting password for Pegawai ID: $id");
+    
+            $pegawai = Pegawai::find($id);
+    
+            if (!$pegawai) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Pegawai not found'
+                ], 404);
+            }
+    
+            $pegawai->password = Hash::make($pegawai->tanggalLahir);
+            $pegawai->update();
+    
+            return response()->json([
+                'status' => true,
+                'message' => 'Password reset successfully'
+            ]);
+        }catch (\Exception $e) {
+            \Log::error("Failed to reset password: " . $e->getMessage());
+            return response()->json([
+                'status' => false,
+                'message' => 'Failed to reset password',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
+
 
     // === [PembeliController Methods] ===
 
@@ -470,4 +490,14 @@ class PegawaiController extends Controller
             "data" => $kurir
         ], 200);
     }}
+
+    public function myData(){
+        $pegawai = auth('pegawai')->user()->load('dompet', 'jabatan');
+
+        return response()->json([
+            "status" => true,
+            "message" => "User retrieved successfully",
+            "data" => $pegawai
+        ]);
+    }
 }

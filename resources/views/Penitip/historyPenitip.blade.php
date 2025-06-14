@@ -47,46 +47,6 @@
 
 </head>
 <body>
-
-    <!-- ////////////////////INI MODAL DETAIL///////////////////////////// -->
-    <!-- <div class="modal fade" id="detailBarang" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="modal-title fs-5" id="exampleModalLabel"><strong>Detail Barang</strong></h2>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <strong>Nama Barang : </strong><span id="namaBarang" name="namaBarang"></span>
-                    </div>
-                    <div class="mb-3">
-                        <strong>Berat Barang : </strong><span id="beratBarang" name="beratBarang"></span>
-                    </div>
-                    <div class="mb-3">
-                        <strong>Harga Barang : </strong><span id="harga" name="harga"></span>
-                    </div>
-                    <div class="mb-3">
-                        <strong>Tanggal Penitipan Barang : </strong><span id="tanggalPenitipan" name="tanggalPenitipan"></span>
-                    </div>
-                    <div class="mb-3">
-                        <strong>Tanggal Penitipan Selesai : </strong><span id="tanggalPenitipanSelesai" name="tanggalPenitipanSelesai"></span>
-                    </div>
-                    <div class="mb-3">
-                        <strong>Kategori Barang : </strong><span id="kategori" name="kategori"></span>
-                    </div>
-                    <div class="mb-3">
-                        <strong>Status Barang : </strong><span id="status" name="status"></span>
-                    </div>
-                    <div class="mb-3">
-                        <strong>Tanggal Barang Terjual : </strong><span id="tanggalTerjual" name="tanggalTerjual"></span>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </div> -->
-
     <div class="modal fade" id="detailBarang" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -124,51 +84,6 @@
     </div>
 </div>
 
-    <!-- Navbar dengan container -->
-    <!-- <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
-        <div class="container-fluid">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div class="collapse navbar-collapse" id="navbarNav"> -->
-                <!-- Nav-bar kiri -->
-                <!-- <ul class="navbar-nav me-auto">
-                    <li class="nav-item d-flex align-items-center">
-                        <img src="{{ asset('logoReUseMart.png') }}" alt="Logo Reusemart" style="width:50px;">
-                    </li>
-                    <li class="nav-item d-flex align-items-center">
-                        <a class="nav-link text-black" href="{{url('/penitip/dashboard')}}">
-                            <strong>Home</strong>
-                        </a>
-                    </li>
-                    <li class="nav-item d-flex align-items-center">
-                        <a class="nav-link text-black" href="{{url('/penitip/history')}}">
-                            <strong>History Transaksi</strong>
-                        </a>
-                    </li>
-                </ul> -->
-
-                <!-- Nav-bar kanan -->
-                <!-- <ul class="navbar-nav ms-auto mb-2 mb-lg-0 profile-menu"> 
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <div class="profile-pic d-inline">
-                                <img src="{{ asset('img/pp.png') }}" alt="Profile Picture" style="width:35px;" class="rounded-circle">
-                            </div>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="{{url('/penitip/profile')}}"><i class="fas fa-sliders-h fa-fw"></i> Profile</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" id="logoutLink"><i class="fas fa-sign-out-alt fa-fw" ></i> Log Out</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-    <hr style="margin: 0; border: 2px solid #dee2e6;"/> -->
     @include('layouts.navbar')
 
     <!--//////////////////////////////////////////// Main Content//////////////////////////////////// -->
@@ -204,8 +119,6 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    // barangData = data.data;
-                    // renderBarang(data.data);
                     if (data.status && Array.isArray(data.data)) {
                         renderBarang(data.data);
                     } else {
@@ -282,16 +195,6 @@
 
             
         });
-            // searchInput.addEventListener("input", () => {
-            //     const query = searchInput.value.toLowerCase();
-            //     fetch(`http://127.0.0.1:8000/api/pembeli/alamat/search?q=${query}`, {
-            //         headers: { 
-            //             "Authorization": `Bearer ${localStorage.getItem('token')}` },
-            //     })
-            //         .then(response => response.json())
-            //         .then(data => renderAlamat(data.data))
-            //         .catch(error => console.error("Error searching alamat:", error));
-            // });
 
         // document.querySelectorAll(".btn-detail").forEach(button => {
             document.addEventListener("click", function (e) {
@@ -306,22 +209,41 @@
                     const statusBarang = button.getAttribute("data-statusBarang");
                     const tanggalTerjual = button.getAttribute("data-tanggalPembelian");
 
+                    function formatTanggalJam(tanggalString) {
+                        if (!tanggalString) return "-";
+                        const date = new Date(tanggalString);
+                        return date.toLocaleString("id-ID", {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                        });
+                    }
+
+                    function formatTanggalSaja(tanggalString) {
+                        if (!tanggalString) return "-";
+                        const date = new Date(tanggalString);
+                        return date.toLocaleDateString("id-ID", {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                        });
+                    }
+
                     // Isi modal
                     document.getElementById("namaBarang").textContent = namaBarang;
                     document.getElementById("beratBarang").textContent = beratBarang;
                     document.getElementById("hargaBarang").textContent = hargaBarang;
                     document.getElementById("kategori").textContent = kategori;
-                    document.getElementById("tanggalPenitipan").textContent = tanggalPenitipan;
-                    document.getElementById("tanggalPenitipanSelesai").textContent = tanggalPenitipanSelesai;
+                    document.getElementById("tanggalPenitipan").textContent = formatTanggalJam(tanggalPenitipan);
+                    document.getElementById("tanggalPenitipanSelesai").textContent = formatTanggalSaja(tanggalPenitipanSelesai);
                     document.getElementById("statusBarang").textContent = statusBarang;
-                    document.getElementById("tanggalTerjual").textContent = tanggalTerjual; // Perbaikan di sini
+                    document.getElementById("tanggalTerjual").textContent = formatTanggalJam(tanggalTerjual);
                 }
     });
 
-        // });
-
         /////////////////////buat profile/////////////////////
-        // const auth_token = localStorage.getItem('auth_token');
 
     fetch('http://localhost:8000/api/penitip/profile', {
         method: 'GET',

@@ -32,7 +32,7 @@ class TransaksiPembelianController extends Controller
 
     return response()->json($pembelians);
 }
-    public function showfornota(){
+public function showfornota(){
     $pembelians = TransaksiPembelian::with([
         'detailTransaksiPembelian.barang',
         'pegawai',
@@ -42,11 +42,30 @@ class TransaksiPembelianController extends Controller
         'pembeli.alamat',
         
     ])
-    ->where('status', 'Lunas Siap')
+    ->whereIn('status', ['Lunas Siap Diambil', 'Lunas Siap Diantarkan','Lunas Belum Dijadwalkan'])
     ->get();
 
     return response()->json($pembelians);
 }
+
+
+
+public function getDibayar(){
+    $pembelians = TransaksiPembelian::with([
+        'detailTransaksiPembelian.barang',
+        'pegawai',
+        'pegawai2',
+        'pegawai3',
+        'pembeli',
+        'pembeli.alamat',
+    ])
+    ->whereIn('status', ['Menunggu Verifikasi'])
+    ->get();
+
+    return response()->json($pembelians);
+    
+}
+
 
 
     public function store(Request $request){
@@ -99,7 +118,7 @@ class TransaksiPembelianController extends Controller
                     'idPembeli' => $pembeli->idPembeli,
                     'idAlamat' => $validated['idAlamat'],
                     'tanggalWaktuPembelian' => $validated['tanggalWaktuPembelian'],
-                    'status' => "LUNAS BELUM DIJADWALKAN",
+                    'status' => "Lunas Belum Dijadwalkan",
                     'totalHarga' => $validated['totalHarga']
                 ]);
                 
@@ -455,7 +474,7 @@ public function notaPenjualanPdf($noNota)
             $transaksi->idPegawai1 = $idPegawai;
             $transaksi->save();
 
-           if ($validated['status'] === 'LUNAS BELUM DIJADWALKAN') {
+           if ($validated['status'] === 'Lunas Belum Dijadwalkan') {
                 $detailBarang = $transaksi->detailTransaksiPembelian()->first();
                 if ($detailBarang) {
                     $barang = $detailBarang->barang;
@@ -644,6 +663,169 @@ public function tolakVerifikasi(Request $request, $noNota)
             ]);
 
         } catch (\Exception $e) {
+            return response()->json([
+                "status" => false,
+                "message" => $e->getMessage(),
+                "data" => null
+            ], 500);
+        }
+    }
+
+    public function getHistoryPengiriman(){
+        try{
+            $pegawai = auth('pegawai')->user();
+            if (!$pegawai) {
+                return response()->json([
+                    "status" => false,
+                    "message" => "Pegawai belum login",
+                    "data" => null,
+                ], 400);
+            }
+            $idPegawai = $pegawai->idPegawai;
+
+            $history = TransaksiPembelian::with([
+                'detailTransaksiPembelian.barang',
+                'pembeli',
+            ])
+                ->where('idPegawai3', $idPegawai)
+                ->where('status', 'Barang diterima')
+                ->get();
+
+            if ($history->isEmpty()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'History Pengiriman tidak ditemukan.',
+                    'data' => []
+                ]);
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'History Pengiriman ditemukan.',
+                'data' => $history
+            ]);
+
+        }catch (\Exception $e) {
+            return response()->json([
+                "status" => false,
+                "message" => $e->getMessage(),
+                "data" => null
+            ], 500);
+        }
+    }
+
+    public function getPengiriman(){
+        try{
+            $pegawai = auth('pegawai')->user();
+            if (!$pegawai) {
+                return response()->json([
+                    "status" => false,
+                    "message" => "Pegawai belum login",
+                    "data" => null,
+                ], 400);
+            }
+            $idPegawai = $pegawai->idPegawai;
+
+            $pengiriman = TransaksiPembelian::with([
+                'detailTransaksiPembelian.barang',
+                'pembeli.alamat',
+            ])
+                ->where('idPegawai3', $idPegawai)
+                ->where('status', 'Lunas Siap Diantarkan')
+                // ->where('')
+                ->get();
+
+            if ($pengiriman->isEmpty()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Jadwal Pengiriman tidak ditemukan.',
+                    'data' => []
+                ]);
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Jadwal Pengiriman ditemukan.',
+                'data' => $pengiriman
+            ]);
+        }catch (\Exception $e) {
+            return response()->json([
+                "status" => false,
+                "message" => $e->getMessage(),
+                "data" => null
+            ], 500);
+        }
+    }
+
+    public function pengirimanDone(Request $request, $noNota){
+        try{
+            $pegawai = auth('pegawai')->user();
+            if (!$pegawai) {
+                return response()->json([
+                    "status" => false,
+                    "message" => "Pegawai belum login",
+                    "data" => null,
+                ], 400);
+            }
+
+            if (!$noNota) {
+                return response()->json([
+                    "status" => false,
+                    "message" => "noNota tidak boleh kosong",
+                    "data" => null
+                ], 400);
+            }
+
+            // $transaksi = TransaksiPembelian::where('noNota', $noNota)->first();
+            $transaksi = TransaksiPembelian::with('detailTransaksiPembelian.barang.detailTransaksiPenitipan.transaksiPenitipan.penitip', 'pembeli')
+                ->where('noNota', $noNota)
+                ->first();
+
+
+            if (!$transaksi) {
+                return response()->json([
+                    "status" => false,
+                    "message" => "Transaksi tidak ditemukan untuk noNota: $noNota",
+                    "data" => null
+                ], 404);
+            }
+
+            $transaksi->status = 'Barang Diterima';
+            $transaksi->save();
+
+           // === Kirim notifikasi ke semua penitip yang unik ===
+            $notifiedPenitipIds = [];
+
+            foreach ($transaksi->detailTransaksiPembelian as $detail) {
+                
+                $penitip = $detail->barang->detailTransaksiPenitipan?->transaksiPenitipan?->penitip;
+
+                if ($penitip && $penitip->fcm_token && !in_array($penitip->id, $notifiedPenitipIds)) {
+                    app(FCMService::class)->sendNotification(
+                        $penitip->fcm_token,
+                        'Barang Diterima',
+                        'Barang titipan Anda telah diterima oleh pembeli.'
+                    );
+                    $notifiedPenitipIds[] = $penitip->id;
+                }
+            }
+
+            // === Kirim notifikasi ke PEMBELI ===
+            $pembeli = $transaksi->pembeli;
+            if ($pembeli && $pembeli->fcm_token) {
+                app(FCMService::class)->sendNotification(
+                    $pembeli->fcm_token,
+                    'Barang Diterima',
+                    'Barang Anda telah diterima. Terima kasih telah berbelanja di toko kami.'
+                );
+            }
+
+            return response()->json([
+                "status" => true,
+                "message" => "Status transaksi dengan noNota $noNota berhasil diperbarui menjadi 'Barang Diterima'",
+                "data" => $transaksi
+            ]);
+        }catch (\Exception $e) {
             return response()->json([
                 "status" => false,
                 "message" => $e->getMessage(),

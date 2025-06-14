@@ -85,33 +85,37 @@
         </div> 
         <div class="row w-100 justify-content-center">
             
-            <div class="col-md-6 border p-4 rounded shadow">
-            <h2 class="text-center" style="color:rgb(24, 134, 4); font-weight: bold;">Registrasi Organisasi</h2>
+            <div class="col-12 col-md-6 col-lg-4 mx-auto bg-light p-4 rounded-3 shadow" style="z-index: 1;">
+            <h3 class="text-center mb-4">Registrasi Organisasi</h3>
                 <form id="registerForm">
                     <div class="mb-3">
-                        <label for="namaOrganisasi" class="form-label"><strong>Nama Organisasi</strong></label>
-                        <input type="text" class="form-control" id="namaOrganisasi" required>
+                        <label for="namaOrganisasi" class="form-label">Nama Organisasi</label>
+                        <input type="text" class="form-control" id="namaOrganisasi" placeholder="Enter name" required>
                     </div>
                     <div class="mb-3">
-                        <label for="alamat" class="form-label"><strong>Alamat</strong></label>
-                        <input type="text" class="form-control" id="alamat" required>
+                        <label for="alamat" class="form-label">Alamat</label>
+                        <input type="text" class="form-control" id="alamat" placeholder="Enter address" required>
                     </div>
                     <div class="mb-3">
-                        <label for="email" class="form-label"><strong>Email</strong></label>
-                        <input type="email" class="form-control" id="email" required>
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" placeholder="Enter email" required>
                     </div>
                     <div class="mb-3">
-                        <label for="username" class="form-label"><strong>Username</strong></label>
-                        <input type="text" class="form-control" id="username" required>
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" placeholder="Enter username" required>
                     </div>
                     <div class="mb-3">
-                        <label for="password" class="form-label"><strong>Password</strong></label>
-                        <input type="password" class="form-control" id="password" required>
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" placeholder="Enter password" required>
                     </div>
                     <div class="d-flex justify-content-center register-button">
-                        <button type="submit" class="btn btn-success">Submit</button>
+                        <button type="submit" class="btn btn-primary w-100">Submit</button>
                     </div>
                 </form>
+                <p class="text-center mt-3">
+                    Already have an account for organization?
+                    <a href="/UsersLogin" class="text-decoration-none">Click here!</a>
+                </p>
             </div>
         </div>
     </div>

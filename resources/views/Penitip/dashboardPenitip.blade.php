@@ -1,124 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reusemart</title>
-    <!-- Bootstrap CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
-    <!-- Toastify CSS -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Toastify JS -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
-
-    <script>
-		const token = localStorage.getItem("auth_token");
-			if (!token) {
-				window.location.href = "{{ url('/UsersLogin') }}";
-			}
-	</script>
-
-    <style>
-        body {
-            background-color: #f4f6f9;
-            font-family: 'Poppins', sans-serif;
-        }
-    </style>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ReUseMart</title>
+  <!-- Bootstrap CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+    crossorigin="anonymous"
+  />
+  <!-- Toastify CSS -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+  />
 </head>
 <body>
-    @include('layouts.navbar')
-    <!-- Navbar dengan container -->
-     <!-- <nav class="navbar navbar-expand-lg navbar-light bg-lightshadow-sm">
-        <div class="container-fluid">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
 
-            <div class="collapse navbar-collapse" id="navbarNav"> -->
-                <!-- Nav-bar kiri -->
-                <!-- <ul class="navbar-nav me-auto">
-                    <li class="nav-item d-flex align-items-center">
-                        <img src="{{ asset('logoReUseMart.png') }}" alt="Logo Reusemart" style="width:50px;">
-                    </li>
-                    <li class="nav-item d-flex align-items-center">
-                        <a class="nav-link text-black" href="{{url('/penitip/dashboard')}}">
-                            <strong>Home</strong>
-                        </a>
-                    </li>
-                    <li class="nav-item d-flex align-items-center">
-                        <a class="nav-link text-black" href="{{url('/penitip/history')}}">
-                            <strong>History Transaksi</strong>
-                        </a>
-                    </li>
-                </ul> -->
+  @include('layouts.navbar')
 
-                <!-- Nav-bar kanan -->
-                <!-- <ul class="navbar-nav ms-auto mb-2 mb-lg-0 profile-menu"> 
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <div class="profile-pic d-inline">
-                                <img src="{{ asset('img/pp.png') }}" alt="Profile Picture" style="width:35px;" class="rounded-circle">
-                            </div>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="{{url('/penitip/profile')}}"><i class="fas fa-sliders-h fa-fw"></i> Profile</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" id="logoutLink"><i class="fas fa-sign-out-alt fa-fw" ></i> Log Out</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav> -->
+<video autoplay muted loop id="video-bg"
+  style="
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: -1;
+  ">
+    <source src="{{ asset('ReUseMartVid.mp4') }}" type="video/mp4">
+    Your browser does not support the video tag.
+</video>
+  <main class="container my-5 p-4 bg-white rounded shadow-sm" style="max-width: 700px;">
+    <h1 class="text-center text-success mb-3">Selamat Datang!</h1>
+    <p class="lead text-center">
+      Anda masuk sebagai <strong><span>Penitip</span></strong>.
+    </p>
+    <hr class="mb-4" />
 
-    <hr style="margin: 0; border: 2px solid #dee2e6;"/>
-    <!-- Main Content -->
-    <div class="container vh-100 d-flex justify-content-center align-items-center">
-    <div class="row w-100 justify-content-center">
-        <div class="col-md-6 border p-4 rounded shadow">
-        
-        </div>
-    </div>
-</div>
+    <h2 class="text-center text-success mb-4">Profil Penitip</h2>
 
-    <script>
-        /////////////////////buat logout///////////////////////
-        document.getElementById('logoutLink').addEventListener('click', function (e) {
-            e.preventDefault();
+    <table class="table table-bordered w-75 mx-auto">
+      <tbody>
+        <tr>
+          <th scope="row" class="w-25">ID Penitip</th>
+          <td id="penitipId">-</td>
+        </tr>
+        <tr>
+          <th scope="row">Nama Penitip</th>
+          <td id="penitipNama">-</td>
+        </tr>
+      </tbody>
+    </table>
+  </main>
 
-            const token = localStorage.getItem('auth_token');
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+  <!-- Toastify JS -->
+  <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
 
-            if (token) {
-                fetch('http://localhost:8000/api/logout', {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer ' + token,
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data.message); // opsional: tampilkan pesan sukses logout
-                })
-                .catch(error => {
-                    console.error('Logout error:', error);
-                })
-                .finally(() => {
-                    // Bersihkan token & redirect ke halaman awal
-                    localStorage.removeItem('token');
-                    window.location.href = '/';
-                });
-            } else {
-                // Jika token tidak ada, langsung redirect
-                window.location.href = '/';
-            }
-        });
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const token = localStorage.getItem("auth_token");
+      if (!token) {
+        Toastify({
+          text: "Token tidak ditemukan. Silakan login ulang.",
+          duration: 4000,
+          close: true,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "rgb(214, 10, 10)",
+        }).showToast();
+        setTimeout(() => {
+          window.location.href = "/UsersLogin";
+        }, 2000);
+        return;
+      }
 
-    </script>
-
+      fetch('http://localhost:8000/api/penitip/profile', {
+        method: 'GET',
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Accept": "application/json",
+          "Content-Type": "application/json"
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status && data.data) {
+          const user = data.data;
+          document.getElementById("penitipId").textContent = user.idPenitip || "-";
+          document.getElementById("penitipNama").textContent = user.namaPenitip || "-";
+        } else {
+          Toastify({
+            text: "Gagal memuat data profil. Silakan login ulang.",
+            duration: 4000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "rgb(214, 10, 10)",
+          }).showToast();
+          setTimeout(() => {
+            window.location.href = "/UsersLogin";
+          }, 2000);
+        }
+      })
+      .catch(error => {
+        console.error('Fetch error:', error);
+        Toastify({
+          text: "Terjadi kesalahan. Silakan coba lagi.",
+          duration: 4000,
+          close: true,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "rgb(214, 10, 10)",
+        }).showToast();
+      });
+    });
+  </script>
 </body>
 </html>

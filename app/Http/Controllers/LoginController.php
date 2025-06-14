@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Laravel\Sanctum\PersonalAccessToken;
 
 class LoginController extends Controller
 {
@@ -87,11 +88,33 @@ class LoginController extends Controller
 
 
     public function logout (Request $request){
-        if (Auth::check()) {
-            $request->user()->currentAccessToken()->delete();
+        if (Auth::guard('penitip')->check()) {
+            $user = Auth::guard('penitip')->user();
+        } elseif (Auth::guard('pembeli')->check()) {
+            $user = Auth::guard('pembeli')->user();
+        } elseif (Auth::guard('pegawai')->check()) {
+            $user = Auth::guard('pegawai')->user();
+        } else {
+            return response()->json(['message' => 'Not authenticated'], 401);
+        }
+
+        // Hapus token aktif
+        if (method_exists($user, 'currentAccessToken') && $user->currentAccessToken()) {
+            $user->currentAccessToken()->delete();
             return response()->json(['message' => 'Logged out successfully']);
         }
-    
-        return response()->json(['message' => 'Not logged in'], 401);
+
+        // Atau hapus token pakai header manual
+        $authHeader = $request->header('Authorization');
+        if ($authHeader && str_starts_with($authHeader, 'Bearer ')) {
+            $tokenValue = explode(' ', $authHeader)[1];
+            $token = PersonalAccessToken::findToken($tokenValue);
+            if ($token) {
+                $token->delete();
+                return response()->json(['message' => 'Logged out successfully']);
+            }
+        }
+
+        return response()->json(['message' => 'No token found'], 401);
     }
 }

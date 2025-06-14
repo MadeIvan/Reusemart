@@ -48,7 +48,7 @@
         <!-- Diskusi produk akan muncul di sini -->
     </div>
 
-    <div class="container my-3 kirim-diskusi">
+    <div class="container my-3 kirim-diskusi" style="display: none;">
         <div class="col-md-8 mt-3">
             <textarea class="form-control " id="exampleFormControlTextarea1" rows="2" placeholder="Tulis Komentar"></textarea>
         </div>
@@ -70,7 +70,8 @@
             const token = localStorage.getItem('auth_token');
             const pathSegments = window.location.pathname.split('/');
             const productId = pathSegments[pathSegments.length - 1]; 
-            document.querySelector('.btn.btn-dark').addEventListener('click', kirimDiskusi);
+            
+            role = localStorage.getItem("user_role");
             
             
             // Fetch the product data from the API
@@ -102,16 +103,26 @@
                             
                         `;
 
-                        // Append the product details to the container
-                        productDetailContainer.innerHTML = productDetailHTML;
-                        const addToCartBtn = productDetailContainer.querySelector('.add-to-cart-btn');
-                        if (addToCartBtn) {
-                            addToCartBtn.addEventListener('click', function(event) {
-                                event.preventDefault(); // <- tambahkan ini
-                                const idBarang = this.getAttribute('data-id');
-                                addToCart(idBarang);
-                            });
+                        if(role === "cs") {
+                            productDetailContainer.innerHTML = productDetailHTML;
+                           const addToCartBtn = productDetailContainer.querySelector('.add-to-cart-btn');
+                            if (addToCartBtn) {
+                                addToCartBtn.disabled = true;
+                            }
+                        } else if (role === "pembeli") {
+                            document.querySelector('.kirim-diskusi').style.display = 'block';
+                            document.querySelector('.btn.btn-dark').addEventListener('click', kirimDiskusi);
+                            productDetailContainer.innerHTML = productDetailHTML;
+                            const addToCartBtn = productDetailContainer.querySelector('.add-to-cart-btn');
+                            if (addToCartBtn) {
+                                addToCartBtn.addEventListener('click', function(event) {
+                                    event.preventDefault(); // <- tambahkan ini
+                                    const idBarang = this.getAttribute('data-id');
+                                    addToCart(idBarang);
+                                });
+                            }
                         }
+                      
 
                         getDiskusi(productId);
 
@@ -142,14 +153,14 @@
                         }
 
                         if (item.idPembeli) {
-                            diskusiItems += `
-                            <div class="diskusi-tanggal-pembeli">
-                            <p class="text-success"><strong>${namaPengirim} | </strong></p>
-                            <p><strong>${item.tanggalDiskusi}</strong></p>
+                                diskusiItems += `
+                                <div class="diskusi-tanggal-pembeli">
+                                    <p class="text-success"><strong>${namaPengirim} | </strong></p>
+                                    <p><strong>${item.tanggalDiskusi}</strong></p>
                                     <p><strong>${item.waktuMengirimDiskusi}</strong></p>
                                 </div>
-                                <p class="diskusi-pembeli"> ${item.pesandiskusi}</p>
-                            `;
+                                    <p > ${item.pesandiskusi}</p>
+                                `;
                         } else if (item.idPegawai) {
                             diskusiItems += `
                             <div class="diskusi-tanggal-pegawai">
@@ -186,6 +197,11 @@
             const komentar = document.getElementById('exampleFormControlTextarea1').value.trim();
             const idBarang = window.location.pathname.split('/').pop();
             const btn = document.getElementById('kirimBtn');
+            const role = localStorage.getItem("user_role");
+
+            const endpoint = role === "cs" 
+                ? `http://127.0.0.1:8000/api/pegawai/buat-diskusi/${idBarang}` 
+                : `http://127.0.0.1:8000/api/pembeli/buat-diskusi/${idBarang}`;
             
             console.log('Token:', token); // Periksa token
             console.log('ID Barang:', idBarang); // Periksa ID Barang
@@ -204,7 +220,7 @@
             btn.disabled = true;
             btn.textContent = "Mengirim...";
 
-            fetch(`http://127.0.0.1:8000/api/buat-diskusi/${idBarang}`,{
+            fetch(endpoint,{
                 method: 'POST',
                 headers: {
                     "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,

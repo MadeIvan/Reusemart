@@ -106,6 +106,10 @@
                         Don't have an account for organization?
                         <a href="/organisasi/register" class="text-decoration-none">Click here!</a>
                     </p>
+                     <p class="text-center mt-3">
+                        Don't have an account for buyer?
+                        <a href="/pembeli/register" class="text-decoration-none">Click here!</a>
+                    </p>
                 </div>
             </div>          
         </div>

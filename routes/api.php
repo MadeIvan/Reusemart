@@ -22,6 +22,7 @@ use App\Http\Controllers\TransaksiPembelianController;
 use App\Http\Controllers\PointRedemptionController;
 use App\Http\Controllers\FCMTokenController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\KomisiController;
 
 Route::post('/send-notification', [NotificationController::class, 'sendNotification']);
 
@@ -71,6 +72,7 @@ Route::delete('/pegawai/{id}', [PegawaiController::class, 'softDelete']);
 Route::put('/pegawai/reset-password/{id}', [PegawaiController::class, 'resetPassword']);
 Route::get('/jabatan', [JabatanController::class, 'index']);
 Route::get('/pegawai-showkurir', [PegawaiController::class, 'showKurir']);
+Route::get('/pegawai/getData', [PegawaiController::class, 'myData']);
 
 
 // === Authenticated groups ===
@@ -79,19 +81,37 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 // === Role-based and resource routes ===
+Route::middleware(['auth:pegawai'])->group(function () {
+    Route::post('/pegawai/logout', [LoginController::class, 'logout']);
+});
+
+Route::middleware(['auth:pegawai','role:1'])->group(function () {
+    Route::get('/requestDonasi', [RequestDonasiController::class, 'request']);
+    Route::get('/requestDonasi-accepted', [TransaksiDonasiController::class, 'requestAccepted']);
+    Route::get('/laporanPenitip/{id}', [TransaksiPenitipanController::class, 'transaksiPenitip']);
+});    
+
 Route::middleware(['auth:pegawai','role:2'])->group(function () {
     Route::get('/organisasi', [OrganisasiController::class, 'index']);
     Route::get('/organisasi/search', [OrganisasiController::class, 'show']);
     Route::put('/organisasi/update/{id}', [OrganisasiController::class, 'update']);
     Route::delete('/organisasi/delete/{id}', [OrganisasiController::class, 'destroy']);
     Route::put('/pegawai/reset-password/{id}', [PegawaiController::class, 'resetPassword']);
-    Route::post('/buat-diskusi/{id}', [DiskusiController::class, 'store']);
+    
+});
+
+Route::middleware(['auth:pegawai','role:4'])->group(function () {
+    Route::get('/getHistory', [TransaksiPembelianController::class, 'getHistoryPengiriman']);
+    Route::get('/getPengiriman', [TransaksiPembelianController::class, 'getPengiriman']);
+    Route::put('/updatePengiriman/{noNota}', [TransaksiPembelianController::class, 'pengirimanDone']);
 });
 
 Route::middleware(['auth:pegawai','role:5'])->group(function () {
     Route::get('/verifikasi', [TransaksiPembelianController::class, 'getNotConfirmed']);
     Route::post('/verifikasi/{id}', [TransaksiPembelianController::class, 'terimaPembayaran']);    
     Route::post('/tolak-verifikasi/{id}', [TransaksiPembelianController::class, 'tolakVerifikasi']); 
+    Route::get('/dibayar', [TransaksiPembelianController::class, 'getDibayar']); 
+    Route::post('/pegawai/buat-diskusi/{id}', [DiskusiController::class, 'store']);
 });
 Route::middleware(['auth:sanctum', 'auth.pembeli'])->group(function () {
     Route::post('/pembeli/buat-alamat', [AlamatController::class, 'store']);
@@ -102,7 +122,7 @@ Route::middleware(['auth:sanctum', 'auth.pembeli'])->group(function () {
     Route::put('/pembeli/alamat/set-default/{id}', [AlamatController::class, 'setAsDefault']);
     Route::get('/alamatUtama', [AlamatController::class, 'getUtama']);
 
-    Route::post('/buat-diskusi/{id}', [DiskusiController::class, 'store']);
+    Route::post('/pembeli/buat-diskusi/{id}', [DiskusiController::class, 'store']);
     Route::get('/pembeli/getData', [PembeliController::class, 'getData']);
     Route::put('/updatePoin', [PembeliController::class, 'updatePoin']);
     Route::post('/tambah-keranjang/{id}', [PembeliController::class, 'addToCart']);
@@ -113,6 +133,8 @@ Route::middleware(['auth:sanctum', 'auth.pembeli'])->group(function () {
     Route::get('/getData', [TransaksiPembelianController::class, 'getDataTerbaru']);
     Route::post('/buktiBayar/{id}', [TransaksiPembelianController::class, 'buktiBayar']);
     Route::post('/batalkanPesanan/{id}', [TransaksiPembelianController::class, 'canceled']);
+
+    Route::post('/pembeli/logout', [LoginController::class, 'logout']);
 });
 
 Route::middleware(['auth:penitip'])->group(function () {
@@ -120,6 +142,7 @@ Route::middleware(['auth:penitip'])->group(function () {
     Route::get('/penitip/profile', [PenitipController::class, 'myData']);
     Route::post('/logout', [LoginController::class, 'logout']);
     Route::get('/penitip/history', [PenitipController::class, 'loadBarang']);
+    Route::post('/penitip/logout', [LoginController::class, 'logout']);
 });
 
 // === Barang, Diskusi, RequestDonasi, Donasi, etc. ===
@@ -141,6 +164,7 @@ Route::middleware('auth:organisasi')->group(function () {
     Route::post('/create/reqdonasi', [reqdonasiController::class, 'store']);
     Route::put('/reqdonasi/{id}', [reqDonasiController::class, 'update']);
     Route::delete('/reqdonasi/{id}', [reqDonasiController::class, 'destroy']);
+    Route::post('/organisasi/logout', [LoginController::class, 'logout']);
 });
 
 // === Penitipan & Pembelian ===
@@ -165,5 +189,9 @@ Route::get('/indexall',[BarangController::class,'indexall']);
 
 Route::post('/addimages', [ImagesBarangController::class, 'store']);
 
+Route::post('/komisi-reusemart/{noNota}', [KomisiController::class, 'komisiReuseMart']);
+Route::get('/dompet/pegawai/{idPegawai}', [DompetController::class, 'getDompetByPegawai']);
+Route::get('/komisi', [KomisiController::class, 'index']);
+Route::post('/komisi/store', [KomisiController::class, 'store']);
 
 
