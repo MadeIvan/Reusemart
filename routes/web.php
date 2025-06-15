@@ -142,6 +142,14 @@ Route::get('/laporanPenitip', function () {
     return view('Owner.laporanPenitip');
 });
 
+Route::get('/resetPassword', function () {
+    return view('Login.resetPassword');
+});
+
+Route::get('/newPassword', function () {
+    return view('Login.newPassword');
+});
+
 Route::get('/laporanRequestDonasi/pdf', [RequestDonasiController::class, 'notaReqPdf'])->name('nota.pdf.laporanrequestdonasi');
 Route::get('/laporanDonasiAcc/pdf', [TransaksiDonasiController::class, 'laporanDonasiPdf'])->name('nota.pdf.laporanTransaksiDonasi');
 Route::get('/laporanPenitip/pdf', [TransaksiPenitipanController::class, 'laporanTransaksiPenitipPdf'])->name('nota.pdf.laporanUntukPenitip');

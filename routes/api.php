@@ -23,6 +23,7 @@ use App\Http\Controllers\PointRedemptionController;
 use App\Http\Controllers\FCMTokenController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\KomisiController;
+use App\Http\Controllers\ForgotPasswordController;
 
 Route::post('/send-notification', [NotificationController::class, 'sendNotification']);
 
@@ -56,7 +57,7 @@ Route::delete('/dompet/{id}', [DompetController::class, 'deleteDompet']);
 // === Organisasi ===
 Route::post('/organisasi/register', [OrganisasiController::class, 'register']);
 Route::post('/organisasi/login', [OrganisasiController::class, 'login']);
-Route::get('/check-email-username', [OrganisasiController::class, 'checkEmailUsername']);
+Route::get('/organisasi/check-email-username', [OrganisasiController::class, 'checkEmailUsername']);
 
 // === Pembeli ===
 Route::post('/pembeli/register', [PembeliController::class, 'register']);
@@ -193,5 +194,8 @@ Route::post('/komisi-reusemart/{noNota}', [KomisiController::class, 'komisiReuse
 Route::get('/dompet/pegawai/{idPegawai}', [DompetController::class, 'getDompetByPegawai']);
 Route::get('/komisi', [KomisiController::class, 'index']);
 Route::post('/komisi/store', [KomisiController::class, 'store']);
+
+Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink']);
+Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword']);
 
 
