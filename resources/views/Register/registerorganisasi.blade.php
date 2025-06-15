@@ -155,7 +155,7 @@
 
             // Check if email and username already exist
             try {
-                const checkResponse = await fetch(`http://127.0.0.1:8000/api/check-email-username?email=${encodeURIComponent(email)}&username=${encodeURIComponent(username)}`, {
+                const checkResponse = await fetch(`http://127.0.0.1:8000/api/organisasi/check-email-username?email=${encodeURIComponent(email)}&username=${encodeURIComponent(username)}`, {
                     method: "GET",
                 });
 

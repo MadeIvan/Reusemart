@@ -169,6 +169,7 @@
                 leftMenu.appendChild(createItem("/penitip/profile", "Profile"));
                 rightMenu.appendChild(createLogout());            
             }else if (role === "organisasi") {
+                leftMenu.appendChild(createItem("/OrganisasiMain", "Request Donasi"));
                 leftMenu.appendChild(createItem("/organisasi/history-request", "History Request Donasi"));
                 rightMenu.appendChild(createLogout());
             }else if(role === "admin"){
