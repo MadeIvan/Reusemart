@@ -168,6 +168,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 window.location.href = 'http://127.0.0.1:8000/OrganisasiMain'
 
             }
+             } catch (error) {
+                    console.error('Error during login:', error);
+                    alert('An error occurred during login. Please try again.');
+                }        
         });
     });
 </script>

@@ -5,9 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\DB;
-use App\Models\TransaksiPenitipan;
-use App\Models\DetailTransaksiPenitipan;
-use Barryvdh\DomPDF\Facade\Pdf;
+// use App\Models\TransaksiPenitipan;
+// use App\Models\DetailTransaksiPenitipan;
+// use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Pegawai;
 use App\Models\TransaksiPenitipan;
 use App\Models\DetailTransaksiPenitipan;
@@ -138,8 +138,7 @@ public function notaPenitipanPdf($id)
     //     ->download("nota-penitipan-{$id}.pdf");
 }
 
-
-    public function transaksiPenitip($id){
+ public function transaksiPenitip($id){
 
         $penitipan = TransaksiPenitipan::with([
             'penitip',
@@ -196,6 +195,8 @@ public function notaPenitipanPdf($id)
             'data' => $laporan
         ]);
     }
+
+
 
 
     public function laporanTransaksiPenitipPdf(Request $request)

@@ -153,13 +153,13 @@
                     "Content-Type": "application/json",
                 },
                 });
-
+                const data = await response.json();
+                console.log("Data dari API:", data);
                 if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                const data = await response.json();
-                console.log("Data dari API:", data);
+                
 
                 if (data.status === "success") {
                     allData = data.data;

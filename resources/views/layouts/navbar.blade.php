@@ -179,7 +179,7 @@
                 leftMenu.appendChild(createItem("/pegawaiView", "Pegawai"));
                 rightMenu.appendChild(createLogout());
             }else if(role==="cs"){
-                leftMenu.appendChild(createItem("/home", "Produk"));
+                // leftMenu.appendChild(createItem("/home", "Produk"));
                 leftMenu.appendChild(createItem("/pegawaidata", "Profile"));
                 leftMenu.appendChild(createItem("/pegawai/PenitipData", "Data Penitip"));
                 leftMenu.appendChild(createItem("/verifikasi", "Verifikasi Pembayaran"));

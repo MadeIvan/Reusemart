@@ -354,6 +354,7 @@ public function updatePenjadwalan(Request $request, $noNota)
 
 
 
+
 public function notaPenjualanPdf($noNota)
 {
     $transaksi = TransaksiPembelian::with([
@@ -363,8 +364,13 @@ public function notaPenjualanPdf($noNota)
         // ...add kurir, etc.
     ])->where('noNota', $noNota)->firstOrFail();
 
+    // You may need to prepare extra values, e.g., points, discount, etc.
 
- public function getDataTerbaru(Request $request){
+    return Pdf::loadView('pdf.nota_penjualan', compact('transaksi'))
+        ->stream("nota-penjualan-{$noNota}.pdf"); // use ->download() if you want forced download
+}
+
+    public function getDataTerbaru(Request $request){
         $pembeli = auth('pembeli')->user();
             if (!$pembeli) {
                 return response()->json([
@@ -533,7 +539,7 @@ public function notaPenjualanPdf($noNota)
                 if ($detailBarang) {
                     $barang = $detailBarang->barang;
                     $penitip = $barang?->detailTransaksiPenitipan?->transaksiPenitipan?->penitip;   
-                    \Log::info('FCM Token Penitip: ' . $penitip);
+                    // \Log::info('FCM Token Penitip: ' . $penitip);
 
                     if ($penitip && $penitip->fcm_token) {
                         app(FCMService::class)->sendNotification(
@@ -541,9 +547,9 @@ public function notaPenjualanPdf($noNota)
                             'Barang Terjual!',
                             'Selamat! Barang Anda telah berhasil terjual.'
                         );
-                        \Log::info('FCM Token Penitip: ' . $penitip->fcm_token);
+                        // \Log::info('FCM Token Penitip: ' . $penitip->fcm_token);
                     } else {
-                        \Log::info('Penitip tidak ditemukan atau token kosong');
+                        // \Log::info('Penitip tidak ditemukan atau token kosong');
                     }
                 }
             }

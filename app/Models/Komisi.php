@@ -29,7 +29,7 @@ class Komisi extends Model
 
     public function transaksiPembelian(){
 
-        return $this->belongsTo(TraansaksiPembelian::class, 'noNota', 'noNota');
+        return $this->belongsTo(TransaksiPembelian::class, 'noNota', 'noNota');
 
        // return $this->hasMany(TransaksiPembelian::class, 'noNota', 'noNota');
 
@@ -39,3 +39,4 @@ class Komisi extends Model
         return $this->belongsTo(Barang::class, 'idBarang', 'idBarang');
     }
 
+}
