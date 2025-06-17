@@ -73,7 +73,7 @@
     </style>
 </head>
 <body>
-
+        @include('layouts.navbar')
     <div class="container mt-4">
         <h2>Data Pegawai</h2>
 
@@ -304,7 +304,7 @@
                 document.getElementById("idPegawai").value = item.idPegawai;
                 document.getElementById("namaPegawai").value = item.namaPegawai || '';  // Set idTopSeller        // Set idDompet
                 document.getElementById("username").value = item.username || '';         // Set username
-                document.getElementById("password").value = item.password || '';   // Set namaPegawai
+                // document.getElementById("password").value = item.password || '';   // Set namaPegawai
                 
                 // Store the current Pegawai ID
                 currentPegawaiId = item.idPegawai;
@@ -446,18 +446,34 @@
                     return;
                 }
                 
-                if (confirm("Are you sure you want to delete this pegawai?")) {
+                if (confirm("Are you sure you want to reset password this pegawai?")) {
                     try {
+                        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); 
                         const response = await fetch(`http://127.0.0.1:8000/api/pegawai/reset-password/${currentPegawaiId}`, {
                             method: "PUT",
                             headers: { 
-                                "Authorization": `Bearer ${localStorage.getItem('authToken')}`,
+                                
+                                "Authorization": `Bearer ${localStorage.getItem('auth_token')}`,
+                                "Content-Type": "application/json",
                                 "X-CSRF-TOKEN": csrfToken
                             }
                         });
                         
-                        const result = await response.json();
-                        
+                            console.log("Response status:", response.status);
+
+                            const text = await response.text();
+                            console.log("Response raw text:", text);
+
+                            let result;
+                            try {
+                                result = JSON.parse(text);
+                            } catch (e) {
+                                console.error("Response is not valid JSON:", e);
+                                throw new Error("Response is not valid JSON");
+                            }
+                            console.log("Response JSON:", result);
+
+                            
                         if (result.status === true) {
                             showToast("Pegawai reset successfully!", "bg-success");
                             
@@ -466,20 +482,20 @@
                             // document.getElementById("idTopSeller").value = "";
                             document.getElementById("namaPegawai").value = "";
                             document.getElementById("username").value = "";
-                            document.getElementById("password").value = "";
+                            // document.getElementById("password").value = "";
                             // document.getElementById("nik").value = "";
                             
                             currentPegawaiId = null;
                             
                             fetchPegawai(); // Refresh the table data
                         } else {
-                            showToast("Failed to delete pegawai!", "bg-danger");
-                            console.error("Error deleting pegawai:", result);
+                            showToast("Failed to reset password pegawai!", "bg-danger");
+                            console.error("Error reset password pegawai:", result);
                             fetchPegawai(); 
                         }
                     } catch (error) {
-                        console.error("Error deleting pegawai:", error);
-                        showToast("An error occurred while deleting.", "bg-danger");
+                        console.error("Error reset password pegawai:", error);
+                        showToast("An error occurred while reset password.", "bg-danger");
                     }
                 }
             });

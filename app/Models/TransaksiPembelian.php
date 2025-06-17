@@ -58,4 +58,5 @@ class TransaksiPembelian extends Model
         return $this->belongsTo(Komisi::class,'noNota','noNota');
     }
     
+
 }

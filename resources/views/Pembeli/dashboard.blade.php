@@ -35,21 +35,25 @@
   <main class="container my-5 p-4 bg-white rounded shadow-sm" style="max-width: 700px;">
     <h1 class="text-center text-success mb-3">Selamat Datang!</h1>
     <p class="lead text-center">
-      Anda masuk sebagai <strong><span>Penitip</span></strong>.
+      Anda masuk sebagai <strong><span id="loggedInAs">Memuat...</span></strong>.
     </p>
     <hr class="mb-4" />
 
-    <h2 class="text-center text-success mb-4">Profil Penitip</h2>
+    <h2 class="text-center text-success mb-4">Profil Pembeli</h2>
 
     <table class="table table-bordered w-75 mx-auto">
       <tbody>
         <tr>
-          <th scope="row" class="w-25">ID Penitip</th>
-          <td id="penitipId">-</td>
+          <th scope="row" class="w-25">ID Pembeli</th>
+          <td id="idPembeli">-</td>
         </tr>
         <tr>
-          <th scope="row">Nama Penitip</th>
-          <td id="penitipNama">-</td>
+          <th scope="row">Nama Pembeli</th>
+          <td id="namaPembeli">-</td>
+        </tr>
+        <tr>
+          <th scope="row">Username</th>
+          <td id="usernamePembeli">-</td>
         </tr>
       </tbody>
     </table>
@@ -62,10 +66,10 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      const token = localStorage.getItem("auth_token");
-      if (!token) {
+      const dataUserString = localStorage.getItem("userData");
+      if (!dataUserString) {
         Toastify({
-          text: "Token tidak ditemukan. Silakan login ulang.",
+          text: "Anda belum login atau sesi telah berakhir. Mohon login.",
           duration: 4000,
           close: true,
           gravity: "top",
@@ -78,45 +82,23 @@
         return;
       }
 
-      fetch('http://localhost:8000/api/penitip/profile', {
-        method: 'GET',
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Accept": "application/json",
-          "Content-Type": "application/json"
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.status && data.data) {
-          const user = data.data;
-          document.getElementById("penitipId").textContent = user.idPenitip || "-";
-          document.getElementById("penitipNama").textContent = user.namaPenitip || "-";
-        } else {
-          Toastify({
-            text: "Gagal memuat data profil. Silakan login ulang.",
-            duration: 4000,
-            close: true,
-            gravity: "top",
-            position: "right",
-            backgroundColor: "rgb(214, 10, 10)",
-          }).showToast();
-          setTimeout(() => {
-            window.location.href = "/UsersLogin";
-          }, 2000);
-        }
-      })
-      .catch(error => {
-        console.error('Fetch error:', error);
+      try {
+        const user = JSON.parse(dataUserString);
+        document.getElementById("loggedInAs").textContent = localStorage.getItem("user_role") || "Pengguna";
+        document.getElementById("idPembeli").textContent = user.pembeli.idPembeli || "-";
+        document.getElementById("namaPembeli").textContent = user.pembeli.namaPembeli || "-";
+        document.getElementById("usernamePembeli").textContent = user.pembeli.username || "-";
+    } catch (e) {
+        console.error("Error parsing user data:", e);
         Toastify({
-          text: "Terjadi kesalahan. Silakan coba lagi.",
-          duration: 4000,
-          close: true,
-          gravity: "top",
-          position: "right",
-          backgroundColor: "rgb(214, 10, 10)",
+        text: "Gagal menampilkan data pengguna",
+        duration: 4000,
+        close: true,
+        gravity: "top",
+        position: "right",
+        backgroundColor: "orange",
         }).showToast();
-      });
+    }
     });
   </script>
 </body>

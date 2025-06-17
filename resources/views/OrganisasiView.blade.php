@@ -73,6 +73,7 @@
     </style>
 </head>
 <body>
+    @include('layouts.navbar')
 
     <div class="container mt-4">
         <h2>REQUEST DONASI</h2>

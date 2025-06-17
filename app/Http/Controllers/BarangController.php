@@ -17,8 +17,10 @@ class BarangController extends Controller
     public function index()
     {
         try {
-        
-            $barang = Barang::where('statusBarang', 'tersedia')->get();
+            $barang = Barang::with('imagesbarang')
+                ->where('statusBarang', 'tersedia')
+                ->get();
+            // $barang = Barang::where('statusBarang', 'tersedia')->get();
 
             return response()->json($barang);
         } catch (\Exception $e) {

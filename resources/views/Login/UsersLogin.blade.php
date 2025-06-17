@@ -106,12 +106,19 @@
                         Don't have an account for organization?
                         <a href="/organisasi/register" class="text-decoration-none">Click here!</a>
                     </p>
+                     <p class="text-center mt-3">
+                        Don't have an account for buyer?
+                        <a href="/pembeli/register" class="text-decoration-none">Click here!</a>
+                    </p>
+                    <p class="text-center mt-2">
+                        <a href="/resetPassword" id="forgotPasswordLink" class="text-decoration-none">Lupa password?</a>
+                    </p>
+
                 </div>
             </div>          
         </div>
-    <!-- </div> -->
 
-    <!-- Script to handle the form submission -->
+
     <script>
 
 
@@ -154,22 +161,15 @@ document.addEventListener('DOMContentLoaded', function () {
             } else if (status == 'pembeli') {
                 localStorage.setItem('auth_token', resData.data.token);
                 localStorage.setItem('user_role', 'pembeli');
-                window.location.href = 'http://127.0.0.1:8000/pembeli/alamat';
+                window.location.href = 'http://127.0.0.1:8000/pembeli/dashboard';
             } else if (status == 'organisasi') {
                 localStorage.setItem('auth_token', resData.data.token);
                 localStorage.setItem('user_role', 'organisasi');
                 window.location.href = 'http://127.0.0.1:8000/OrganisasiMain'
+
             }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('An error occurred: ' + error.message);
-        }
+        });
     });
-});
 </script>
-
-
-
-
 </body>
 </html>

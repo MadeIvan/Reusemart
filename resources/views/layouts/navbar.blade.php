@@ -154,7 +154,7 @@
 
             // Isi menu berdasarkan role
             if (role === "pembeli") {
-                leftMenu.appendChild(createItem("#", "Home"));
+                leftMenu.appendChild(createItem("/pembeli/dashboard", "Home"));
                 leftMenu.appendChild(createItem("/home", "Produk"));
                 leftMenu.appendChild(createItem("/pembeli/alamat", "Alamat"));
                 leftMenu.appendChild(createItem("/pembeli/HistoryPembeli", "History Pembelian"));
@@ -170,11 +170,16 @@
                 leftMenu.appendChild(createItem("/penitip/profile", "Profile"));
                 rightMenu.appendChild(createLogout());            
             }else if (role === "organisasi") {
+                leftMenu.appendChild(createItem("/OrganisasiMain", "Request Donasi"));
                 leftMenu.appendChild(createItem("/organisasi/history-request", "History Request Donasi"));
                 rightMenu.appendChild(createLogout());
             }else if(role === "admin"){
-                
+                leftMenu.appendChild(createItem("/pegawaidata", "Profile"));
+                leftMenu.appendChild(createItem("/organisasi", "Organisasi"));
+                leftMenu.appendChild(createItem("/pegawaiView", "Pegawai"));
+                rightMenu.appendChild(createLogout());
             }else if(role==="cs"){
+                leftMenu.appendChild(createItem("/home", "Produk"));
                 leftMenu.appendChild(createItem("/pegawaidata", "Profile"));
                 leftMenu.appendChild(createItem("/pegawai/PenitipData", "Data Penitip"));
                 leftMenu.appendChild(createItem("/verifikasi", "Verifikasi Pembayaran"));
@@ -183,11 +188,13 @@
                 rightMenu.appendChild(createLogout());            
 
             }else if (role==="gudang"){
+
             leftMenu.appendChild(createItem("/pegawaidata", "Profile"));
             leftMenu.appendChild(createItem("/pegawai/gudangview", "View Gudang"));
             leftMenu.appendChild(createItem("/pegawai/penjadwalan", "Penjadwalan Barang"));
             leftMenu.appendChild(createItem("/pegawai/ViewNota", "Nota Pembelian Barang"));
             rightMenu.appendChild(createLogout());   
+
             }else if (role==="owner"){
                 leftMenu.appendChild(createItem("/pegawaidata", "Profile"));
                 leftMenu.appendChild(createItem("/requestDonasi", "Request Donasi"));
@@ -197,6 +204,7 @@
                 leftMenu.appendChild(createItem("/laporanKomisi", "Komisi"));
                 leftMenu.appendChild(createItem("/laporanStok", "Gudang"));
                 rightMenu.appendChild(createLogout());  
+
             }
         }
     });

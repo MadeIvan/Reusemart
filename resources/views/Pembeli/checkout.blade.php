@@ -405,7 +405,7 @@
                         const konversi = user.poin * 100; // 1 poin = Rp100
                         const totalHargaBarang =dataCheck.totalhargabarang;
                         const ongkir = Number(dataCheck?.ongkir || 0);
-                        const totalAwal = totalHargaBarang;
+                        let totalAwal = dataCheck.total_harga;
 
                         
                         if(totalHargaBarang > 500000){
@@ -434,18 +434,28 @@
                         localStorage.setItem('sisaPoin', user.poin + totalPoin);
 
                         const inputPoin = document.getElementById("inputPoin");
-                        const hasilKonversi = document.getElementById("hasilKonversi");
                         const sisaPoinText = document.getElementById("sisaPoinSetelahTransaksi");
-
+                        
+                        
                         inputPoin.addEventListener("input", () => {
+                            const hasilKonversi = document.getElementById("hasilKonversi");
+                            const maksimalPoinDitukar = Math.floor((totalHargaBarang + ongkir));
                             let nilaiPoin = parseInt(inputPoin.value) || 0;
                             
-                            if (nilaiPoin > user.poin) {
+                            if (nilaiPoin > user.poin  ) {
                                 nilaiPoin = user.poin;
                                 inputPoin.value = user.poin;
                             }
 
-                            const rupiah = nilaiPoin * 100;
+                            
+                            let rupiah = nilaiPoin * 100;
+                            
+                            if(rupiah > maksimalPoinDitukar){
+                                nilaiPoin = maksimalPoinDitukar/100;
+                                inputPoin.value = maksimalPoinDitukar/100;
+                                rupiah = nilaiPoin * 100;
+                            }
+                            
                             hasilKonversi.innerHTML  = `<strong> Rp ${rupiah.toLocaleString('id-ID')}</strong>`;
                             hasilKonversi.classList.toggle("text-black", nilaiPoin > 0);
                             hasilKonversi.classList.toggle("text-muted", nilaiPoin === 0);
@@ -456,7 +466,9 @@
 
                             if (poinDitukarkan && totalHargaAkhir) {
                                 poinDitukarkan.textContent = `- Rp ${rupiah.toLocaleString('id-ID')}`;
-                                const totalAwal = totalHargaBarang+ongkir;
+
+                                const totalAwal = totalHargaBarang + ongkir;   ///////////tambah iniiiiiiiii
+
                                 // Hitung total baru (total awal - poin)
                                 let totalBaru = totalAwal - rupiah;
                                 if (totalBaru < 0) totalBaru = 0;
@@ -510,108 +522,108 @@
                 })
             }
     document.getElementById("checkout-btn").addEventListener("click", function() {
-    const dataCheckout = JSON.parse(localStorage.getItem("data_checkout"));
-    const inputPoinElement = document.getElementById('inputPoin');
-    const nilaiPoin = inputPoinElement ? parseInt(inputPoinElement.value) || 0 : 0;
-    const sisaPoin = localStorage.getItem('sisaPoin');
-    const alamat = JSON.parse(localStorage.getItem('alamatPengiriman'));
+        const dataCheckout = JSON.parse(localStorage.getItem("data_checkout"));
+        const inputPoinElement = document.getElementById('inputPoin');
+        const nilaiPoin = inputPoinElement ? parseInt(inputPoinElement.value) || 0 : 0;
+        const sisaPoin = localStorage.getItem('sisaPoin');
+        const alamat = JSON.parse(localStorage.getItem('alamatPengiriman'));
 
-    let idAlamat = alamat ? alamat.idAlamat : null;
+        let idAlamat = alamat ? alamat.idAlamat : null;
 
-    console.log('idAlamat:', idAlamat);
+        console.log('idAlamat:', idAlamat);
 
-    fetch(`http://127.0.0.1:8000/api/checkout`, {
-        method: "POST",
-        headers: {
-            "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
-            'Accept': 'application/json',
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-        },
-        body: JSON.stringify({
-            idAlamat: idAlamat,
-            tanggalWaktuPembelian: getCurrentDateTime(),
-            totalHarga: localStorage.getItem('totalSetelahPoin') !== null
-                ? parseFloat(localStorage.getItem('totalSetelahPoin'))
-                : Number(dataCheckout.total_harga.toString().replace(/\./g, '')),
-            id_barang: barangArray,
-            sisaPoin: sisaPoin,
+        fetch(`http://127.0.0.1:8000/api/checkout`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
+                'Accept': 'application/json',
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            },
+            body: JSON.stringify({
+                idAlamat: idAlamat,
+                tanggalWaktuPembelian: getCurrentDateTime(),
+                totalHarga: localStorage.getItem('totalSetelahPoin') !== null
+                    ? parseFloat(localStorage.getItem('totalSetelahPoin'))
+                    : Number(dataCheckout.total_harga.toString().replace(/\./g, '')),
+                id_barang: barangArray,
+                sisaPoin: sisaPoin,
+            })
         })
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log("Checkout response:", data);
+        .then(response => response.json())
+        .then(data => {
+            console.log("Checkout response:", data);
 
-        if (!data.status) {
-            alert("Gagal membuat transaksi: " + data.message);
-            throw new Error("Checkout failed");
-        }
+            if (!data.status) {
+                alert("Gagal membuat transaksi: " + data.message);
+                throw new Error("Checkout failed");
+            }
 
-        const noNota = data.data.noNota;
-        console.log("Extracted noNota:", noNota);
+            const noNota = data.data.noNota;
+            console.log("Extracted noNota:", noNota);
 
-        if (!noNota || noNota === "0") {
-            throw new Error("Invalid transaction ID (noNota) from checkout response");
-        }
+            if (!noNota || noNota === "0") {
+                throw new Error("Invalid transaction ID (noNota) from checkout response");
+            }
 
-        if (nilaiPoin > 0) {
-            const userData = localStorage.getItem('userData');
-            const pembeli = userData ? JSON.parse(userData).pembeli : null;
-            const idPembeli = pembeli?.idPembeli;
-            console.log('Point redemption request data:', {
-                idPembeli: idPembeli,
-                points_used: nilaiPoin,
-                transaction_id: noNota,
-            });
-
-            // Fire and forget, no waiting for response
-            fetch('http://127.0.0.1:8000/api/point-redemptions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                },
-                body: JSON.stringify({
+            if (nilaiPoin > 0) {
+                const userData = localStorage.getItem('userData');
+                const pembeli = userData ? JSON.parse(userData).pembeli : null;
+                const idPembeli = pembeli?.idPembeli;
+                console.log('Point redemption request data:', {
                     idPembeli: idPembeli,
                     points_used: nilaiPoin,
                     transaction_id: noNota,
-                }),
-            }).catch(err => console.error("Point redemption error:", err));
-        }
+                });
 
-        // Redirect right away after checkout success
-        window.location.href = `/pembayaran/${noNota}`;
-        hapusKeranjang();
+                // Fire and forget, no waiting for response
+                fetch('http://127.0.0.1:8000/api/point-redemptions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    },
+                    body: JSON.stringify({
+                        idPembeli: idPembeli,
+                        points_used: nilaiPoin,
+                        transaction_id: noNota,
+                    }),
+                }).catch(err => console.error("Point redemption error:", err));
+            }
 
-        Toastify({
-            text: "Berhasil Membuat Pesanan",
-            duration: 3000,
-            gravity: "top",
-            position: "right",
-            style: { background: "#8bc34a" },
-        }).showToast();
+            // Redirect right away after checkout success
+            if( parseFloat(localStorage.getItem('totalSetelahPoin')) !== 0){
+                window.location.href = `/pembayaran/${noNota}`;
+                hapusKeranjang();
+            }else{
+                window.location.href = `/home`;
+                hapusKeranjang();
+            }
 
-        sessionStorage.setItem('pesananSelesai', '1');
-    })
-    .catch(error => {
-        console.error("Error:", error);
-        Toastify({
-            text: "Gagal Membuat Pesanan",
-            duration: 3000,
-            gravity: "top",
-            position: "right",
-            style: { background: "rgb(221, 25, 25)" },
-        }).showToast();
+            Toastify({
+                text: "Berhasil Membuat Pesanan",
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                style: { background: "#8bc34a" },
+            }).showToast();
+
+            sessionStorage.setItem('pesananSelesai', '1');
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            Toastify({
+                text: "Gagal Membuat Pesanan",
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                style: { background: "rgb(221, 25, 25)" },
+            }).showToast();
+        });
     });
-});
-
-            
-   
-
-
-            });
+ });
     </script>
 </body>
 </html>

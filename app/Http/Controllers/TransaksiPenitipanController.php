@@ -3,11 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+
 use Illuminate\Support\Facades\DB;
 use App\Models\TransaksiPenitipan;
 use App\Models\DetailTransaksiPenitipan;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Pegawai;
+use App\Models\TransaksiPenitipan;
+use App\Models\DetailTransaksiPenitipan;
+use App\Models\Penitip;
+use App\Models\Barang;
+use App\Models\DetailTransaksiPembelian;
+use App\Models\Komisi;
+use Barryvdh\DomPDF\Facade\Pdf;
 class TransaksiPenitipanController extends Controller
 {
 public function store(Request $request)
@@ -16,12 +24,10 @@ public function store(Request $request)
         'idPegawai1' => 'required|exists:pegawai,idPegawai',
         'idPegawai2' => 'nullable|exists:pegawai,idPegawai',
         'idPenitip' => 'required|exists:penitip,idPenitip',
-        // 'tanggalPenitipan' => now(),
-        'totalHarga' => 'nullable|numeric|min:0',
+        'totalHarga' => 'required|numeric|min:0',
         'idBarang' => 'required|exists:barang,idBarang'
     ]);
 
-    // Optional: Check if this barang is already in a penitipan
     if (DetailTransaksiPenitipan::where('idBarang', $request->idBarang)->exists()) {
         return response()->json([
             'status' => false,
@@ -31,7 +37,6 @@ public function store(Request $request)
 
     DB::beginTransaction();
     try {
-        // Generate new TP ID
         $last = TransaksiPenitipan::orderBy('idTransaksiPenitipan', 'desc')->first();
         $lastNumber = $last ? (int) str_replace('TP', '', $last->idTransaksiPenitipan) : 0;
         $newIdTP = 'TP' . ($lastNumber + 1);
@@ -43,7 +48,6 @@ public function store(Request $request)
         $tanggalMulai = new \DateTime($request->tanggalPenitipan);
         $tanggalSelesai = (clone $tanggalMulai)->modify('+30 days');
 
-        // Create transaksiPenitipan
         $transaksi = TransaksiPenitipan::create([
             'idTransaksiPenitipan' => $newIdTP,
             'idPegawai1' => $request->idPegawai1,
@@ -54,7 +58,6 @@ public function store(Request $request)
             'totalHarga' => $request->totalHarga,
         ]);
 
-        // Link to 1 barang
         DetailTransaksiPenitipan::create([
             'idTransaksiPenitipan' => $newIdTP,
             'idBarang' => $request->idBarang
@@ -74,6 +77,7 @@ public function store(Request $request)
         ], 500);
     }
 }
+
 
 public function add30($id){
     $tanggalMulai = new \DateTime($id);
@@ -133,4 +137,151 @@ public function notaPenitipanPdf($id)
     // return Pdf::loadView('Pegawai.notaPenitipan', compact('transaksi'))
     //     ->download("nota-penitipan-{$id}.pdf");
 }
+
+
+    public function transaksiPenitip($id){
+
+        $penitipan = TransaksiPenitipan::with([
+            'penitip',
+            'detailTransaksiPenitipan.barang.detailTransaksiPembelian' => function ($query) {
+                $query->whereHas('transaksiPembelian', function ($q) {
+                    $q->where(function ($subQuery) {
+                        $subQuery->where('status', 'like', 'Lunas%')
+                                ->orWhere('status', 'like', '%Barang diterima%');
+                    });
+                });
+            },
+            'detailTransaksiPenitipan.barang.detailTransaksiPembelian.transaksiPembelian.komisi'
+        ])
+        ->where('idPenitip', $id)
+        ->whereHas('detailTransaksiPenitipan.barang', function ($query) {
+            $query->where('statusBarang', 'Terjual')
+                ->whereHas('detailTransaksiPembelian.transaksiPembelian', function ($q) {
+                  $q->where(function ($subQuery) {
+                        $subQuery->where('status', 'like', 'Lunas%')
+                                ->orWhere('status', 'like', '%Barang Diterima%');
+                    });
+              });
+
+        })
+        ->get();
+
+        $laporan = [];
+
+        foreach ($penitipan as $transaksi) {
+            $penitip = $transaksi->penitip;
+
+            foreach ($transaksi->detailTransaksiPenitipan as $detail) {
+                $barang = $detail->barang;
+
+                if ($barang && $barang->detailTransaksiPembelian->isNotEmpty()) {
+                    foreach ($barang->detailTransaksiPembelian as $dtp) {
+                        $transaksiPembelian = $dtp->transaksiPembelian ?? null;
+                        $komisi = Komisi::where('noNota', $transaksiPembelian->noNota)
+                                    ->first();
+
+                        $laporan[] = [
+                            'penitip' => $penitip,
+                            'barang'=> $barang,
+                            'komisi'=> $komisi,
+                            'tanggalMasuk' => $transaksi->tanggalPenitipan,
+                        ];
+                    }
+                }
+            }
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $laporan
+        ]);
+    }
+
+
+    public function laporanTransaksiPenitipPdf(Request $request)
+    {
+        $id = $request->query('idPenitip');
+        $thn = $request->query('tahun');
+        $bln = $request->query('bulan');
+
+        $query = TransaksiPenitipan::with([
+            'penitip',
+            'detailTransaksiPenitipan.barang.detailTransaksiPembelian' => function ($query) {
+                $query->whereHas('transaksiPembelian', function ($q) {
+                    $q->where(function ($subQuery) {
+                        $subQuery->where('status', 'like', 'Lunas%')
+                                ->orWhere('status', 'like', '%Barang diterima%');
+                    });
+                });
+            },
+            'detailTransaksiPenitipan.barang.detailTransaksiPembelian.transaksiPembelian.komisi'
+        ])
+        ->where('idPenitip', $id)
+        ->whereHas('detailTransaksiPenitipan.barang', function ($query) {
+            $query->where('statusBarang', 'Terjual')
+                ->whereHas('detailTransaksiPembelian.transaksiPembelian', function ($q) {
+                    $q->where(function ($subQuery) {
+                        $subQuery->where('status', 'like', 'Lunas%')
+                                ->orWhere('status', 'like', '%Barang diterima%');
+                    });
+                });
+        });
+
+        if ($thn) {
+            $query->whereHas('detailTransaksiPenitipan.barang.detailTransaksiPembelian.transaksiPembelian', function ($query) use ($thn) {
+                $query->whereYear('tanggalWaktuPembelian', $thn);
+            });
+        }
+
+            if ($bln) {
+            $query->whereHas('detailTransaksiPenitipan.barang.detailTransaksiPembelian.transaksiPembelian', function ($query) use ($bln) {
+                $query->whereMonth('tanggalWaktuPembelian', $bln);
+            });
+        }
+
+
+        $penitipan = $query->get();
+
+        $laporan = [];
+
+        foreach ($penitipan as $transaksi) {
+            $penitip = $transaksi->penitip;
+
+            foreach ($transaksi->detailTransaksiPenitipan as $detail) {
+                $barang = $detail->barang;
+
+                if ($barang && $barang->detailTransaksiPembelian->isNotEmpty()) {
+                    foreach ($barang->detailTransaksiPembelian as $dtp) {
+                        $transaksiPembelian = $dtp->transaksiPembelian ?? null;
+
+                        if ($transaksiPembelian && (
+                            str_starts_with($transaksiPembelian->status, 'Barang diterima') ||
+                            str_starts_with($transaksiPembelian->status, 'Lunas Siap Diantarkan') || 
+                            str_starts_with($transaksiPembelian->status, 'Lunas Siap Diambil') ||
+                            str_starts_with($transaksiPembelian->status, 'Lunas Belum Dijadwalkan') ||
+                            str_starts_with($transaksiPembelian->status, 'Lunas Belum Diambil') ||
+                            str_starts_with($transaksiPembelian->status, 'Lunas Dikirim') ||
+                            str_starts_with($transaksiPembelian->status, 'Lunas Tidak Diambil (Didonasikan)')
+                        )) {
+                            $komisi = Komisi::where('noNota', $transaksiPembelian->noNota)->first();
+
+                            $laporan[] = [
+                                'penitip' => $penitip,
+                                'barang' => $barang,
+                                'komisi' => $komisi,
+                                'tanggalMasuk' => $transaksi->tanggalPenitipan,
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+
+        $penitipData = $penitipan->first()?->penitip ?? null;
+
+        return Pdf::loadView('nota.pdf.laporanUntukPenitip', compact('laporan', 'penitipData', 'thn', 'bln'))
+            ->setPaper('a4', 'landscape')
+            ->stream("Laporan Penitip.pdf");
+    }
+
 }

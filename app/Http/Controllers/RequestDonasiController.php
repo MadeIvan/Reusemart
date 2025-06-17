@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\ReqDonasi;
+use App\Models\RequestDonasi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
+
 class RequestDonasiController extends Controller
 {
     // Middleware to ensure that the user is authenticated
@@ -189,6 +191,7 @@ class RequestDonasiController extends Controller
             ], 500);
         }
     }
+
     public function request(){
         $requestDonasi = ReqDonasi::with([
             'transaksiDonasi.barang',
@@ -215,5 +218,5 @@ class RequestDonasiController extends Controller
             ->setPaper('a4', 'landscape')
             ->stream("Laporan Request Donasi.pdf");
     }
-    
+
 }

@@ -65,14 +65,14 @@
 
   <div class="d-flex justify-content-center align-items-center vh-100 position-relative" style="z-index: 1;">
     <div class="col-11 col-sm-8 col-md-6 col-lg-4 login-form-bg p-4 rounded shadow">
-      <h2 class="text-center custom-heading-color mb-4">Login Pegawai</h2>
+      <h3 class="text-center mb-4">Login Pegawai</h3>
       <form id="loginForm" autocomplete="off">
         <div class="mb-3">
-          <label for="username" class="form-label"><strong>Username</strong></label>
+          <label for="username" class="form-label">Username</label>
           <input type="text" class="form-control" id="username" autocomplete="username" required />
         </div>
         <div class="mb-3">
-          <label for="password" class="form-label"><strong>Password</strong></label>
+          <label for="password" class="form-label">Password</label>
           <div class="input-group">
             <input type="password" class="form-control" id="password" autocomplete="current-password" required />
             <button class="btn btn-outline-secondary toggle-password" type="button" id="togglePassword">
@@ -81,7 +81,7 @@
           </div>
         </div>
         <div class="d-grid gap-2 login-button">
-          <button type="submit" class="btn btn-success" id="loginButton">Login</button>
+          <button type="submit" class="btn btn-primary w-100">Login</button>
         </div>
       </form>
     </div>
@@ -153,7 +153,8 @@
             localStorage.setItem('user_role', 'admin');
             localStorage.setItem('namaPegawai', namaPegawai);
             localStorage.setItem('idPegawai', idPegawai);
-            window.location.href = 'http://127.0.0.1:8000/organisasi';
+            window.location.href = 'http://127.0.0.1:8000/pegawaidata';
+
           } else if(IdJabatan==3){
             alert('Login As Pegawai Gudang!');
             localStorage.setItem('user_role', 'gudang');
