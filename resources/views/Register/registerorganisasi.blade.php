@@ -62,6 +62,11 @@
                                 <img src="{{ asset('logoReUseMart.png') }}" alt="Logo Reusemart" style="width:50px;">
                             </a>
                         </li>
+                        <li class="nav-item d-flex align-items-center">
+                            <a class="nav-link text-white" href="{{url('/home')}}">
+                                Produk
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>

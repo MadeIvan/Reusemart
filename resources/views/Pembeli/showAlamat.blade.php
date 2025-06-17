@@ -154,6 +154,12 @@
                         </select>
                     </div>
                     <div class="mb-3">
+                        <label for="kelurahanAlamatCreate" class="form-label"><strong>Kelurahan</strong></label>
+                        <select class="form-control" id="kelurahanAlamatCreate" name="kelurahanAlamatCreate" required>
+                            <option value="" disabled selected>Pilih Kelurahan</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
                         <label for="kodePosAlamatCreate" class="form-label"><strong>Kode Pos</strong></label>
                         <input class="form-control" id="kodePosAlamatCreate" name="kodePosAlamatCreate" required></input>
                     </div>
@@ -257,41 +263,198 @@
             
           
             fetchAlamat();
-            
+
+            /* =========================
+            1. KECAMATAN / KAPANEWON
+            =========================*/
             const kecamatanData = {
-                bantul: ["Bambanglipuro", "Bantul", "Banguntapan", "Jetis", "Kasihan", "Pajangan", "Pandak", "Sanden", "Sedayu", "Sewon", "Pleret", "Imogiri"],
-                sleman: ["Depok", "Gamping", "Godean", "Minggir", "Mlati", "Ngaglik", "Ngemplak", "Pakem", "Prambanan", "Seyegan", "Tempel", "Turi"],
-                kulprog: ["Galur", "Kalibawang", "Kokap", "Lendah", "Nanggulan", "Panjatan", "Wates", "Sentolo", "Samigaluh"],
-                gunkid: ["Playen", "Gedangsari", "Nglipar", "Paliyan", "Panggang", "Semanu", "Ngawen", "Wonosari", "Karangmojo", "Patuk", "Ponjong", "Tepus"],
-                yk: ["Gedongtengen", "Gondokusuman", "Gondomanan", "Jetis", "Kotagede", "Kraton", "Mantrijeron", "Mergangsan", "Ngampilan", "Pakualaman", "Tegalrejo", "Umbulharjo"]
+                bantul: [
+                    "Bambanglipuro", "Banguntapan", "Bantul", "Dlingo", "Imogiri", "Jetis", "Kasihan",
+                    "Kretek", "Pajangan", "Pandak", "Piyungan", "Pleret", "Pundong", "Sanden",
+                    "Sedayu", "Sewon", "Srandakan"
+                ],
+
+                sleman: [
+                    "Berbah", "Cangkringan", "Depok", "Gamping", "Godean", "Kalasan", "Minggir", "Mlati",
+                    "Moyudan", "Ngaglik", "Ngemplak", "Pakem", "Prambanan", "Seyegan", "Sleman",
+                    "Tempel", "Turi"
+                ],
+
+                kulprog: [
+                    "Galur", "Girimulyo", "Kalibawang", "Kokap", "Lendah", "Nanggulan", "Panjatan",
+                    "Pengasih", "Samigaluh", "Sentolo", "Temon", "Wates"
+                ],
+
+                gunkid: [
+                    "Gedangsari", "Girisubo", "Karangmojo", "Ngawen", "Nglipar", "Paliyan", "Panggang",
+                    "Patuk", "Playen", "Ponjong", "Purwosari", "Rongkop", "Saptosari", "Semanu",
+                    "Semin", "Tanjungsari", "Tepus", "Wonosari"
+                ],
+
+                yk: [
+                    "Danurejan", "Gedongtengen", "Gondokusuman", "Gondomanan", "Jetis", "Kotagede",
+                    "Kraton", "Mantrijeron", "Mergangsan", "Ngampilan", "Pakualaman", "Tegalrejo",
+                    "Umbulharjo", "Wirobrajan"
+                ]
             };
+
+
+            /* =====================
+            2. KELURAHAN PER KEC.
+            =====================*/
+            const kelurahanData = {
+                bantul: {
+                    Bambanglipuro: ["Mulyodadi", "Sidomulyo", "Sumbermulyo"],
+                    Banguntapan: ["Banguntapan", "Baturetno", "Jagalan", "Jambidan", "Potorono", "Singosaren", "Tamanan", "Wirokerten"],
+                    Bantul: ["Bantul", "Palbapang", "Ringinharjo", "Sabdodadi", "Trirenggo"],
+                    Dlingo: ["Dlingo", "Jatimulyo", "Mangunan", "Muntuk", "Temuwuh", "Terong"],
+                    Imogiri: ["Girirejo", "Imogiri", "Karangtalun", "Karangtengah", "Kebonagung", "Selopamioro", "Sriharjo", "Wukirsari"],
+                    Jetis: ["Canden", "Patalan", "Sumberagung", "Trimulyo"],
+                    Kasihan: ["Bangunjiwo", "Ngestiharjo", "Tamantirto", "Tirtonirmolo"],
+                    Kretek: ["Donotirto", "Parangtritis", "Tirtohargo", "Tirtomulyo", "Tirtosari"],
+                    Pajangan: ["Guwosari", "Sendangsari", "Triwidadi"],
+                    Pandak: ["Caturharjo", "Gilangharjo", "Triharjo", "Wijirejo"],
+                    Piyungan: ["Srimulyo", "Sitimulyo", "Srimartani"],
+                    Pleret: ["Bawuran", "Pleret", "Segoroyoso", "Wonokromo", "Wonolelo"],
+                    Pundong: ["Panjangrejo", "Seloharjo", "Srihardono"],
+                    Sanden: ["Gadingsari", "Gadingharjo", "Murtigading", "Srigading"],
+                    Sedayu: ["Argodadi", "Argorejo", "Argosari", "Argomulyo"],
+                    Sewon: ["Bangunharjo", "Panggungharjo", "Pendowoharjo", "Timbulharjo"],
+                    Srandakan: ["Poncosari", "Trimurti"]
+                },
+
+                sleman: {
+                    Berbah: ["Jogotirto", "Kalitirto", "Sendangtirto", "Tegaltirto"],
+                    Cangkringan: ["Argomulyo", "Glagaharjo", "Kepuharjo", "Wukirsari", "Umbulharjo"],
+                    Depok: ["Caturtunggal", "Condongcatur", "Maguwoharjo"],
+                    Gamping: ["Ambarketawang", "Balecatur", "Banyuraden", "Nogotirto", "Trihanggo"],
+                    Godean: ["Sidoagung", "Sidoarum", "Sidokarto", "Sidoluhur", "Sidomoyo", "Sidomulyo", "Sidorejo"],
+                    Kalasan: ["Purwomartani", "Selomartani", "Tamanmartani", "Tirtomartani"],
+                    Minggir: ["Sendangagung", "Sendangarum", "Sendangmulyo", "Sendangrejo", "Sendangsari"],
+                    Mlati: ["Sendangadi", "Sinduadi", "Sumberadi", "Tirtoadi", "Tlogoadi"],
+                    Moyudan: ["Sumberagung", "Sumberarum", "Sumberrahayu", "Sumbersari"],
+                    Ngaglik: ["Donoharjo", "Minomartani", "Sardonoharjo", "Sariharjo", "Sinduharjo", "Sukoharjo"],
+                    Ngemplak: ["Bimomartani", "Sindumartani", "Umbulmartani", "Wedomartani", "Widodomartani"],
+                    Pakem: ["Candibinangun", "Hargobinangun", "Harjobinangun", "Pakembinangun", "Purwobinangun"],
+                    Prambanan: ["Bokoharjo", "Gayamharjo", "Madurejo", "Sambirejo", "Sumberharjo", "Wukirharjo"],
+                    Seyegan: ["Margoagung", "Margodadi", "Margokaton", "Margoluwih", "Margomulyo"],
+                    Sleman: ["Caturharjo", "Pandowoharjo", "Tridadi", "Triharjo", "Trimulyo"],
+                    Tempel: ["Banyurejo", "Lumbungrejo", "Margorejo", "Merdikorejo", "Mororejo", "Pondokrejo", "Sumberejo", "Tambakrejo"],
+                    Turi: ["Bangunkerto", "Donokerto", "Girikerto", "Wonokerto"]
+                },
+
+                kulprog: {
+                    Galur: ["Banaran", "Brosot", "Karangsewu", "Kranggan", "Nomporejo", "Pandowan", "Tirtarahayu"],
+                    Girimulyo: ["Giripurwo", "Jatimulyo", "Pendoworejo", "Purwosari"],
+                    Kalibawang: ["Banjararum", "Banjarasri", "Banjarharjo", "Banjaroyo"],
+                    Kokap: ["Hargomulyo", "Hargorejo", "Hargotirto", "Hargowilis", "Kalirejo"],
+                    Lendah: ["Bumirejo", "Gulurejo", "Jatirejo", "Ngentakrejo", "Sidorejo", "Wahyuharjo"],
+                    Nanggulan: ["Banyuroto", "Kembang", "Donomulyo", "Jatisarono", "Tanjungharjo", "Wijimulyo"],
+                    Panjatan: ["Bojong", "Bugel", "Cerme", "Depok", "Garongan", "Gotakan", "Kanoman", "Krembangan", "Panjatan", "Pleret", "Tayuban"],
+                    Pengasih: ["Karangsari", "Kedungsari", "Margosari", "Pengasih", "Sidomulyo", "Sendangsari", "Tawangsari"],
+                    Samigaluh: ["Banjarsari", "Gerbosari", "Kebonharjo", "Ngargosari", "Pagerharjo", "Purwoharjo", "Sidoharjo"],
+                    Sentolo: ["Banguncipto", "Demangrejo", "Kaliagung", "Salamrejo", "Sentolo", "Srikayangan", "Sukoreno", "Tuksono"],
+                    Temon: ["Demen", "Glagah", "Jangkaran", "Janten", "Kalidengen", "Kaligintung", "Karangwuluh", "Kebonrejo", "Kedundang", "Kulur", "Palihan", "Plumbon", "Sindutan", "Temonkulon", "Temonwetan"],
+                    Wates: ["Bendungan", "Giripeni", "Karangwuni", "Kulwaru", "Ngestiharjo", "Sogan", "Triharjo"]
+                },
+
+                gunkid: {
+                    Gedangsari: ["Hargomulyo", "Mertelu", "Ngalang", "Sampang", "Serut", "Tegalrejo", "Watugajah"],
+                    Girisubo: ["Balong", "Jepitu", "Karangawen", "Jerukwudel", "Pucung", "Songbanyu", "Nglindur", "Tileng"],
+                    Karangmojo: ["Bendungan", "Bejiharjo", "Gedangrejo", "Jatiayu", "Karangmojo", "Kelor", "Ngawis", "Ngipak", "Wiladeg"],
+                    Ngawen: ["Beji", "Jurangjero", "Kampung", "Sambirejo", "Tancep", "Watusigar"],
+                    Nglipar: ["Katongan", "Kedungkeris", "Kedungpoh", "Natah", "Nglipar", "Pengkol", "Pilangrejo"],
+                    Paliyan: ["Giring", "Grogol", "Karangasem", "Karangduwet", "Mulusan", "Pampang", "Sodo"],
+                    Panggang: ["Giriharjo", "Girikarto", "Girimulyo", "Girisekar", "Girisuko", "Giriwungu"],
+                    Patuk: ["Beji", "Bunder", "Nglanggeran", "Nglegi", "Ngoro-oro", "Patuk", "Pengkok", "Putat", "Salam", "Semoyo", "Terbah"],
+                    Playen: ["Banaran", "Bandung", "Banyusoco", "Bleberan", "Dengok", "Gading", "Getas", "Logandeng", "Ngawu", "Ngleri", "Ngunut", "Playen", "Plembutan"],
+                    Ponjong: ["Bedoyo", "Genjahan", "Gombang", "Karangasem", "Kenteng", "Ponjong", "Sawahan", "Sidorejo", "Sumbergiri", "Tambakromo", "Umbulrejo"],
+                    Purwosari: ["Giriasih", "Giricahyo", "Girijatih", "Giripurwo", "Giritirto"],
+                    Rongkop: ["Botodayaan", "Bohol", "Karangwuni", "Melikan", "Petir", "Pringombo", "Pucanganom", "Semugih"],
+                    Saptosari: ["Jetis", "Kanigoro", "Kepek", "Krambilsawit", "Monggol", "Ngloro", "Planjan"],
+                    Semanu: ["Candirejo", "Dadapayu", "Ngeposari", "Pacarejo", "Semanu"],
+                    Semin: ["Bendung", "Bulurejo", "Candirejo", "Kalitekuk", "Karangsari", "Kemejing", "Pundungsari", "Rejosari", "Semin", "Sumberejo"],
+                    Tanjungsari: ["Banjarejo", "Hargosari", "Kemadang", "Kemiri", "Ngestirejo"],
+                    Tepus: ["Giripanggung", "Purwodadi", "Sidoharjo", "Sumberwungu", "Tepus"],
+                    Wonosari: ["Baleharjo", "Duwet", "Gari", "Karangtengah", "Karangrejek", "Kepek", "Mulo", "Piyaman", "Pulutan", "Selang", "Siraman", "Wareng", "Wonosari", "Wunung"]
+                },
+
+                yk: {
+                    Danurejan: ["Bausasran", "Tegalpanggung", "Suryatmajan"],
+                    Gedongtengen: ["Pringgokusuman", "Sosromenduran"],
+                    Gondokusuman: ["Baciro", "Demangan", "Klitren", "Kotabaru", "Terban"],
+                    Gondomanan: ["Ngupasan", "Prawirodirjan"],
+                    Jetis: ["Bumijo", "Cokrodiningratan", "Gowongan"],
+                    Kotagede: ["Prenggan", "Purbayan", "Rejowinangun"],
+                    Kraton: ["Panembahan", "Kadipaten", "Patehan"],
+                    Mantrijeron: ["Gedongkiwo", "Suryodiningratan", "Mantrijeron"],
+                    Mergangsan: ["Brontokusuman", "Keparakan", "Wirogunan"],
+                    Ngampilan: ["Ngampilan", "Notoprajan"],
+                    Pakualaman: ["Gunungketur", "Purwokinanti"],
+                    Tegalrejo: ["Bener", "Karangwaru", "Kricak", "Tegalrejo"],
+                    Umbulharjo: ["Pandeyan", "Sorosutan", "Giwangan", "Warungboto", "Mujamuju", "Semaki", "Tahunan"],
+                    Wirobrajan: ["Pakuncen", "Patangpuluhan", "Wirobrajan"]
+                }
+            };
+
+
+
 
             const kotaSelect = document.getElementById('kotaAlamatCreate');
             const kecamatanSelect = document.getElementById('kecamatanAlamatCreate');
+            const kelurahanSelect = document.getElementById('kelurahanAlamatCreate');
 
-            kotaSelect.addEventListener('change', function() {
+            // Inisialisasi dropdown dalam kondisi disabled
+            kecamatanSelect.disabled = true;
+            kelurahanSelect.disabled = true;
+
+            kotaSelect.addEventListener('change', function () {
                 const selectedKota = this.value;
-                
-                // Hapus opsi lama di kecamatan
+
+                // Reset isi kecamatan dan kelurahan
                 kecamatanSelect.innerHTML = '<option value="" disabled selected>Pilih Kecamatan</option>';
+                kelurahanSelect.innerHTML = '<option value="" disabled selected>Pilih Kelurahan</option>';
+                kelurahanSelect.disabled = true;
 
                 if (selectedKota && kecamatanData[selectedKota]) {
-                    // Isi kecamatan sesuai kota yang dipilih
                     kecamatanData[selectedKota].forEach(kecamatan => {
                         const option = document.createElement('option');
-                        option.value = kecamatan.toLowerCase().replace(/\s+/g, '');
+                        option.value = kecamatan; // gunakan original name
                         option.textContent = kecamatan;
                         kecamatanSelect.appendChild(option);
                     });
                     kecamatanSelect.disabled = false;
                 } else {
-                    // Jika tidak ada data, disable dropdown kecamatan
                     kecamatanSelect.disabled = true;
                 }
             });
 
-            // Inisialisasi disable kecamatan jika belum pilih kota
-            kecamatanSelect.disabled = true;
+            kecamatanSelect.addEventListener('change', function () {
+                const selectedKota = kotaSelect.value;
+                const selectedKecamatan = this.value;
+
+                // Reset isi kelurahan
+                kelurahanSelect.innerHTML = '<option value="" disabled selected>Pilih Kelurahan</option>';
+
+                if (
+                    selectedKota &&
+                    selectedKecamatan &&
+                    kelurahanData[selectedKota] &&
+                    kelurahanData[selectedKota][selectedKecamatan]
+                ) {
+                    kelurahanData[selectedKota][selectedKecamatan].forEach(kelurahan => {
+                        const option = document.createElement('option');
+                        option.value = kelurahan;
+                        option.textContent = kelurahan;
+                        kelurahanSelect.appendChild(option);
+                    });
+                    kelurahanSelect.disabled = false;
+                } else {
+                    kelurahanSelect.disabled = true;
+                }
+            });
+
+
 
             ////////////////////////SHOW ALAMAT//////////////////////////////////;
 
@@ -505,25 +668,52 @@
                 const provinsi = document.getElementById("ProvinsiAlamatCreate").options[document.getElementById("ProvinsiAlamatCreate").selectedIndex].text;
                 const kota = document.getElementById("kotaAlamatCreate").options[document.getElementById("kotaAlamatCreate").selectedIndex].text;
                 const kecamatan = document.getElementById("kecamatanAlamatCreate").options[document.getElementById("kecamatanAlamatCreate").selectedIndex].text;
+                const kelurahan = document.getElementById("kelurahanAlamatCreate").options[document.getElementById("kelurahanAlamatCreate").selectedIndex].text;
                 const kodePos = document.getElementById("kodePosAlamatCreate").value;
-                const alamat = `${alamatJalan}, ${kecamatan}, ${kota}, ${provinsi}, ${kodePos}`;
+                const alamat = `${alamatJalan}, ${kelurahan}, ${kecamatan}, ${kota}, ${provinsi}, ${kodePos}`;
                 const nama = document.getElementById("namaCreate").value;
                 const isDefault = document.getElementById("isDefault").checked;
 
-                if(!kategori || !alamatJalan || !nama || !kodePos || !kecamatan || !kota) {
+                if(!kategori || !alamatJalan || !nama || !kodePos || !kecamatan || !kota || !kelurahan) {
                     Toastify({
                         text: "Semua field harus diisi",
                         duration: 3000,
                         gravity: "top",
                         position: "right",
                         style: {
-                            background: "#8bc34a"
+                            background: "rgb(221, 25, 25)"
                         },
                     }).showToast();
                     return;
                 };
 
-                const alamatLengkap = `${alamatJalan}, ${kecamatan}, ${kota}, ${provinsi}, Kode Pos: ${kodePos}`;
+                if (!/^\d{5}$/.test(kodePos)) {
+                    Toastify({
+                        text: "Kode pos harus 5 digit angka",
+                        duration: 3000,
+                        gravity: "top",
+                        position: "right",
+                        style: {
+                            background: "rgb(221, 25, 25)"
+                        },
+                    }).showToast();
+                    return;
+                }
+
+                function resetFormCreateAlamat() {
+                    document.getElementById("kategoriAlamatCreate").value = "";
+                    document.getElementById("namaCreate").value = "";
+                    document.getElementById("alamatCreate").value = "";
+                    document.getElementById("kotaAlamatCreate").value = "";
+                    document.getElementById("kecamatanAlamatCreate").innerHTML = '<option value="" disabled selected>Pilih Kecamatan</option>';
+                    document.getElementById("kecamatanAlamatCreate").disabled = true;
+                    document.getElementById("kelurahanAlamatCreate").innerHTML = '<option value="" disabled selected>Pilih Kelurahan</option>';
+                    document.getElementById("kelurahanAlamatCreate").disabled = true;
+                    document.getElementById("kodePosAlamatCreate").value = "";
+                    document.getElementById("isDefault").checked = false;
+                }
+
+                const alamatLengkap = `${alamatJalan}, ${kelurahan}, ${kecamatan}, ${kota}, ${provinsi}, Kode Pos: ${kodePos}`;
                 fetch("http://127.0.0.1:8000/api/pembeli/buat-alamat", {
                     method: "POST",
                     headers: {
@@ -543,7 +733,10 @@
                 .then(data => {
                     console.log("Data berhasil ditambahkan:", data);
                     const modal = bootstrap.Modal.getInstance(document.getElementById("createAlamat"));
-                    if (modal) modal.hide();
+                    if (modal){
+                        modal.hide();
+                        resetFormCreateAlamat();
+                    } ;
     
                     Toastify({
                         text: "Berhasil Menambahkan Alamat",
