@@ -188,7 +188,10 @@
 
             
             rightMenu.appendChild(createLogout());   
-            }
+            }else if(role==="owner"){
+                leftMenu.appendChild(createItem("/pegawaidata", "Profile"));
+                leftMenu.appendChild(createItem("/pegawai/penjualankategori", "Laporan Penjualan per Kategori"));
+                rightMenu.appendChild(createLogout());
         }
     });
 </script>

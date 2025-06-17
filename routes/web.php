@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BarangController;
 use Illuminate\Support\Facades\Password;
 use App\Http\Controllers\TransaksiPembelianController;
+use App\Http\Controllers\TransaksiPenitipanController;
+
 
 
 Route::get('/', function () {
@@ -137,7 +139,19 @@ Route::get('/pembeli/MyProfile', function () {
     return view('Pembeli.profilePembeli');
 });
 
+
+Route::get('/pegawai/penjualankategori', function () {
+    return view('Pegawai.Owner.PenjualanKategori');
+});
+
 Route::get('/laporan-per-kategori-barang', [TransaksiPembelianController::class, 'laporanPerKategoriBarang']);
 
 Route::get('/laporan-penitipan-habis', [\App\Http\Controllers\TransaksiPenitipanController::class, 'laporanPenitipanHabis']);
 // Route::get('/products', [BarangController::class, 'index']);
+
+Route::get('/pegawai/laporan-per-kategori-barang', [TransaksiPembelianController::class, 'laporanPerKategoriBarang'])->name('pegawai.laporanPerKategoriBarang');
+
+Route::get('/pegawai/penitipanhabis', function () {
+    return view('Pegawai.Owner.showPenitipanHabis');
+});
+Route::get('/pegawai/laporan-penitipan-habis', [TransaksiPenitipanController::class, 'laporanPenitipanHabis'])->name('pegawai.laporanPenitipanHabis');

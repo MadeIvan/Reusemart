@@ -612,13 +612,14 @@ public function laporanPerKategoriBarang(Request $request)
         'Perlengkapan Taman & Outdoor',
         'Peralatan Kantor & Industri',
         'Kosmetik & Perawatan Diri',
+
     ];
 
     // Hitung jumlah item terjual per kategori (status: Barang Diterima)
     $terjual = \App\Models\DetailTransaksiPembelian::whereHas('transaksiPembelian', function($q) use ($tahun) {
         $q->whereYear('tanggalWaktuPembelian', $tahun)
-          ->where('status', 'Barang Diterima');
-          
+        ->wherein('status', ['Barang Diterima', 'Barang Diambil', 'Barang diterima'])
+        ->whereNotNull('idPegawai3');
     })
     ->with('barang')
     ->get()
@@ -630,9 +631,9 @@ public function laporanPerKategoriBarang(Request $request)
     });
 
     // Hitung jumlah item gagal terjual per kategori (status: Dibatalkan (Tidak dibayar))
-    $gagal = \App\Models\DetailTransaksiPembelian::whereHas('transaksiPembelian', function($q) use ($tahun) {
-        $q->whereYear('tanggalWaktuPembelian', $tahun)
-          ->where('status', 'Dibatalkan (Tidak dibayar)');
+    $gagal = \App\Models\DetailTransaksiPembelian::whereHas('transaksiPembelian', function($q) {
+        $q->wherein('status', ['Dibatalkan (Tidak dibayar)','Dibatalkan (Bukti Tidak Valid)','Dibatalkan (Tidak dibayar)'])
+        ->whereNotNull('idPegawai3');
     })
     ->with('barang')
     ->get()
@@ -649,7 +650,7 @@ public function laporanPerKategoriBarang(Request $request)
         $dataKategori[] = [
             'nama' => $namaKategori,
             'terjual' => $terjual[$namaKategori] ?? '...',
-            'gagal' => $gagal[$namaKategori] ?? '...',
+            'gagal' => $gagal[$namaKategori] ?? '0',
         ];
     }
 
@@ -727,6 +728,75 @@ public function showHistoriKomisiHunter($idHunter)
     ]);
 }
 
+public function laporanKategori(Request $request)
+{
+    $tahun = $request->input('tahun', date('Y'));
 
+    $kategoriList = [
+        'Elektronik & Gadget',
+        'Pakaian & Aksesoris',
+        'Perabotan Rumah Tangga',
+        'Buku, Alat Tulis, & Peralatan Sekolah',
+        'Hobi, Mainan, & Koleksi',
+        'Perlengkapan Bayi & Anak',
+        'Otomotif & Aksesoris',
+        'Perlengkapan Taman & Outdoor',
+        'Peralatan Kantor & Industri',
+        'Kosmetik & Perawatan Diri',
+    ];
+
+    $terjual = \App\Models\DetailTransaksiPembelian::whereHas('transaksiPembelian', function($q) use ($tahun) {
+        $q->whereYear('tanggalWaktuPembelian', $tahun)
+        ->wherein('status', ['Barang Diterima', 'Barang Diambil', 'Barang diterima'])
+        ->whereNotNull('idPegawai3');
+        
+    })
+    ->with('barang')
+    ->get()
+    ->groupBy(function($item) {
+        return $item->barang->kategori ?? 'Lainnya';
+    })
+    ->map(function($group) {
+        return $group->count();
+    });
+
+    $gagal = \App\Models\DetailTransaksiPembelian::whereHas('transaksiPembelian', function($q) {
+        $q->wherein('status', ['Dibatalkan (Tidak dibayar)','Dibatalkan (Bukti Tidak Valid)','Dibatalkan (Tidak dibayar)'])
+        ->whereNotNull('idPegawai3');
+    })
+    ->with('barang')
+    ->get()
+    ->groupBy(function($item) {
+        return $item->barang->kategori ?? 'Lainnya';
+    })
+    ->map(function($group) {
+        return $group->count();
+    });
+
+    // Gabungkan data kategori sesuai urutan di gambar
+    $dataKategori = [];
+    foreach ($kategoriList as $namaKategori) {
+        $dataKategori[] = [
+            'nama' => $namaKategori,
+            'terjual' => $terjual[$namaKategori] ?? '0',
+            'gagal' => $gagal[$namaKategori] ?? '0',
+        ];
+    }
+
+    $totalTerjual = 0;
+    $totalGagal = 0;
+    foreach ($dataKategori as $row) {
+        $totalTerjual += is_numeric($row['terjual']) ? $row['terjual'] : 0;
+        $totalGagal += is_numeric($row['gagal']) ? $row['gagal'] : 0;
+    }
+
+    // Return as JSON (no PDF)
+    return response()->json([
+        'tahun' => $tahun,
+        'data' => $dataKategori,
+        'total_terjual' => $totalTerjual,
+        'total_gagal' => $totalGagal,
+    ]);
+}
 
 }

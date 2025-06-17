@@ -193,3 +193,7 @@ Route::post('/store/claim', [ClaimMerchandiseController::class, 'store']);
 
 
 Route::get('/show-umum-barang', [BarangController::class, 'ShowUmum']);
+
+Route::get('/laporan-kategori', [TransaksiPembelianController::class, 'laporanKategori']);
+
+Route::get('/penitipan-habis', [TransaksiPenitipanController::class, 'apiPenitipanHabis']);
