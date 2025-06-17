@@ -11,7 +11,7 @@ use App\Models\TransaksiPembelian;
 //     return view('Pegawai.Merch');
 // });
 Route::get('/', function () {
-    return view('Pegawai.Merch');
+    return view('PegawaiGudang.komisiHunter');
 });
 Route::get('/home', function () {
     return view('home');

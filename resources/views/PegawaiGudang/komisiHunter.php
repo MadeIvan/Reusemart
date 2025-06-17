@@ -265,8 +265,8 @@
             <table class="table table-bordered" id="pegawaiTable">
                 <thead>
                     <tr>
-                        
-                        <th>Nama Barang</th>
+                        <th>ID Hunter</th>
+                        <th>Nama Hunter</th>
                    
                         <!-- <th>Password</th>  -->
                     </tr>
@@ -372,8 +372,8 @@
                     console.log("Token:", localStorage.getItem('auth_token'));
 
                     if (Array.isArray(data) && data.length > 0) {
-                        pegawaiData = data;
-                        renderTable(pegawaiData);
+                        
+                        renderTable(data);
                     } else {
                         alert("Gagal memuat data barang.");
                         console.error("Error loading data:", data);
@@ -395,34 +395,32 @@
                 data.forEach(item => {
                     const row = document.createElement("tr");
                     row.innerHTML = `
+                        <td>${item.idHunter}</td>
                         <td>${item.namaHunter}</td>
-
                     `;
                     row.addEventListener("click", () => {
-    // Get the idBarang from the clicked row item
-    const currentItem = item.idBarang; // id for printing
-    console.log("selected item:", currentItem);
+                    const selectedItem = item.idBarang;
+                    console.log(selectedItem);
 
-    // Call the backend (Laravel) function to generate the PDF
-    fetch(`http://127.0.0.1:8000/api/generate-pdf/${currentItem}`, { // Adjust the URL to match your route
-        method: 'GET',
-        headers: {
-            'Accept': 'application/pdf',
-            'Content-Type': 'application/json',
-        }
-    })
-    .then(response => response.blob())  // Read the response as a blob
-    .then(blob => {
-        // Create an object URL for the blob and trigger download or display
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = `Laporan_Stok_Barang_${currentItem}.pdf`;  // Set the desired filename
-        link.click();  // Simulate a click to start the download
-    })
-    .catch(error => {
-        console.error("Error generating PDF:", error);
-    });
-});
+                    fetch(`http://127.0.0.1:8000/api/generate-pdf/${selectedItem}`, { // Adjust the URL to match your route
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/pdf',
+                            'Content-Type': 'application/json',
+                        }
+                    })
+                    .then(response => response.blob())  // Read the response as a blob
+                    .then(blob => {
+                        // Create an object URL for the blob and trigger download or display
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = `Laporan_Stok_Barang_${selectedItem}.pdf`;  // Set the desired filename
+                        link.click();  // Simulate a click to start the download
+                    })
+                    .catch(error => {
+                        console.error("Error generating PDF:", error);
+                    });
+                });
                     tableBody.appendChild(row);
                 });
             }

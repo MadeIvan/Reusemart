@@ -199,7 +199,7 @@ public function indexall3()
         $currentYear = Carbon::now()->year;
         $currentMonth = Carbon::now()->month;
 
-        // Fetch barang with necessary relationships, filtered by the current month and year
+        
         $barang = Barang::with('detailTransaksiPenitipan.transaksiPenitipan.penitip', 
                                 'detailTransaksiPenitipan.transaksiPenitipan.pegawai', 
                                 'detailTransaksiPenitipan.transaksiPenitipan.pegawai2',
@@ -207,9 +207,10 @@ public function indexall3()
                                 'detailTransaksiPembelian.transaksiPembelian.komisi')
                         ->where('statusBarang', 'Terjual')
                         ->whereHas('detailTransaksiPenitipan.transaksiPenitipan', function($query) {
-                            // Only include items where idPegawai2 is not null in transaksiPenitipan
                             $query->whereNotNull('idPegawai2');
                         })
+                        // ->groupBy(DB::raw('YEAR(komisi.transaksiPembelian.tanggalWaktuPelunasan), MONTH(komisi.transaksiPembelian.tanggalWaktuPelunasan)'))
+
                         
                         ->get();
 
@@ -230,13 +231,15 @@ public function indexall3()
         if (!$namaHunter) {
         return null; // Filter out this item if namaHunter is null
         }
+        //why no
         $status = 'Tidak'; // Default status
         $tanggalPenitipan = optional($transaksi)->tanggalPenitipan;
         $tanggalPenitipanSelesai = optional($transaksi)->tanggalPenitipanSelesai;
-        $komisiHunter = optional(optional($pembelian)->transaksiPembelian)->komisi->komisiHunter;
+        $komisiHunter = optional($transaksi)->tanggalPenitipan;
         if(!$komisiHunter){
             return null;
         }
+        $idHunter = optional($transaksi)->idPegawai2;
         $komisiMart = 0.20 * $item->hargaBarang;
         $bonusPenitip = 0;
 
@@ -270,6 +273,7 @@ public function indexall3()
             'statusBarang' => $item->statusBarang,
             'image' => $item->image,
             'kategori' => $item->kategori,
+            'idHunter'=>$idHunter,
             'komisiHunter' => $komisiHunter,
             'komisi' => optional(optional($pembelian)->transaksiPembelian)->komisi,
             'tanggalMasuk' => optional($transaksi)->tanggalPenitipan,
@@ -332,7 +336,7 @@ public function indexByIdBarang($idBarang)
                 return null; // Filter out this item if namaHunter is null
             }
 
-            $status = 'Tidak'; // Default status
+            $status = 'Tidak';
             $tanggalPenitipan = optional($transaksi)->tanggalPenitipan;
             $tanggalPenitipanSelesai = optional($transaksi)->tanggalPenitipanSelesai;
             $komisiHunter = optional(optional($pembelian)->transaksiPembelian)->komisi->komisiHunter;
@@ -487,7 +491,7 @@ public function createpdfbyid($idBarang)
             ];
         });
 
-        return Pdf::loadView('nota.pdf.laporantest', compact('result'))
+        return Pdf::loadView('nota.pdf.laporanHunter', compact('result'))
             ->setPaper('a4', 'landscape')
             ->stream("Laporan Stok Barang.pdf");
     } catch (\Exception $e) {
