@@ -231,6 +231,69 @@ $penitip = auth('penitip')->user()->load('dompet');
         'data' => $penitips
     ]);
 }
+public function getTopPenitipByMonth(Request $request)
+{
+    $validated = $request->validate([
+        'month' => 'required|string|min:1|max:12',
+        'year' => 'nullable|integer|min:2000|max:2100',
+    ]);
+
+    $month = $validated['month'];
+    $year = $validated['year'] ?? now()->year;
+
+    $topPenitip = DB::table('barang')
+        ->join('detailTransaksiPenitipan', 'barang.idBarang', '=', 'detailTransaksiPenitipan.idBarang')
+        ->join('transaksiPenitipan', 'detailTransaksiPenitipan.idTransaksiPenitipan', '=', 'transaksiPenitipan.idTransaksiPenitipan')
+        ->join('penitip', 'transaksiPenitipan.idPenitip', '=', 'penitip.idPenitip')
+        ->join('detailTransaksiPembelian', 'barang.idBarang', '=', 'detailTransaksiPembelian.idBarang')
+        ->join('transaksiPembelian', 'detailTransaksiPembelian.noNota', '=', 'transaksiPembelian.noNota')
+        ->where('barang.statusBarang', 'Terjual')
+        ->whereMonth('transaksiPembelian.tanggalWaktuPelunasan', $month)
+        ->whereYear('transaksiPembelian.tanggalWaktuPelunasan', $year)
+        ->select(
+            'penitip.idPenitip',
+            'penitip.namaPenitip',
+            DB::raw('COUNT(barang.idBarang) as totalBarangTerjual')
+        )
+        ->groupBy('penitip.idPenitip', 'penitip.namaPenitip')
+        ->orderByDesc('totalBarangTerjual')
+        ->limit(1)
+        ->first();
+
+    if (!$topPenitip) {
+        return response()->json([
+            'month' => $month,
+            'year' => $year,
+            'message' => 'Tidak ada penitip yang menjual barang di bulan ini.'
+        ], 404);
+    }
+
+
+    $totalPendapatan = DB::table('barang')
+        ->join('detailTransaksiPenitipan', 'barang.idBarang', '=', 'detailTransaksiPenitipan.idBarang')
+        ->join('transaksiPenitipan', 'detailTransaksiPenitipan.idTransaksiPenitipan', '=', 'transaksiPenitipan.idTransaksiPenitipan')
+        ->join('penitip', 'transaksiPenitipan.idPenitip', '=', 'penitip.idPenitip')
+        ->join('detailTransaksiPembelian', 'barang.idBarang', '=', 'detailTransaksiPembelian.idBarang')
+        ->join('transaksiPembelian', 'detailTransaksiPembelian.noNota', '=', 'transaksiPembelian.noNota')
+        ->where('barang.statusBarang', 'Terjual')
+        ->whereMonth('transaksiPembelian.tanggalWaktuPelunasan', $month)
+        ->whereYear('transaksiPembelian.tanggalWaktuPelunasan', $year)
+        ->where('penitip.idPenitip', $topPenitip->idPenitip)
+        ->select('transaksiPembelian.totalHarga', 'transaksiPembelian.noNota')
+        ->distinct()
+        ->get()
+        ->sum('totalHarga');
+
+    return response()->json([
+        'month' => $month,
+        'year' => $year,
+        'idPenitip' => $topPenitip->idPenitip,
+        'totalPendapatan' => $totalPendapatan,
+        'topPenitip' => $topPenitip
+    ]);
 }
+}
+
+
 
 

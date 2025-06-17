@@ -37,6 +37,12 @@ class Penitip extends Authenticatable
         return $this->belongsTo(Dompet::class, 'idDompet', 'idDompet');
     }
 
+    public function penitip()
+    {
+        return $this->belongsTo(Penitip::class, 'idPenitip', 'idPenitip');
+    }
+
+
 
 }
 

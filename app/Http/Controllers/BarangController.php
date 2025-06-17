@@ -872,6 +872,60 @@ public function showIdPenitipAndBarang($idBarang)
     }
 }
 
+public function getBarangTerjualByMonth(Request $request)
+{
+    $validated = $request->validate([
+        'month' => 'required|integer|min:1|max:12',
+
+    ]);
+
+    $month = $validated['month'];
+
+
+    $barangTerjual = Barang::with([
+            'detailTransaksiPembelian.transaksiPembelian'
+        ])
+        ->where('statusBarang', 'Terjual')
+        ->whereHas('detailTransaksiPembelian.transaksiPembelian', function ($query) use ($month) {
+            $query->whereMonth('tanggalWaktuPelunasan', $month);
+                  
+        })
+        ->get();
+
+    return response()->json([
+        'month' => $month,
+        'jumlah_barang_terjual' => $barangTerjual->count(),
+        'data' => $barangTerjual,
+    ]);
+}
+
+public function updateBarangStatusForDonasi()
+{
+    // Get the current date
+    $currentDate = now();
+
+    // Get the barang with status "Tersedia" that needs to be updated
+    $barangsToUpdate = DB::table('barang')
+        ->join('detailTransaksiPenitipan', 'barang.idBarang', '=', 'detailTransaksiPenitipan.idBarang')
+        ->join('transaksiPenitipan', 'detailTransaksiPenitipan.idTransaksiPenitipan', '=', 'transaksiPenitipan.idTransaksiPenitipan')
+        ->where('barang.statusBarang', 'Tersedia') // Only check barang with "Tersedia" status
+        ->whereRaw('DATEDIFF(?, transaksiPenitipan.tanggalPenitipanSelesai) > 7', [$currentDate])
+        ->select('barang.idBarang', 'barang.statusBarang')
+        ->get();
+
+    // Loop through each barang and update the status to "Barang untuk donasi"
+    foreach ($barangsToUpdate as $barang) {
+        DB::table('barang')
+            ->where('idBarang', $barang->idBarang)
+            ->update(['statusBarang' => 'Barang untuk donasi']);
+    }
+
+    return response()->json([
+        'message' => 'Barang status updated to "Barang untuk donasi".',
+        'updated_items' => $barangsToUpdate->count()
+    ]);
+}
+
 
 
 }

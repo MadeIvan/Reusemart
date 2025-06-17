@@ -179,6 +179,7 @@
                 leftMenu.appendChild(createItem("/pegawai/PenitipData", "Data Penitip"));
                 leftMenu.appendChild(createItem("/verifikasi", "Verifikasi Pembayaran"));
                 leftMenu.appendChild(createItem("/merchandise","Merchandise" ));
+                leftMenu.appendChild(createItem("/Pegawai/TopSeller","Top Seller" ));
                 rightMenu.appendChild(createLogout());            
 
             }else if (role==="gudang"){

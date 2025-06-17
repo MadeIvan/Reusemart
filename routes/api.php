@@ -196,4 +196,9 @@ Route::middleware('auth:pegawai')->post('/pegawai/register-fcm-token', [FCMToken
 Route::middleware('auth:penitip')->post('/penitip/register-fcm-token', [FCMTokenController::class, 'registerFcmToken']);
 Route::middleware('auth:pembeli')->post('/pembeli/register-fcm-token', [FCMTokenController::class, 'registerFcmToken']);
 
-Route::get('/topSeller/get', [TopSellerController::class, 'index']);
+Route::get('/topseller/get', [TopSellerController::class, 'index']);
+Route::get('/topseller', [PenitipController::class, 'getTopPenitipByMonth']);
+Route::post('/topseller/add', [TopSellerController::class, 'store']);
+
+Route::get('/topseller/{idTopSeller}', [TopSellerController::class, 'getTopSellerById']);
+Route::put('/update-barang-status', [BarangController::class, 'updateBarangStatusForDonasi']);

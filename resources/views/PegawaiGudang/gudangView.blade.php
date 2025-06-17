@@ -84,7 +84,7 @@
             <div class="row">
                 <div class="col-12 btn-container">
                     <button type="button" class="btn btn-success" id="addBarangButton">Tambah barang</button>
-
+                    <button type="button" class="btn btn-primary" id="updatestatus">Update Status</button>
                 </div>
             </div>
         </form>
@@ -1140,6 +1140,34 @@
                 // Show the drop area again if you hide it
                 toggleDropAreaVisibility();
             }
+            document.getElementById('updatestatus').addEventListener('click', function() {
+    // Show a loading indicator or message
+    console.log('Sending update request to API...');
+
+    // The API endpoint
+    const url = 'http://127.0.0.1:8000/api/update-barang-status'; // Adjust URL if necessary
+
+    // Send a PUT request to update barang status
+    fetch(url, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+            "X-CSRF-TOKEN": csrfToken // If authorization is required
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Handle success (for example, show a success message)
+        alert('Status updated successfully: ' + data.message); 
+        fetchPenitip();
+        fetchPegawai();// Show a success message
+    })
+    .catch(error => {
+        // Handle error (for example, show an error message)
+    alert('There was an error updating the status: ' + error.message);
+    });
+});
 
             // Initial fetch when the page loads
             fetchPenitip();
