@@ -41,15 +41,42 @@
 </head>
 <body>
 
-    <!-- Video Background -->
-    <div class="position-relative" style="height: 100vh;">
-        <!-- <video autoplay muted loop id="video-bg">
-            <source src="{{ asset('storage/essentials/ReUseMartVid.mp4') }}" type="video/mp4">
+    <!-- //////////////////ini background video///////////////////// -->
+    <div class="position-relative" style="height: 100vh; overflow: hidden;">
+        <video autoplay muted loop id="video-bg">
+            <source src="{{ asset('ReUseMartVid.mp4') }}" type="video/mp4">
             Your browser does not support the video tag.
-        </video> -->
+        </video>
 
+        <!-- /////////////////////////////////////ini navbar////////////////////////// -->
+        <nav class="navbar navbar-expand-lg navbar-light shadow-sm fixed-top" style="background-color: rgba(255, 255, 255, 0.0); backdrop-filter: blur(5px);">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <!-- Nav-bar kiri -->
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item d-flex align-items-center">
+                            <a class="nav-link active text-black" href="{{url('/')}}" >
+                                <!-- <strong>Home</strong> -->
+                                <img src="{{ asset('logoReUseMart.png') }}" alt="Logo Reusemart" style="width:50px;">
+                            </a>
+                        </li>
+                        <li class="nav-item d-flex align-items-center">
+                            <a class="nav-link text-white" href="{{url('/home')}}">
+                                Produk
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
         <!-- Overlay for readability, with adjusted opacity -->
         <div class="position-absolute w-100 h-100 bg-dark" style="opacity: 0.4; z-index: -1;"></div>
+
 
         <!-- Login Form -->
         <div class="container d-flex justify-content-center align-items-center h-100">
@@ -59,24 +86,28 @@
                     <form>
                         <div class="mb-3">
                             <label for="namaPembeli" class="form-label">Nama Pembeli</label>
-                            <input type="text" class="form-control" id="namaPembeli" placeholder="Masukkan Nama Pembeli">
+                            <input type="text" class="form-control" id="namaPembeli" placeholder="Enter name">
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" placeholder="Masukkan email">
+                            <input type="email" class="form-control" id="email" placeholder="Enter email">
                         </div>
                         <div class="mb-3">
                             <label for="username" class="form-label">Username</label>
-                            <input type="text" class="form-control" id="username" placeholder="Masukkan username">
+                            <input type="text" class="form-control" id="username" placeholder="Enter username">
                         </div>
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" placeholder="Masukkan password">
+                            <input type="password" class="form-control" id="password" placeholder="Enter password">
                         </div>
                         <div class="d-flex justify-content-center register-button">
                             <button type="submit" class="btn btn-primary w-100 item-center">Registrasi</button>
                         </div>
                     </form>
+                    <p class="text-center mt-3">
+                    Already have an account for buyer?
+                    <a href="/UsersLogin" class="text-decoration-none">Click here!</a>
+                </p>
                 </div>
             </div>
         </div>

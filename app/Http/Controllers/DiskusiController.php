@@ -50,7 +50,7 @@ class DiskusiController extends Controller
         if ($isPembeli) {
             $userId = Auth::guard('pembeli')->user()->idPembeli;
         } elseif ($isPegawai) {
-            $userId = Auth::guard('pegawai')->user()->idPenitip;
+            $userId = Auth::guard('pegawai')->user()->idPegawai;
         } else {
             return response()->json([
                 'message' => "Unauthorized. Anda harus login sebagai pembeli atau pegawai.",
@@ -68,7 +68,7 @@ class DiskusiController extends Controller
                 'idPembeli'=> $userId,
                 'idPegawai'=> null,
             ];
-        }else if($isPenitip){
+        }else if($isPegawai){
             $data = [
                 'idDiskusi'=> $newId,
                 'idBarang'=> $barang->idBarang,

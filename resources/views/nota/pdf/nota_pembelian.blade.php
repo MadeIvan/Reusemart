@@ -56,6 +56,7 @@
             Delivery: 
             @if($transaksi->idAlamat)
                 Kurir ReUseMart ({{ $transaksi->pegawai3->namaPegawai ?? '-' }})
+
             @else
                 - (diambil sendiri)
             @endif

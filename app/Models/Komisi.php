@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 
 
+
 class Komisi extends Model
 {
     use HasFactory;
@@ -25,12 +26,15 @@ class Komisi extends Model
         'idBarang',
         'komisiMart',
         'komisiHunter',
+
         'komisiPenitip',
     ];
 
 
     public function transaksiPembelian(){
+
         return $this->belongsTo(TransaksiPembelian::class, 'noNota', 'noNota');
+
     }
 
     public function barang(){
@@ -39,3 +43,4 @@ class Komisi extends Model
 
 
 }
+

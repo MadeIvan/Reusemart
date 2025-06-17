@@ -2,14 +2,27 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BarangController;
-use Illuminate\Support\Facades\Password;
-use App\Http\Controllers\TransaksiPembelianController;
+// use App\Http\Controllers\RequestDonasiController;
+use App\Http\Controllers\TransaksiDonasiController;
 use App\Http\Controllers\TransaksiPenitipanController;
+use Illuminate\Support\Facades\Password;
+
+use App\Http\Controllers\TransaksiPembelianController;
 
 
 
+
+use App\Http\Controllers\RequestDonasiController;
+use App\Models\TransaksiPembelian;
+
+
+use App\Services\FCMService;
+
+// Route::get('/', function () {
+//     return view('Pegawai.Merch');
+// });
 Route::get('/', function () {
-    return view('utama');
+    return view('Login.loginPegawai');
 });
 Route::get('/home', function () {
     return view('home');
@@ -53,6 +66,9 @@ Route::get('/Pegawailogin', function () {
 Route::get('/pegawai/PenitipData', function () {
     return view('Pegawai.CsView');
 });
+Route::get('/Pegawai/TopSeller', function () {
+    return view('Pegawai.TopSeller');
+});
 
 Route::get('/pegawaidata', function () {
     return view('Pegawai.MainPegawai');
@@ -61,6 +77,10 @@ Route::get('/pegawaidata', function () {
 Route::get('/pembeli/alamat', function () {
     return view('Pembeli.showAlamat');
 });
+Route::get('/pembeli/dashboard', function () {
+    return view('Pembeli.dashboard');
+});
+
 
 Route::get('/penitip/dashboard', function () {
     return view('Penitip.dashboardPenitip');
@@ -92,7 +112,9 @@ Route::get('/lupa-password/{token}', function (string $token) {
     return view('auth.reset-password', ['token' => $token]);
 })->middleware('guest')->name('password.reset');
 
+
 Route::get('/pegawaiview', function () {
+
     return view('pegawaiView');
 });
 
@@ -129,6 +151,33 @@ Route::get('/nota-pembelian-pdf/{noNota}', [TransaksiPembelianController::class,
 Route::get('/pegawai/ViewNota', function () {
     return view('PegawaiGudang.NotaPembelian');
 });
+Route::get('/pegawai/dibayar', function () {
+    return view('Pegawai.newCode');
+});
+Route::get('/requestDonasi', function () {
+    return view('Owner.laporanReqDonasi');
+});
+Route::get('/donasi', function () {
+    return view('Owner.laporanDonasi');
+});
+Route::get('/laporanPenitip', function () {
+    return view('Owner.laporanPenitip');
+});
+
+Route::get('/resetPassword', function () {
+    return view('Login.resetPassword');
+});
+
+Route::get('/newPassword', function () {
+    return view('Login.newPassword');
+});
+
+Route::get('/laporanRequestDonasi/pdf', [RequestDonasiController::class, 'notaReqPdf'])->name('nota.pdf.laporanrequestdonasi');
+Route::get('/laporanDonasiAcc/pdf', [TransaksiDonasiController::class, 'laporanDonasiPdf'])->name('nota.pdf.laporanTransaksiDonasi');
+Route::get('/laporanPenitip/pdf', [TransaksiPenitipanController::class, 'laporanTransaksiPenitipPdf'])->name('nota.pdf.laporanUntukPenitip');
+
+
+
 
 Route::get('/pembeli/HistoryPembeli', function () {
     return view('Pembeli.HistoryPembeli');
@@ -138,6 +187,16 @@ Route::get('/pembeli/HistoryPembeli', function () {
 Route::get('/pembeli/MyProfile', function () {
     return view('Pembeli.profilePembeli');
 });
+
+Route::get('/merchandise', function () {
+    return view('Pegawai.Merch');
+});
+
+Route::get('/requestDonasi', function () {
+    return view('Owner.laporanReqDonasi');
+});
+Route::get('/laporanRequestDonasi/pdf', [RequestDonasiController::class, 'notaReqPdf'])->name('nota.pdf.laporanrequestdonasi');
+
 
 
 Route::get('/pegawai/penjualankategori', function () {
@@ -155,3 +214,22 @@ Route::get('/pegawai/penitipanhabis', function () {
     return view('Pegawai.Owner.showPenitipanHabis');
 });
 Route::get('/pegawai/laporan-penitipan-habis', [TransaksiPenitipanController::class, 'laporanPenitipanHabis'])->name('pegawai.laporanPenitipanHabis');
+
+Route::get('/laporanStok', function () {
+    return view('Owner.LaporanStok');
+});
+Route::get('/laporanStok/pdf', [BarangController::class, 'notaReqPdf'])->name('nota.pdf.barang');
+// Route::get('/laporanStok/pdf', [BarangController::class, 'notaReqPdf'])->name('nota.pdf.laporanrequestdonasi');
+// Route::get('/laporanRequestDonasi/pdf', [RequestDonasiController::class, 'notaReqPdf'])->name('nota.pdf.laporanrequestdonasi');
+Route::get('/laporanKomisi', function () {
+    return view('Owner.Komisi');
+});
+Route::get('/laporanKomisi/pdf', [BarangController::class, 'notaReqPdf2'])->name('nota.pdf.laporanKomisi');
+// Route::get('/products', [BarangController::class, 'index']);
+
+Route::get('/laporanPenjualan', function () {
+    return view('Owner.Penjualan');
+});
+Route::get('/laporanPenjualan/pdf', [TransaksiPembelianController::class, 'notaReqPdf'])->name('nota.pdf.laporanPenjualan');
+
+

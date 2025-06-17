@@ -97,8 +97,8 @@
 <script>
 
 function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
+    const value = ; ${document.cookie};
+    const parts = value.split(; ${name}=);
     if (parts.length === 2) return parts.pop().split(';').shift();
     return null;
 }
@@ -145,12 +145,12 @@ document.addEventListener("DOMContentLoaded", function(){
     }
     function showError(message) {
         hideLoading();
-        document.getElementById("barangContainer").innerHTML = `<div class='col-12 text-center text-danger'>${message}</div>`;
+        document.getElementById("barangContainer").innerHTML = <div class='col-12 text-center text-danger'>${message}</div>;
     }
     fetch('http://localhost:8000/api/penitip/profile', {
         method: 'GET',
         headers: {
-            "Authorization": `Bearer ${token}`,
+            "Authorization": Bearer ${token},
             'Accept': 'application/json',
             "Content-Type": "application/json",
             "X-CSRF-TOKEN": csrfToken,
@@ -169,10 +169,10 @@ document.addEventListener("DOMContentLoaded", function(){
     });
 
     function fetchBarang(idPenitip){
-        fetch(`http://localhost:8000/api/transaksi-penitipan/penitip/${idPenitip}`, {
+        fetch(http://localhost:8000/api/transaksi-penitipan/penitip/${idPenitip}, {
             method: "GET",
             headers: {
-                "Authorization": `Bearer ${token}`,
+                "Authorization": Bearer ${token},
                 'Accept': 'application/json',
                 "Content-Type": "application/json",
                 "X-CSRF-TOKEN": csrfToken,
@@ -308,7 +308,7 @@ document.addEventListener("DOMContentLoaded", function(){
                 `;
             } else {
                 imageList.forEach((img, idx) => {
-                    const imgSrc = `http://127.0.0.1:8000/${img}`;
+                    const imgSrc = http://127.0.0.1:8000/${img};
                     carouselImages.innerHTML += `
                         <div class="carousel-item ${idx === 0 ? 'active' : ''}">
                             <img src="${imgSrc}" class="d-block carousel-image" alt="Barang Image ${idx+1}" onclick="openFullscreenPreview('${imgSrc}')">
@@ -316,11 +316,11 @@ document.addEventListener("DOMContentLoaded", function(){
                     `;
                 });
                 imageList.forEach((img, idx) => {
-                    const imgSrc = `http://127.0.0.1:8000/${img}`;
+                    const imgSrc = http://127.0.0.1:8000/${img};
                     const thumbnail = document.createElement('img');
                     thumbnail.src = imgSrc;
-                    thumbnail.className = `thumbnail ${idx === 0 ? 'active' : ''}`;
-                    thumbnail.alt = `Thumbnail ${idx+1}`;
+                    thumbnail.className = thumbnail ${idx === 0 ? 'active' : ''};
+                    thumbnail.alt = Thumbnail ${idx+1};
                     thumbnail.onclick = () => {
                         const carousel = bootstrap.Carousel.getInstance(document.getElementById('barangCarousel'));
                         carousel.to(idx);
@@ -347,10 +347,10 @@ document.addEventListener("DOMContentLoaded", function(){
                 return;
             }
             if (!confirm("Perpanjang tanggal penitipan selesai 30 hari dari tanggal saat ini?")) return;
-            fetch(`http://localhost:8000/api/perpanjang-penitipan/${currentIdTransaksiPenitipan}`, {
+            fetch(http://localhost:8000/api/perpanjang-penitipan/${currentIdTransaksiPenitipan}, {
                 method: "POST",
                 headers: {
-                    "Authorization": `Bearer ${token}`,
+                    "Authorization": Bearer ${token},
                     "Accept": "application/json",
                     "Content-Type": "application/json",
                     "X-CSRF-TOKEN": csrfToken,

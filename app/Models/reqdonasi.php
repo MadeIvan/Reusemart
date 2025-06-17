@@ -32,9 +32,9 @@ class ReqDonasi extends Model
     public $incrementing = false;
 
     // Relationship with TransaksiDonasi
-    public function transaksiDonasi()
+    public function transaksidonasi()
     {
-        return $this->belongsTo(TransaksiDonasi::class, 'idTransaksiDonasi', 'idTransaksiDonasi');
+        return $this->hasOne(TransaksiDonasi::class, 'idRequest', 'idRequest');
     }
 
     // Relationship with Organisasi

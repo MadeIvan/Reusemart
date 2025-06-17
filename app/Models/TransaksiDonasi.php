@@ -18,6 +18,7 @@ class TransaksiDonasi extends Model
 
     // Set timestamps to false if you don't have 'created_at' and 'updated_at' columns
     public $timestamps = false;
+    public $incrementing = false;
 
     // Fillable fields for mass assignment
     protected $fillable = [
@@ -33,7 +34,7 @@ class TransaksiDonasi extends Model
     protected $dates = ['tanggalDonasi'];
     public function barang()
     {
-        return $this->belongsTo(Barang::class, 'idBarang', 'idBarang');
+        return $this->hasOne(Barang::class, 'idBarang', 'idBarang');
     }
 
     public function requestDonasi()

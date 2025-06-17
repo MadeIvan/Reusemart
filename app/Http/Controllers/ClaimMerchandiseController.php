@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\ClaimMerchandise;
 use Illuminate\Http\Request;
 use App\Models\Merchandise;
+
 use Illuminate\Support\Facades\DB;
+
 
 class ClaimMerchandiseController extends Controller
 {
@@ -22,6 +24,7 @@ class ClaimMerchandiseController extends Controller
     /**
      * Store a newly created claim.
      */
+
 
 
 public function store(Request $request)
@@ -89,7 +92,7 @@ public function store(Request $request)
         return response()->json(['message' => 'Error: ' . $e->getMessage()], 500);
     }
 }
-    /**
+
      * Display the specified claim.
      */
     public function show($id)

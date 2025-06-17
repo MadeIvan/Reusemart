@@ -84,7 +84,7 @@
             <div class="row">
                 <div class="col-12 btn-container">
                     <button type="button" class="btn btn-success" id="addBarangButton">Tambah barang</button>
-
+                    <button type="button" class="btn btn-primary" id="updatestatus">Update Status</button>
                 </div>
             </div>
         </form>
@@ -224,8 +224,29 @@
             </div>
         </div>
     </div>
+    
 
-    <!-- Toast notification -->
+
+
+    <div class="modal fade" id="actionModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-sm modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Pilih Aksi</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body d-flex justify-content-around">
+        <button id="printNotaBtn" type="button" class="btn btn-warning">Cetak Nota</button>
+        <button id="editBtn" type="button" class="btn btn-primary">Edit Data</button>
+      </div>
+    </div>
+  </div>
+</div>
+    <!-- Toast notification
+    
+    
+    
+    -->
     <div class="toast-container">
         <div class="toast align-items-center text-bg-primary border-0" role="alert" aria-live="assertive" aria-atomic="true" id="successToast">
             <div class="d-flex">
@@ -266,6 +287,7 @@
             let currentEditItem = null;
             const tableBody = document.getElementById("tableBody");
             const formData = new FormData();
+            const actionModal = new bootstrap.Modal(document.getElementById('actionModal'), {});
             // const searchInput = document.getElementById("searchInput");
             // const form = document.getElementById("PegawaiForm");
             // const registerButton = document.getElementById("registerButton");
@@ -367,6 +389,9 @@
 
 
             // Render the table with fetched data
+            let currentItem = null;     // full item object for editing
+            let currentItemId = null;   // just id for printing
+
             function renderTable(data) {
                 tableBody.innerHTML = ""; // Clear the table before rendering new data
                 data.forEach(item => {
@@ -375,20 +400,35 @@
                         <td id="${item.idBarang}">${item.idBarang}</td>
                         <td>${item.namaBarang || '-'}</td>
                         <td>${item.namaPenitip || '-'}</td>
-                       
                         <td>${item.statusBarang}</td>
                         <td>${item.tanggalPenitipanSelesai || '-'}</td>
-                        
                     `;
                     row.addEventListener("click", () => {
-                        openEditModal(item);
+                        currentItem = item;  // full item for edit modal
+                        currentItemId = item.transaksiPenitipan.idTransaksiPenitipan; // id for printing
+                        console.log("selected item:", currentItem);
+                        actionModal.show();
                     });
-                    // row.addEventListener("click", () => populateForm(item));  // Add click event to the row
                     tableBody.appendChild(row);
                 });
             }
 
-             const pegawai = JSON.parse(pegawaiDataString);
+            // Print Nota button
+            document.getElementById('printNotaBtn').addEventListener('click', () => {
+                if (!currentItemId) return;
+                const url = `/api/nota-penitipan/${currentItemId}/pdf`;
+                window.open(url, '_blank');
+                actionModal.hide();
+            });
+
+            // Edit button
+            document.getElementById('editBtn').addEventListener('click', () => {
+                if (!currentItem) return;
+                openEditModal(currentItem); // pass full item object
+                actionModal.hide();
+            });
+
+            const pegawai = JSON.parse(pegawaiDataString);
             const addBarangButton = document.getElementById("addBarangButton");
             const addBarangModal = new bootstrap.Modal(document.getElementById("addBarangModal"));
             const addBarangForm = document.getElementById("addBarangForm");
@@ -866,11 +906,12 @@
             function openEditModal(item) {
                 document.getElementById('preview').innerHTML = '';
                 currentEditItem = item;
-                console.log(currentEditItem);
+                console.log("current:",currentEditItem);
                 console.log("openEditModal called with item:", item);
                 const username = item.transaksiPenitipan?.penitip?.username || '';
-                console.log(username);
                 fetchPenitip(username);
+                console.log(username);
+                
                 // Show modal
                 const modalEl = document.getElementById("addBarangDetailModal");
                 const modal = new bootstrap.Modal(modalEl);
@@ -1099,6 +1140,34 @@
                 // Show the drop area again if you hide it
                 toggleDropAreaVisibility();
             }
+            document.getElementById('updatestatus').addEventListener('click', function() {
+    // Show a loading indicator or message
+    console.log('Sending update request to API...');
+
+    // The API endpoint
+    const url = 'http://127.0.0.1:8000/api/update-barang-status'; // Adjust URL if necessary
+
+    // Send a PUT request to update barang status
+    fetch(url, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+            "X-CSRF-TOKEN": csrfToken // If authorization is required
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Handle success (for example, show a success message)
+        alert('Status updated successfully: ' + data.message); 
+        fetchPenitip();
+        fetchPegawai();// Show a success message
+    })
+    .catch(error => {
+        // Handle error (for example, show an error message)
+    alert('There was an error updating the status: ' + error.message);
+    });
+});
 
             // Initial fetch when the page loads
             fetchPenitip();

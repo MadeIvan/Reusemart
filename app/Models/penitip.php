@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Auth\Passwords\CanResetPassword as CanResetPasswordTrait;
 
 class Penitip extends Authenticatable
 {
-    use HasFactory, HasApiTokens;
+    use HasFactory, HasApiTokens, CanResetPasswordTrait;
 
     protected $table = 'penitip';
     protected $primaryKey = 'idPenitip';
@@ -25,7 +26,8 @@ class Penitip extends Authenticatable
         'namaPenitip',
         'idPenitip',
         'deleted_at',
-
+        'alamat',
+        'email'
     ];
 
     protected $hidden = [
@@ -35,6 +37,12 @@ class Penitip extends Authenticatable
      public function dompet(){
         return $this->belongsTo(Dompet::class, 'idDompet', 'idDompet');
     }
+
+    public function penitip()
+    {
+        return $this->belongsTo(Penitip::class, 'idPenitip', 'idPenitip');
+    }
+
 
 
 }
