@@ -15,7 +15,6 @@ class AlamatController extends Controller
             //////////CEK ID PEMBELI/////////
             $pembeli = auth('pembeli')->user();
             $pembeliId = $pembeli->idPembeli;
-    
             $request->validate([
                 'alamat'=> 'required|string|max:255',
                 'kategori'=> 'required|string',

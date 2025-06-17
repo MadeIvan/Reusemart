@@ -265,17 +265,17 @@ async function fetchData() {
         }
 
 
-        async function markBarangDiterima(noNota) {
+async function markBarangDiterima(noNota) {
     if (!confirm(`Apakah Anda yakin ingin menandai nota ${noNota} sebagai "Barang Diterima"?`)) {
         return;
     }
 
     try {
         const response = await fetch(`http://127.0.0.1:8000/api/transaksi-pembelian/${noNota}/status`, {
-            method: 'PUT', // or POST, depends on your backend
+            method: 'PUT',
             headers: {
-                'Content-Type': 'application/json', 
-                "X-CSRF-TOKEN": csrfToken
+                'Content-Type': 'application/json',
+                "X-CSRF-TOKEN": csrfToken,
 
             },
             body: JSON.stringify({
@@ -288,9 +288,19 @@ async function fetchData() {
             throw new Error(errorData.message || 'Gagal mengupdate status.');
         }
 
-        alert(`Status nota ${noNota} berhasil diubah menjadi "Barang Diterima".`);
-        
-        // Refresh data table
+        // Call komisi API
+        const komisiRes = await fetch(`http://127.0.0.1:8000/api/komisi-reusemart/${noNota}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                "X-CSRF-TOKEN": csrfToken,
+
+            }
+        });
+        const komisiData = await komisiRes.json();
+        console.log('Komisi Report:', komisiData);
+
+        alert(`Status nota ${noNota} berhasil diubah menjadi "Barang Diterima".\nKomisi telah dibagikan!`);
         fetchData();
 
     } catch (error) {

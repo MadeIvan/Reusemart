@@ -21,6 +21,7 @@ use App\Http\Controllers\TransaksiPenitipanController;
 use App\Http\Controllers\TransaksiPembelianController;
 use App\Http\Controllers\PointRedemptionController;
 use App\Http\Controllers\ImagesBarangController;
+
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\ClaimMerchandiseController;
 use App\Http\Controllers\MerchandiseController;
@@ -35,6 +36,11 @@ use App\Http\Controllers\ForgotPasswordController;
 
 Route::post('/send-notification', [NotificationController::class, 'sendNotification']);
 
+
+
+Route::middleware('auth:pegawai')->post('/pegawai/register-fcm-token', [FCMTokenController::class, 'registerFcmToken']);
+Route::middleware('auth:penitip')->post('/penitip/register-fcm-token', [FCMTokenController::class, 'registerFcmToken']);
+Route::middleware('auth:pembeli')->post('/pembeli/register-fcm-token', [FCMTokenController::class, 'registerFcmToken']);
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
      return response()->json($request->user());
 });
@@ -152,9 +158,13 @@ Route::middleware(['auth:penitip'])->group(function () {
     Route::post('/logout', [LoginController::class, 'logout']);
     Route::get('/penitip/history', [PenitipController::class, 'loadBarang']);
 
+    Route::post('/perpanjang-penitipan/{idTransaksiPenitipan}', [TransaksiPenitipanController::class, 'perpanjangPenitipan']);
+
+
     Route::get('/penitip/getData', [PenitipController::class, 'getData']);
 
     Route::post('/penitip/logout', [LoginController::class, 'logout']);
+
 
 });
 
@@ -214,6 +224,27 @@ Route::get('/generate-pdf/{idBarang}', [BarangController::class, 'createpdfbyid'
 
 Route::post('/addimages', [ImagesBarangController::class, 'store']);
 
+
+
+Route::get('/transaksi-penitipan/penitip/{idPenitip}', [TransaksiPenitipanController::class, 'getAllByPenitip']);
+
+
+Route::post('/komisi-reusemart/{noNota}', [KomisiController::class, 'komisiReuseMart']);
+Route::get('/dompet/pegawai/{idPegawai}', [DompetController::class, 'getDompetByPegawai']);
+Route::get('/komisi', [KomisiController::class, 'index']);
+Route::post('/komisi/store', [KomisiController::class, 'store']);
+Route::get('/pegawai/getData', [PegawaiController::class, 'myData']);
+Route::get('/histori-komisi-hunter/{idHunter}', [TransaksiPembelianController::class, 'showHistoriKomisiHunter']);
+
+Route::get('/getClaim', [ClaimMerchandiseController::class, 'index']);
+Route::get('/getMerch', [MerchandiseController::class, 'index']);
+Route::put('/saveClaim/{id}', [ClaimMerchandiseController::class, 'update']);
+Route::post('/store/claim', [ClaimMerchandiseController::class, 'store']);
+
+
+Route::get('/show-umum-barang', [BarangController::class, 'ShowUmum']);
+
+
 Route::get('/generate-idbarang', [BarangController::class, 'generateIdBarang']);
 Route::get('/nota-penitipan/{id}/pdf', [TransaksiPenitipanController::class, 'notaPenitipanPdf']);
 Route::get('/barang/simple/{idBarang}', [BarangController::class, 'showIdPenitipAndBarang']);
@@ -251,3 +282,6 @@ Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink
 Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword']);
 
 
+Route::get('/laporan-kategori', [TransaksiPembelianController::class, 'laporanKategori']);
+
+Route::get('/penitipan-habis', [TransaksiPenitipanController::class, 'apiPenitipanHabis']);

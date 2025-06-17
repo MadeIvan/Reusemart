@@ -193,10 +193,14 @@
             leftMenu.appendChild(createItem("/pegawai/gudangview", "View Gudang"));
             leftMenu.appendChild(createItem("/pegawai/penjadwalan", "Penjadwalan Barang"));
             leftMenu.appendChild(createItem("/pegawai/ViewNota", "Nota Pembelian Barang"));
+
+            
             rightMenu.appendChild(createLogout());   
+
 
             }else if (role==="owner"){
                 leftMenu.appendChild(createItem("/pegawaidata", "Profile"));
+                leftMenu.appendChild(createItem("/pegawai/penjualankategori", "Laporan Penjualan per Kategori"));
                 leftMenu.appendChild(createItem("/requestDonasi", "Request Donasi"));
                 leftMenu.appendChild(createItem("/donasi", "Donasi"));
                 leftMenu.appendChild(createItem("/laporanPenitip", "Penitip"));
@@ -206,6 +210,7 @@
                 rightMenu.appendChild(createLogout());  
 
             }
+
         }
     });
 </script>

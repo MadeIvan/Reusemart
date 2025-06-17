@@ -8,8 +8,13 @@ use App\Http\Controllers\TransaksiPenitipanController;
 use Illuminate\Support\Facades\Password;
 
 use App\Http\Controllers\TransaksiPembelianController;
+
+
+
+
 use App\Http\Controllers\RequestDonasiController;
 use App\Models\TransaksiPembelian;
+
 
 use App\Services\FCMService;
 
@@ -50,7 +55,7 @@ Route::get('/UsersLogin', function () {
 });
 
 // Code 1:
-Route::get('/PegawaiLogin', function () {
+Route::get('/Pegawailogin', function () {
     return view('Login.loginPegawai');
 });
 // Code 2:
@@ -107,7 +112,9 @@ Route::get('/lupa-password/{token}', function (string $token) {
     return view('auth.reset-password', ['token' => $token]);
 })->middleware('guest')->name('password.reset');
 
-Route::get('/pegawaiView', function () {
+
+Route::get('/pegawaiview', function () {
+
     return view('pegawaiView');
 });
 
@@ -191,6 +198,23 @@ Route::get('/requestDonasi', function () {
 Route::get('/laporanRequestDonasi/pdf', [RequestDonasiController::class, 'notaReqPdf'])->name('nota.pdf.laporanrequestdonasi');
 
 
+
+Route::get('/pegawai/penjualankategori', function () {
+    return view('Pegawai.Owner.PenjualanKategori');
+});
+
+Route::get('/laporan-per-kategori-barang', [TransaksiPembelianController::class, 'laporanPerKategoriBarang']);
+
+Route::get('/laporan-penitipan-habis', [\App\Http\Controllers\TransaksiPenitipanController::class, 'laporanPenitipanHabis']);
+// Route::get('/products', [BarangController::class, 'index']);
+
+Route::get('/pegawai/laporan-per-kategori-barang', [TransaksiPembelianController::class, 'laporanPerKategoriBarang'])->name('pegawai.laporanPerKategoriBarang');
+
+Route::get('/pegawai/penitipanhabis', function () {
+    return view('Pegawai.Owner.showPenitipanHabis');
+});
+Route::get('/pegawai/laporan-penitipan-habis', [TransaksiPenitipanController::class, 'laporanPenitipanHabis'])->name('pegawai.laporanPenitipanHabis');
+
 Route::get('/laporanStok', function () {
     return view('Owner.LaporanStok');
 });
@@ -207,4 +231,5 @@ Route::get('/laporanPenjualan', function () {
     return view('Owner.Penjualan');
 });
 Route::get('/laporanPenjualan/pdf', [TransaksiPembelianController::class, 'notaReqPdf'])->name('nota.pdf.laporanPenjualan');
+
 

@@ -55,6 +55,10 @@
           <th scope="row">Tanggal Lahir</th>
           <td id="pegawaiTanggalLahir">-</td>
         </tr>
+        <tr>
+  <th scope="row">Saldo Dompet</th>
+  <td id="pegawaiSaldo">-</td>
+</tr>
       </tbody>
     </table>
   </main>
@@ -81,6 +85,7 @@
         }, 2000);
         return;
       }
+      
 
       try {
         const pegawai = JSON.parse(pegawaiDataString);
@@ -114,6 +119,23 @@
         } else {
           document.getElementById("pegawaiTanggalLahir").textContent = "-";
         }
+        const pegawaiId = pegawai.idPegawai;
+        fetch(`http://127.0.0.1:8000/api/dompet/pegawai/${pegawaiId}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data.status && data.data) {
+              document.getElementById("pegawaiSaldo").textContent =
+                "Rp " + Number(data.data.saldo).toLocaleString("id-ID");
+            } else {
+              document.getElementById("pegawaiSaldo").textContent = "";
+            }
+          })
+          .catch(() => {
+            document.getElementById("pegawaiSaldo").textContent = "-";
+          });
+
+
+
       } catch (e) {
         console.error("Error parsing pegawai data:", e);
         localStorage.removeItem("pegawaiData");
@@ -130,6 +152,7 @@
         // }, 2000);
       }
     });
+    
   </script>
 </body>
 </html>

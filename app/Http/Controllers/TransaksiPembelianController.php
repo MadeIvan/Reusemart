@@ -68,7 +68,6 @@ public function notaReqPdf()
             ->stream("Laporan Penjualan.pdf");
 }
     public function showfornota(){
-
     $pembelians = TransaksiPembelian::with([
         'detailTransaksiPembelian.barang',
         'pegawai',
@@ -78,7 +77,6 @@ public function notaReqPdf()
         'pembeli.alamat',
         
     ])
-
     ->whereIn('status', ['Lunas Siap Diambil', 'Lunas Siap Diantarkan','Lunas Belum Dijadwalkan'])
     ->get();
 
@@ -109,6 +107,7 @@ public function notaPembelianPdf($idTransaksiPenitipan)
 
 
 
+
 public function getDibayar(){
     $pembelians = TransaksiPembelian::with([
         'detailTransaksiPembelian.barang',
@@ -128,6 +127,7 @@ public function getDibayar(){
 
 
     public function store(Request $request){
+
         try {
             // \Log::info('Data masuk:', $request->all());
 
@@ -391,7 +391,7 @@ public function notaPenjualanPdf($noNota)
         ]);
     }
 
-    public function buktiBayar(Request $request, $id){
+public function buktiBayar(Request $request, $id){
         try {
             $validated = $request->validate([
                 'tanggalWaktuPelunasan' => 'required|date_format:Y-m-d H:i:s',
@@ -731,6 +731,7 @@ public function tolakVerifikasi(Request $request, $noNota)
         }
     }
 
+
 public function updateStatus(Request $request, $noNota)
 {
     
@@ -778,6 +779,209 @@ public function index(){
 
 }
 
+
+public function laporanPerKategoriBarang(Request $request)
+{
+    $tahun = $request->input('tahun', date('Y'));
+
+    // List kategori sesuai gambar
+    $kategoriList = [
+        'Elektronik & Gadget',
+        'Pakaian & Aksesoris',
+        'Perabotan Rumah Tangga',
+        'Buku, Alat Tulis, & Peralatan Sekolah',
+        'Hobi, Mainan, & Koleksi',
+        'Perlengkapan Bayi & Anak',
+        'Otomotif & Aksesoris',
+        'Perlengkapan Taman & Outdoor',
+        'Peralatan Kantor & Industri',
+        'Kosmetik & Perawatan Diri',
+
+    ];
+
+    // Hitung jumlah item terjual per kategori (status: Barang Diterima)
+    $terjual = \App\Models\DetailTransaksiPembelian::whereHas('transaksiPembelian', function($q) use ($tahun) {
+        $q->whereYear('tanggalWaktuPembelian', $tahun)
+        ->wherein('status', ['Barang Diterima', 'Barang Diambil', 'Barang diterima'])
+        ->whereNotNull('idPegawai3');
+    })
+    ->with('barang')
+    ->get()
+    ->groupBy(function($item) {
+        return $item->barang->kategori ?? 'Lainnya';
+    })
+    ->map(function($group) {
+        return $group->count();
+    });
+
+    // Hitung jumlah item gagal terjual per kategori (status: Dibatalkan (Tidak dibayar))
+    $gagal = \App\Models\DetailTransaksiPembelian::whereHas('transaksiPembelian', function($q) {
+        $q->wherein('status', ['Dibatalkan (Tidak dibayar)','Dibatalkan (Bukti Tidak Valid)','Dibatalkan (Tidak dibayar)'])
+        ->whereNotNull('idPegawai3');
+    })
+    ->with('barang')
+    ->get()
+    ->groupBy(function($item) {
+        return $item->barang->kategori ?? 'Lainnya';
+    })
+    ->map(function($group) {
+        return $group->count();
+    });
+
+    // Gabungkan data kategori sesuai urutan di gambar
+    $dataKategori = [];
+    foreach ($kategoriList as $namaKategori) {
+        $dataKategori[] = [
+            'nama' => $namaKategori,
+            'terjual' => $terjual[$namaKategori] ?? '...',
+            'gagal' => $gagal[$namaKategori] ?? '0',
+        ];
+    }
+
+    // Hitung total (hanya angka, bukan ...)
+    $totalTerjual = 0;
+    $totalGagal = 0;
+    foreach ($dataKategori as $row) {
+        $totalTerjual += is_numeric($row['terjual']) ? $row['terjual'] : 0;
+        $totalGagal += is_numeric($row['gagal']) ? $row['gagal'] : 0;
+    }
+
+    // Untuk API
+    if ($request->wantsJson()) {
+        return response()->json([
+            'tahun' => $tahun,
+            'data' => $dataKategori,
+            'total_terjual' => $totalTerjual,
+            'total_gagal' => $totalGagal,
+        ]);
+    }
+
+    // Untuk PDF
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('nota.pdf.notaPerKategoriBarang', [
+        'dataKategori' => $dataKategori,
+        'tahun' => $tahun,
+        'tanggalCetak' => now()->format('d F Y'),
+        'totalTerjual' => $totalTerjual,
+        'totalGagal' => $totalGagal,
+    ]);
+    return $pdf->stream('laporan-penjualan-per-kategori-barang.pdf');
+}
+
+public function showHistoriKomisiHunter($idHunter)
+{
+    // Get all TransaksiPenitipan where idPegawai2 == $idHunter and status == 'Terjual'
+    $transaksis = \App\Models\TransaksiPenitipan::with([
+        'detailTransaksiPenitipan.barang'
+    ])
+    ->where('idPegawai2', $idHunter)
+    ->whereHas('detailTransaksiPenitipan.barang', function($q) {
+        $q->where('statusBarang', 'Terjual');
+    })
+    ->get();
+
+    $result = [];
+    foreach ($transaksis as $tp) {
+        foreach ($tp->detailTransaksiPenitipan as $detail) {
+            $barang = $detail->barang;
+            if (!$barang || $barang->statusBarang !== 'Terjual') continue;
+
+            // Find Komisi by idBarang and noNota (from transaksi pembelian)
+            $noNota = optional($barang->detailTransaksiPembelian->first())->noNota ?? null;
+            $komisi = null;
+            if ($noNota) {
+                $komisi = \App\Models\Komisi::where('idBarang', $barang->idBarang)
+                    ->where('noNota', $noNota)
+                    ->whereNotNull('komisiHunter')
+                    ->first();
+            }
+
+            $result[] = [
+                'idTransaksiPenitipan' => $tp->idTransaksiPenitipan,
+                'namaBarang' => $barang->namaBarang,
+                'hargaBarang' => $barang->hargaBarang,
+                'noNota' => $noNota,
+                'komisiHunter' => $komisi ? $komisi->komisiHunter : null,
+            ];
+        }
+    }
+
+    return response()->json([
+        'status' => true,
+        'message' => 'Histori Komisi Hunter',
+        'data' => $result
+    ]);
+}
+
+public function laporanKategori(Request $request)
+{
+    $tahun = $request->input('tahun', date('Y'));
+
+    $kategoriList = [
+        'Elektronik & Gadget',
+        'Pakaian & Aksesoris',
+        'Perabotan Rumah Tangga',
+        'Buku, Alat Tulis, & Peralatan Sekolah',
+        'Hobi, Mainan, & Koleksi',
+        'Perlengkapan Bayi & Anak',
+        'Otomotif & Aksesoris',
+        'Perlengkapan Taman & Outdoor',
+        'Peralatan Kantor & Industri',
+        'Kosmetik & Perawatan Diri',
+    ];
+
+    $terjual = \App\Models\DetailTransaksiPembelian::whereHas('transaksiPembelian', function($q) use ($tahun) {
+        $q->whereYear('tanggalWaktuPembelian', $tahun)
+        ->wherein('status', ['Barang Diterima', 'Barang Diambil', 'Barang diterima'])
+        ->whereNotNull('idPegawai3');
+        
+    })
+    ->with('barang')
+    ->get()
+    ->groupBy(function($item) {
+        return $item->barang->kategori ?? 'Lainnya';
+    })
+    ->map(function($group) {
+        return $group->count();
+    });
+
+    $gagal = \App\Models\DetailTransaksiPembelian::whereHas('transaksiPembelian', function($q) {
+        $q->wherein('status', ['Dibatalkan (Tidak dibayar)','Dibatalkan (Bukti Tidak Valid)','Dibatalkan (Tidak dibayar)'])
+        ->whereNotNull('idPegawai3');
+    })
+    ->with('barang')
+    ->get()
+    ->groupBy(function($item) {
+        return $item->barang->kategori ?? 'Lainnya';
+    })
+    ->map(function($group) {
+        return $group->count();
+    });
+
+    // Gabungkan data kategori sesuai urutan di gambar
+    $dataKategori = [];
+    foreach ($kategoriList as $namaKategori) {
+        $dataKategori[] = [
+            'nama' => $namaKategori,
+            'terjual' => $terjual[$namaKategori] ?? '0',
+            'gagal' => $gagal[$namaKategori] ?? '0',
+        ];
+    }
+
+    $totalTerjual = 0;
+    $totalGagal = 0;
+    foreach ($dataKategori as $row) {
+        $totalTerjual += is_numeric($row['terjual']) ? $row['terjual'] : 0;
+        $totalGagal += is_numeric($row['gagal']) ? $row['gagal'] : 0;
+    }
+
+    // Return as JSON (no PDF)
+    return response()->json([
+        'tahun' => $tahun,
+        'data' => $dataKategori,
+        'total_terjual' => $totalTerjual,
+        'total_gagal' => $totalGagal,
+    ]);
+}
 
     public function getHistoryPengiriman(){
         try{
@@ -941,5 +1145,6 @@ public function index(){
             ], 500);
         }
     }
+
 
 }

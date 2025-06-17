@@ -160,8 +160,6 @@
             localStorage.setItem('user_role', 'gudang');
             localStorage.setItem('namaPegawai', namaPegawai);
             window.location.href = "/pegawaidata";
-            
-            
           } else if(IdJabatan==4){
             alert('Login As Kurir!');
             localStorage.setItem('user_role', 'kurir');

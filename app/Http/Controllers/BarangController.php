@@ -30,6 +30,9 @@ class BarangController extends Controller
             ], 500);  // 500 Internal Server Error
         }
     }
+
+
+
     public function indexall()
 {
     try {
@@ -842,6 +845,55 @@ public function generateIdBarang(Request $request)
 
     return response()->json(['nextId' => $nextId]);
 }
+
+public function ShowUmum()
+{
+    try {
+        // Get all barang with status 'tersedia' and eager load imagesBarang
+        $barang = \App\Models\Barang::with('imagesbarang')
+            ->where('statusBarang', 'tersedia')
+            ->get();
+
+        $result = $barang->map(function($item) {
+            // Collect all non-null images from imagesbarang
+            $images = [];
+            if ($item->imagesbarang) {
+                foreach (['image1', 'image2', 'image3', 'image4', 'image5'] as $imgKey) {
+                    $img = $item->imagesbarang->$imgKey ?? null;
+                    if ($img) {
+                        $images[] = $img;
+                    }
+                }
+            }
+
+            return [
+                'idBarang' => $item->idBarang,
+                'namaBarang' => $item->namaBarang,
+                'beratBarang' => $item->beratBarang,
+                'garansiBarang' => $item->garansiBarang,
+                'periodeGaransi' => $item->periodeGaransi,
+                'hargaBarang' => $item->hargaBarang,
+                'haveHunter' => $item->haveHunter,
+                'statusBarang' => $item->statusBarang,
+                'image' => $item->image,
+                'kategori' => $item->kategori,
+                'images' => $images, // Array of non-null images
+            ];
+        });
+              return response()->json([
+            'status' => true,
+            'data' => $result
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => 'An error occurred while fetching the products.',
+            'message' => $e->getMessage(),
+            'status' => false
+        ], 500);
+    }
+}
+      
+
 public function showIdPenitipAndBarang($idBarang)
 {
     try {
@@ -927,6 +979,8 @@ public function updateBarangStatusForDonasi()
         'updated_items' => $barangsToUpdate->count()
     ]);
 }
+
+
 
 
 
