@@ -201,6 +201,8 @@
             }else if (role==="owner"){
                 leftMenu.appendChild(createItem("/pegawaidata", "Profile"));
                 leftMenu.appendChild(createItem("/pegawai/penjualankategori", "Laporan Penjualan per Kategori"));
+                leftMenu.appendChild(createItem("/pegawai/penitipanhabis", "Penitipan Expired"));
+                
                 leftMenu.appendChild(createItem("/requestDonasi", "Request Donasi"));
                 leftMenu.appendChild(createItem("/donasi", "Donasi"));
                 leftMenu.appendChild(createItem("/laporanPenitip", "Penitip"));
