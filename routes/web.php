@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BarangController;
-use App\Http\Controllers\RequestDonasiController;
+// use App\Http\Controllers\RequestDonasiController;
 use App\Http\Controllers\TransaksiDonasiController;
 use App\Http\Controllers\TransaksiPenitipanController;
 use Illuminate\Support\Facades\Password;
