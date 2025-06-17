@@ -12,7 +12,8 @@
         "kreait/firebase-php": "*",
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^3.3",
-        "laravel/tinker": "^2.7"
+        "laravel/tinker": "^2.7",
+        "spatie/browsershot": "^3.61"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

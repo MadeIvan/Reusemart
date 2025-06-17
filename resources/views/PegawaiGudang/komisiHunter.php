@@ -84,7 +84,7 @@
             <div class="row">
                 <div class="col-12 btn-container">
                     <button type="button" class="btn btn-success" id="addBarangButton">Tambah barang</button>
-                    <button type="button" class="btn btn-primary" id="updatestatus">Update Status</button>
+
                 </div>
             </div>
         </form>
@@ -265,11 +265,9 @@
             <table class="table table-bordered" id="pegawaiTable">
                 <thead>
                     <tr>
-                        <th>ID Barang</th>
-                        <th>Nama Barang</th>
-                        <th>Nama Penitip</th>
-                        <th>Status</th>
-                        <th>Tanggal kadaluarsa</th>
+                        <th>ID Hunter</th>
+                        <th>Nama Hunter</th>
+                   
                         <!-- <th>Password</th>  -->
                     </tr>
                 </thead>
@@ -296,7 +294,7 @@
             // const registerOverlay = document.getElementById("registerOverlay");
             // let pegawaiData = [];
             // let currentPegawaiId = null;
-            
+            const idPenitip = "T1";            
             // SEARCH
             let fileNamesArray = [];
             let selectedHunterId = null;
@@ -363,7 +361,7 @@
             // Fetch Pegawai Data
             async function fetchPegawai() {
                 try {
-                    const response = await fetch("http://127.0.0.1:8000/api/indexall", {
+                    const response = await fetch("http://127.0.0.1:8000/api/indexall3", {
                         method: "GET",
                         headers: { "Authorization": `Bearer ${localStorage.getItem('auth_token')}` },
                     });
@@ -374,8 +372,8 @@
                     console.log("Token:", localStorage.getItem('auth_token'));
 
                     if (Array.isArray(data) && data.length > 0) {
-                        pegawaiData = data;
-                        renderTable(pegawaiData);
+                        
+                        renderTable(data);
                     } else {
                         alert("Gagal memuat data barang.");
                         console.error("Error loading data:", data);
@@ -397,18 +395,32 @@
                 data.forEach(item => {
                     const row = document.createElement("tr");
                     row.innerHTML = `
-                        <td id="${item.idBarang}">${item.idBarang}</td>
-                        <td>${item.namaBarang || '-'}</td>
-                        <td>${item.namaPenitip || '-'}</td>
-                        <td>${item.statusBarang}</td>
-                        <td>${item.tanggalPenitipanSelesai || '-'}</td>
+                        <td>${item.idHunter}</td>
+                        <td>${item.namaHunter}</td>
                     `;
                     row.addEventListener("click", () => {
-                        currentItem = item;  // full item for edit modal
-                        currentItemId = item.transaksiPenitipan.idTransaksiPenitipan; // id for printing
-                        console.log("selected item:", currentItem);
-                        actionModal.show();
+                    const selectedItem = item.idBarang;
+                    console.log(selectedItem);
+
+                    fetch(`http://127.0.0.1:8000/api/generate-pdf/${selectedItem}`, { // Adjust the URL to match your route
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/pdf',
+                            'Content-Type': 'application/json',
+                        }
+                    })
+                    .then(response => response.blob())  // Read the response as a blob
+                    .then(blob => {
+                        // Create an object URL for the blob and trigger download or display
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = `Laporan_Stok_Barang_${selectedItem}.pdf`;  // Set the desired filename
+                        link.click();  // Simulate a click to start the download
+                    })
+                    .catch(error => {
+                        console.error("Error generating PDF:", error);
                     });
+                });
                     tableBody.appendChild(row);
                 });
             }
@@ -432,23 +444,23 @@
             const addBarangButton = document.getElementById("addBarangButton");
             const addBarangModal = new bootstrap.Modal(document.getElementById("addBarangModal"));
             const addBarangForm = document.getElementById("addBarangForm");
-            const namaPegawai = pegawai.namaPegawai
-            const idPegawai = pegawai.idPegawai 
+            // const namaPegawai = pegawai.namaPegawai
+            // const idPegawai = pegawai.idPegawai 
             let barangData={};  
 
-            console.log("Retrieved namaPegawai:", namaPegawai);
-            console.log("Retrieved IdPegawai:", idPegawai);
+            // console.log("Retrieved namaPegawai:", namaPegawai);
+            // console.log("Retrieved IdPegawai:", idPegawai);
             const user_role = localStorage.getItem('user_role');
             console.log("Retrieved rolei:", user_role);
             async function fetchHunters() {
                 try {
-                    const response = await fetch("http://127.0.0.1:8000/api/pegawaiGethunters", {
+                    const response = await fetch("http://127.0.0.1:8000/api/indexall3", {
                         method: "GET",
                         headers: {
                             "Authorization": `Bearer ${localStorage.getItem('auth_token')}`
                         }
                     });
-
+                    
                     const data = await response.json();
                     console.log("Fetched Hunters:", data);
 
@@ -1140,34 +1152,6 @@
                 // Show the drop area again if you hide it
                 toggleDropAreaVisibility();
             }
-            document.getElementById('updatestatus').addEventListener('click', function() {
-    // Show a loading indicator or message
-    console.log('Sending update request to API...');
-
-    // The API endpoint
-    const url = 'http://127.0.0.1:8000/api/update-barang-status'; // Adjust URL if necessary
-
-    // Send a PUT request to update barang status
-    fetch(url, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
-            "X-CSRF-TOKEN": csrfToken // If authorization is required
-        },
-    })
-    .then(response => response.json())
-    .then(data => {
-        // Handle success (for example, show a success message)
-        alert('Status updated successfully: ' + data.message); 
-        fetchPenitip();
-        fetchPegawai();// Show a success message
-    })
-    .catch(error => {
-        // Handle error (for example, show an error message)
-    alert('There was an error updating the status: ' + error.message);
-    });
-});
 
             // Initial fetch when the page loads
             fetchPenitip();

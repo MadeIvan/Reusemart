@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Penjadwalan Barang</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
     <style>
         table.table-bordered > :not(caption) > * > * {
@@ -20,11 +22,7 @@
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="#">Sistem Penjadwalan</a>
-        </div>
-    </nav>
+@include('layouts.navbar')
 
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -65,38 +63,46 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token from meta tag
+
         let data = [];
         let isLoading = true;
 
         // Fetch data from API
-        async function fetchData() {
-            try {
-                showLoading(true);
-                const response = await fetch('http://127.0.0.1:8000/api/barang-penjadwalan');
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const result = await response.json();
-                
-                // Filter only transactions with status starting with "Lunas Siap"
-                data = result.filter(row => row.status && row.status.startsWith('Lunas Siap'));
-                
-                isLoading = false;
-                showLoading(false);
-                renderTable();
-                
-                // Update info banner
-                updateInfoBanner();
-                
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                isLoading = false;
-                showLoading(false);
-                showError(error.message);
-            }
+        // ...existing code...
+// Fetch data from API
+async function fetchData() {
+    try {
+        showLoading(true);
+        const response = await fetch('http://127.0.0.1:8000/api/barang-titipNota');
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
+        
+        const result = await response.json();
+        
+
+        data = result.filter(row =>
+            row.status === 'Lunas Siap Diambil' ||
+            row.status === 'Lunas Siap Diantarkan'
+        );
+        
+        isLoading = false;
+        showLoading(false);
+        renderTable();
+        
+        // Update info banner
+        updateInfoBanner();
+        
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        isLoading = false;
+        showLoading(false);
+        showError(error.message);
+    }
+}
+// ...existing code...
 
         function showLoading(show) {
             const tableBody = document.getElementById('dataTable');
@@ -135,12 +141,12 @@
         }
 
         function updateInfoBanner() {
-            const infoBanner = document.querySelector('.alert-info');
-            infoBanner.innerHTML = `
-                <i class="bi bi-info-circle me-2"></i>
-                Menampilkan <strong>${data.length}</strong> transaksi dengan status "Lunas Siap..."
-            `;
-        }
+    const infoBanner = document.querySelector('.alert-info');
+    infoBanner.innerHTML = `
+        <i class="bi bi-info-circle me-2"></i>
+        Menampilkan <strong>${data.length}</strong> transaksi dengan status <b>"Lunas Siap Diambil"</b> atau <b>"Lunas Siap Diantarkan"</b>
+    `;
+}
 
         function formatCurrency(amount) {
             return new Intl.NumberFormat('id-ID', {
@@ -205,13 +211,13 @@
                         <td><small>${alamat}</small></td>
                         <td><strong>${formatCurrency(totalHarga)}</strong></td>
                         <td>${getStatusBadge(status)}</td>
-                        <td class="text-center">
+                        <td class="text-center">S
                             <div class="btn-group" role="group">
-                                <button class="btn btn-warning btn-sm" title="Download Nota" onclick="downloadNota('${row.noNota}')">
+                                <a href="/nota-pembelian-pdf/${row.noNota}" class="btn btn-warning btn-sm" title="Download Nota" target="_blank">
                                     <i class="bi bi-receipt"></i>
-                                </button>
-                                <button class="btn btn-primary btn-sm" title="Jadwalkan" onclick="schedule('${row.noNota}')">
-                                    <i class="bi bi-calendar-plus"></i>
+                                </a>
+                                <button class="btn btn-success btn-sm" title="Tandai Barang Diterima" onclick="markBarangDiterima('${row.noNota}')">
+                                    <i class="bi bi-check2-circle"></i>
                                 </button>
                             </div>
                         </td>
@@ -257,6 +263,42 @@
         function refreshData() {
             fetchData();
         }
+
+
+        async function markBarangDiterima(noNota) {
+    if (!confirm(`Apakah Anda yakin ingin menandai nota ${noNota} sebagai "Barang Diterima"?`)) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`http://127.0.0.1:8000/api/transaksi-pembelian/${noNota}/status`, {
+            method: 'PUT', // or POST, depends on your backend
+            headers: {
+                'Content-Type': 'application/json', 
+                "X-CSRF-TOKEN": csrfToken
+
+            },
+            body: JSON.stringify({
+                'status': "Barang Diterima"
+            }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Gagal mengupdate status.');
+        }
+
+        alert(`Status nota ${noNota} berhasil diubah menjadi "Barang Diterima".`);
+        
+        // Refresh data table
+        fetchData();
+
+    } catch (error) {
+        console.error('Error updating status:', error);
+        alert(`Error: ${error.message}`);
+    }
+}
+
     </script>
 </body>
 </html>

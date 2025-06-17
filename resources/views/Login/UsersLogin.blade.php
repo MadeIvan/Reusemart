@@ -118,54 +118,55 @@
             </div>          
         </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        document.querySelector('#loginForm').addEventListener('submit', async function(event) {
-            event.preventDefault(); // Prevent the default form submission
 
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-            const status = document.getElementById('status').value;
+    <script>
 
-            const data = { username, password };
-            const csrfToken = document.head.querySelector('meta[name="csrf-token"]').content;
-            try {
-                const response = await fetch(`http://127.0.0.1:8000/api/${status}/login`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken,
-                    },
-                    body: JSON.stringify(data)
-                });
-                const resData = await response.json();
-                const userStorage=resData.data
-                localStorage.setItem('userData', JSON.stringify(userStorage));
-                console.log(resData);
-                if (!response.ok) {
-                    alert(resData.message || 'Login failed');
-                    return;
-                }
-            alert('Login successful! Login as ' + status);
-                
 
-                if (status == 'penitip'  && resData.penitip) {
-                    localStorage.setItem('auth_token', resData.penitip.token);
-                    localStorage.setItem('user_role', 'penitip');
-                    window.location.href = 'http://127.0.0.1:8000/penitip/dashboard';
-                } else if (status == 'pembeli') {
-                    localStorage.setItem('auth_token', resData.data.token);
-                    localStorage.setItem('user_role', 'pembeli');
-                    window.location.href = 'http://127.0.0.1:8000/pembeli/dashboard';
-                } else if (status == 'organisasi') {
-                    localStorage.setItem('auth_token', resData.data.token);
-                    localStorage.setItem('user_role', 'organisasi');
-                    window.location.href = 'http://127.0.0.1:8000/OrganisasiMain'
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('An error occurred: ' + error.message);
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelector('#loginForm').addEventListener('submit', async function(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+        const status = document.getElementById('status').value;
+
+        const data = { username, password };
+        const csrfToken = document.head.querySelector('meta[name="csrf-token"]').content;
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/api/${status}/login`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+                body: JSON.stringify(data)
+            });
+            const resData = await response.json();
+            const userStorage=resData.data
+            ////////////////nambah ini sekalian buat simpen data user di localStorage///////////////////////////////////
+            localStorage.setItem('userData', JSON.stringify(userStorage));
+            console.log(resData);
+            if (!response.ok) {
+                alert(resData.message || 'Login failed');
+                return;
+            }
+        alert('Login successful! Login as ' + status);
+            
+
+            if (status == 'penitip'  && resData.penitip) {
+                localStorage.setItem('auth_token', resData.penitip.token);
+                localStorage.setItem('user_role', 'penitip');
+                window.location.href = 'http://127.0.0.1:8000/penitip/dashboard';
+            } else if (status == 'pembeli') {
+                localStorage.setItem('auth_token', resData.data.token);
+                localStorage.setItem('user_role', 'pembeli');
+                window.location.href = 'http://127.0.0.1:8000/pembeli/dashboard';
+            } else if (status == 'organisasi') {
+                localStorage.setItem('auth_token', resData.data.token);
+                localStorage.setItem('user_role', 'organisasi');
+                window.location.href = 'http://127.0.0.1:8000/OrganisasiMain'
+
             }
         });
     });

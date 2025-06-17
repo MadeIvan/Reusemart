@@ -20,19 +20,20 @@ use App\Http\Controllers\TransaksiDonasiController;
 use App\Http\Controllers\TransaksiPenitipanController;
 use App\Http\Controllers\TransaksiPembelianController;
 use App\Http\Controllers\PointRedemptionController;
+use App\Http\Controllers\ImagesBarangController;
+use App\Http\Controllers\RatingController;
+use App\Http\Controllers\ClaimMerchandiseController;
+use App\Http\Controllers\MerchandiseController;
+use App\Models\TransaksiPembelian;
+use App\Http\Controllers\FCMTokenController;
+use App\Models\TopSeller;
+use App\Http\Controllers\TopSellerController;
 use App\Http\Controllers\FCMTokenController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\KomisiController;
 use App\Http\Controllers\ForgotPasswordController;
 
 Route::post('/send-notification', [NotificationController::class, 'sendNotification']);
-
-
-
-Route::middleware('auth:pegawai')->post('/pegawai/register-fcm-token', [FCMTokenController::class, 'registerFcmToken']);
-Route::middleware('auth:penitip')->post('/penitip/register-fcm-token', [FCMTokenController::class, 'registerFcmToken']);
-Route::middleware('auth:pembeli')->post('/pembeli/register-fcm-token', [FCMTokenController::class, 'registerFcmToken']);
-
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
      return response()->json($request->user());
@@ -123,8 +124,11 @@ Route::middleware(['auth:sanctum', 'auth.pembeli'])->group(function () {
     Route::put('/pembeli/alamat/set-default/{id}', [AlamatController::class, 'setAsDefault']);
     Route::get('/alamatUtama', [AlamatController::class, 'getUtama']);
 
+
     Route::post('/pembeli/buat-diskusi/{id}', [DiskusiController::class, 'store']);
+
     Route::get('/pembeli/getData', [PembeliController::class, 'getData']);
+    
     Route::put('/updatePoin', [PembeliController::class, 'updatePoin']);
     Route::post('/tambah-keranjang/{id}', [PembeliController::class, 'addToCart']);
     Route::get('/keranjang', [PembeliController::class, 'getCart']);
@@ -135,7 +139,11 @@ Route::middleware(['auth:sanctum', 'auth.pembeli'])->group(function () {
     Route::post('/buktiBayar/{id}', [TransaksiPembelianController::class, 'buktiBayar']);
     Route::post('/batalkanPesanan/{id}', [TransaksiPembelianController::class, 'canceled']);
 
+    Route::get('/pembeli/poin', [PembeliController::class, 'getPoin']);
+
+
     Route::post('/pembeli/logout', [LoginController::class, 'logout']);
+
 });
 
 Route::middleware(['auth:penitip'])->group(function () {
@@ -143,7 +151,11 @@ Route::middleware(['auth:penitip'])->group(function () {
     Route::get('/penitip/profile', [PenitipController::class, 'myData']);
     Route::post('/logout', [LoginController::class, 'logout']);
     Route::get('/penitip/history', [PenitipController::class, 'loadBarang']);
+
+    Route::get('/penitip/getData', [PenitipController::class, 'getData']);
+
     Route::post('/penitip/logout', [LoginController::class, 'logout']);
+
 });
 
 // === Barang, Diskusi, RequestDonasi, Donasi, etc. ===
@@ -173,6 +185,14 @@ Route::get('/transaksiPenitipan', [TransaksiPenitipanController::class, 'index']
 Route::post('/addTransaksiPenitipan',[TransaksiPenitipanController::class, 'store']);
 Route::get('/barang-penjadwalan', [TransaksiPembelianController::class, 'showPenjadwalan']);
 Route::put('/barang-penjadwalan/{noNota}/jadwal', [TransaksiPembelianController::class, 'updatePenjadwalan']);
+Route::get('/barang-titipNota',[TransaksiPembelianController::class,'showfornota']);
+
+Route::get('/showAllTransaksi',[TransaksiPembelianController::class,'index']);
+
+Route::get('/nota-pembelian-pdf/{idTransaksiPenitipan}', [TransaksiPembelianController::class, 'notaPembelianPdf'])->name('nota.pembelian.pdf');
+Route::put('/transaksi-pembelian/{noNota}/status', [TransaksiPembelianController::class, 'updateStatus']);
+
+Route::get('/showAllTransaksi', [TransaksiPembelianController::class, 'showAllTransaksiPembeli']);
 
 
 
@@ -187,8 +207,40 @@ Route::get('/pegawaiGethunters', [PegawaiController::class, 'getHunters']);
 Route::get('/getpenitip', [PenitipController::class, 'getPenitip']);
 Route::post('/barang',[BarangController::class,'store']);
 Route::get('/indexall',[BarangController::class,'indexall']);
+Route::get('/indexall2',[BarangController::class,'indexall2']);
+Route::get('/indexall3',[BarangController::class,'indexall3']);
+Route::get('/indexall3/{idBarang}',[BarangController::class,'indexByIdBarang']);
+Route::get('/generate-pdf/{idBarang}', [BarangController::class, 'createpdfbyid']);
 
 Route::post('/addimages', [ImagesBarangController::class, 'store']);
+
+Route::get('/generate-idbarang', [BarangController::class, 'generateIdBarang']);
+Route::get('/nota-penitipan/{id}/pdf', [TransaksiPenitipanController::class, 'notaPenitipanPdf']);
+Route::get('/barang/simple/{idBarang}', [BarangController::class, 'showIdPenitipAndBarang']);
+Route::post('/rating',[RatingController::class,'store']);
+Route::get('/rating/average/{idTarget}', [RatingController::class, 'getAverageRating']);
+Route::get('/livecode/{id}', [TransaksiPenitipanController::class, 'getallbyid']);
+
+Route::get('/add30/{id}', [TransaksiPenitipanController::class, 'add30']);
+Route::get('/getClaim', [ClaimMerchandiseController::class, 'index']);
+Route::get('/getMerch', [MerchandiseController::class, 'index']);
+Route::put('/saveClaim/{id}', [ClaimMerchandiseController::class, 'update']);
+Route::get('/requestDonasi', [RequestDonasiController::class, 'request']);
+Route::get('/penjualanBulanan', [TransaksiPembelianController::class, 'sumTotalHargaPerMonth']);
+// Route::middleware(['auth:pegawai','role:1'])->group(function () {
+//     Route::get('/requestDonasi', [RequestDonasiController::class, 'request']);
+// });
+Route::middleware('auth:pegawai')->post('/pegawai/register-fcm-token', [FCMTokenController::class, 'registerFcmToken']);
+Route::middleware('auth:penitip')->post('/penitip/register-fcm-token', [FCMTokenController::class, 'registerFcmToken']);
+Route::middleware('auth:pembeli')->post('/pembeli/register-fcm-token', [FCMTokenController::class, 'registerFcmToken']);
+
+Route::get('/topseller/get', [TopSellerController::class, 'index']);
+Route::get('/topseller', [PenitipController::class, 'getTopPenitipByMonth']);
+Route::post('/topseller/add', [TopSellerController::class, 'store']);
+
+Route::get('/topseller/{idTopSeller}', [TopSellerController::class, 'getTopSellerById']);
+Route::put('/update-barang-status', [BarangController::class, 'updateBarangStatusForDonasi']);
+
 
 Route::post('/komisi-reusemart/{noNota}', [KomisiController::class, 'komisiReuseMart']);
 Route::get('/dompet/pegawai/{idPegawai}', [DompetController::class, 'getDompetByPegawai']);

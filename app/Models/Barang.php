@@ -42,10 +42,10 @@ class Barang extends Model
         return $this->hasMany(DetailTransaksiPembelian::class, 'idBarang', 'idBarang');
     }
 
-    public function transaksiPembelian()
-    {
-        return $this->belongsTo(TransaksiPembelian::class, 'noNota', 'noNota');
-    }
+    // public function transaksiPembelian()
+    // {
+    //     return $this->belongsTo(TransaksiPembelian::class, 'noNota', 'noNota');
+    // }
 
     public function detailTransaksiPenitipan()
     {

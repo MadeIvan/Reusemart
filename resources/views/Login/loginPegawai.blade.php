@@ -140,6 +140,7 @@
           alert('Login successful!');
           const IdJabatan = resData.data.pegawai.idJabatan;
           const namaPegawai = resData.data.pegawai.namaPegawai;
+          const idPegawai = resData.data.pegawai.idPegawai;
 
           localStorage.setItem('auth_token', resData.data.token);
 
@@ -150,7 +151,10 @@
           } else if(IdJabatan==2){
             alert('Login As Admin!');
             localStorage.setItem('user_role', 'admin');
+            localStorage.setItem('namaPegawai', namaPegawai);
+            localStorage.setItem('idPegawai', idPegawai);
             window.location.href = 'http://127.0.0.1:8000/pegawaidata';
+
           } else if(IdJabatan==3){
             alert('Login As Pegawai Gudang!');
             localStorage.setItem('user_role', 'gudang');
@@ -163,8 +167,10 @@
             localStorage.setItem('user_role', 'kurir');
             window.location.href = "/pegawaidata";
           } else if(IdJabatan==5){
-            alert('Login As CS!');
+            // alert('Login As CS!');
             localStorage.setItem('user_role', 'cs');
+            localStorage.setItem('namaPegawai', namaPegawai);
+            localStorage.setItem('idPegawai', idPegawai);
             window.location.href = "/pegawaidata";
           } else if(IdJabatan==6){
             alert('Login As Hunter!');

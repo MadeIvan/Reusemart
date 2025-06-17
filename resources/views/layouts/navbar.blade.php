@@ -157,7 +157,8 @@
                 leftMenu.appendChild(createItem("/pembeli/dashboard", "Home"));
                 leftMenu.appendChild(createItem("/home", "Produk"));
                 leftMenu.appendChild(createItem("/pembeli/alamat", "Alamat"));
-
+                leftMenu.appendChild(createItem("/pembeli/HistoryPembeli", "History Pembelian"));
+                leftMenu.appendChild(createItem("/pembeli/MyProfile", "Profile"));
                 const cartItem = createItem("/keranjang", "Keranjang", true);
                 cartItem.style.marginRight = "15px";  // jarak kanan
                 rightMenu.appendChild(cartItem);
@@ -182,19 +183,28 @@
                 leftMenu.appendChild(createItem("/pegawaidata", "Profile"));
                 leftMenu.appendChild(createItem("/pegawai/PenitipData", "Data Penitip"));
                 leftMenu.appendChild(createItem("/verifikasi", "Verifikasi Pembayaran"));
+                leftMenu.appendChild(createItem("/merchandise","Merchandise" ));
+                leftMenu.appendChild(createItem("/Pegawai/TopSeller","Top Seller" ));
                 rightMenu.appendChild(createLogout());            
 
             }else if (role==="gudang"){
-                leftMenu.appendChild(createItem("/pegawaidata", "Profile"));
-                leftMenu.appendChild(createItem("/pegawai/gudangview", "View Gudang"));
-                leftMenu.appendChild(createItem("/pegawai/penjadwalan", "Penjadwalan Barang"));
-                rightMenu.appendChild(createLogout());   
+
+            leftMenu.appendChild(createItem("/pegawaidata", "Profile"));
+            leftMenu.appendChild(createItem("/pegawai/gudangview", "View Gudang"));
+            leftMenu.appendChild(createItem("/pegawai/penjadwalan", "Penjadwalan Barang"));
+            leftMenu.appendChild(createItem("/pegawai/ViewNota", "Nota Pembelian Barang"));
+            rightMenu.appendChild(createLogout());   
+
             }else if (role==="owner"){
                 leftMenu.appendChild(createItem("/pegawaidata", "Profile"));
                 leftMenu.appendChild(createItem("/requestDonasi", "Request Donasi"));
                 leftMenu.appendChild(createItem("/donasi", "Donasi"));
                 leftMenu.appendChild(createItem("/laporanPenitip", "Penitip"));
-                rightMenu.appendChild(createLogout());   
+                leftMenu.appendChild(createItem("/laporanPenjualan", "Penjualan"));
+                leftMenu.appendChild(createItem("/laporanKomisi", "Komisi"));
+                leftMenu.appendChild(createItem("/laporanStok", "Gudang"));
+                rightMenu.appendChild(createLogout());  
+
             }
         }
     });

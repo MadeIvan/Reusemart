@@ -51,7 +51,12 @@ class TransaksiPembelian extends Model
         return $this->hasMany(DetailTransaksiPembelian::class, 'noNota', 'noNota');
     }
 
-    public function komisi(){
-        return $this->belongsTo(Komisi::class, 'idKomisi', 'idKomisi');
+    public function pointRedemption(){
+        return $this->belongsTo(PointRedemption::class,'noNota','transaction_id');
     }
+    public function komisi(){
+        return $this->belongsTo(Komisi::class,'noNota','noNota');
+    }
+    
+
 }

@@ -6,10 +6,18 @@ use App\Http\Controllers\RequestDonasiController;
 use App\Http\Controllers\TransaksiDonasiController;
 use App\Http\Controllers\TransaksiPenitipanController;
 use Illuminate\Support\Facades\Password;
+
+use App\Http\Controllers\TransaksiPembelianController;
+use App\Http\Controllers\RequestDonasiController;
+use App\Models\TransaksiPembelian;
+
 use App\Services\FCMService;
 
+// Route::get('/', function () {
+//     return view('Pegawai.Merch');
+// });
 Route::get('/', function () {
-    return view('utama');
+    return view('Login.loginPegawai');
 });
 Route::get('/home', function () {
     return view('home');
@@ -52,6 +60,9 @@ Route::get('/PegawaiLogin', function () {
 
 Route::get('/pegawai/PenitipData', function () {
     return view('Pegawai.CsView');
+});
+Route::get('/Pegawai/TopSeller', function () {
+    return view('Pegawai.TopSeller');
 });
 
 Route::get('/pegawaidata', function () {
@@ -117,6 +128,10 @@ Route::get('/verifikasi', function () {
     return view('Pegawai.verifikasiPembayaran');
 });
 
+Route::get('/nota-penitipan/${noNota}', function () {
+    return view('nota.pdf.nota_pembelian');
+});
+
 // PegawaiGudang special views (only code 1)
 Route::get('/pegawai/gudangview', function () {
     return view('PegawaiGudang.gudangView');
@@ -124,7 +139,7 @@ Route::get('/pegawai/gudangview', function () {
 Route::get('/pegawai/penjadwalan', function () {
     return view('PegawaiGudang.penjadwalanBarang');
 });
-Route::get('/nota-penjualan/{noNota}/pdf', [TransaksiPembelianController::class, 'notaPenjualanPdf']);
+Route::get('/nota-pembelian-pdf/{noNota}', [TransaksiPembelianController::class, 'notaPembelianPdf']);
 
 Route::get('/pegawai/ViewNota', function () {
     return view('PegawaiGudang.NotaPembelian');
@@ -157,17 +172,39 @@ Route::get('/laporanPenitip/pdf', [TransaksiPenitipanController::class, 'laporan
 
 
 
+Route::get('/pembeli/HistoryPembeli', function () {
+    return view('Pembeli.HistoryPembeli');
+});
+
+
+Route::get('/pembeli/MyProfile', function () {
+    return view('Pembeli.profilePembeli');
+});
+
+Route::get('/merchandise', function () {
+    return view('Pegawai.Merch');
+});
+
+Route::get('/requestDonasi', function () {
+    return view('Owner.laporanReqDonasi');
+});
+Route::get('/laporanRequestDonasi/pdf', [RequestDonasiController::class, 'notaReqPdf'])->name('nota.pdf.laporanrequestdonasi');
+
+
+Route::get('/laporanStok', function () {
+    return view('Owner.LaporanStok');
+});
+Route::get('/laporanStok/pdf', [BarangController::class, 'notaReqPdf'])->name('nota.pdf.barang');
+// Route::get('/laporanStok/pdf', [BarangController::class, 'notaReqPdf'])->name('nota.pdf.laporanrequestdonasi');
+// Route::get('/laporanRequestDonasi/pdf', [RequestDonasiController::class, 'notaReqPdf'])->name('nota.pdf.laporanrequestdonasi');
+Route::get('/laporanKomisi', function () {
+    return view('Owner.Komisi');
+});
+Route::get('/laporanKomisi/pdf', [BarangController::class, 'notaReqPdf2'])->name('nota.pdf.laporanKomisi');
 // Route::get('/products', [BarangController::class, 'index']);
 
-// routes/web.php
+Route::get('/laporanPenjualan', function () {
+    return view('Owner.Penjualan');
+});
+Route::get('/laporanPenjualan/pdf', [TransaksiPembelianController::class, 'notaReqPdf'])->name('nota.pdf.laporanPenjualan');
 
-// Route::get('/test-fcm', function () {
-//     $fcmToken = 'fqGedr4nTueD1UF_L1iOQZ:APA91bEbz2pWuk1XjpWiUT8aOD13bEpG0KToPpv98i9FC8C64ls4SEfTV9smpSkw7sq1tmV85MeDFGyHDqj8LZgQ17DWmyHY4s8wwD6CQ_TX0qKTg9BIMMA'; // Ganti dengan token FCM yang valid dari DB
-//     app(FCMService::class)->sendNotification(
-//         $fcmToken,
-//         'Test Judul',
-//         'Isi Pesan Test'
-//     );
-
-//     return 'Notifikasi test sudah dikirim, cek HP kamu.';
-// });

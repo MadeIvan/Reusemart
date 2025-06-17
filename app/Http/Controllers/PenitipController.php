@@ -47,7 +47,17 @@ class PenitipController extends Controller
             ],
         ]);
     }
-
+    public function getData(Request $request)    
+    {
+        // $penitip = $request->user();
+        $penitip = auth('penitip')->user()->load('dompet');
+        
+        return response()->json([
+            "status" => true,
+            "message" => "User retrieved successfully",
+            "data" => $penitip
+        ]);
+    }
     // Get all penitip data
     public function getAllPenitip()
     {
@@ -65,6 +75,7 @@ class PenitipController extends Controller
             'password' => 'required|string|min:6',
             'namaPenitip' => 'required|string|max:255',
             'nik' => 'required|string|size:16',
+            "email"=>'required|string'
         ]);
 
         if ($validator->fails()) {
@@ -79,11 +90,11 @@ class PenitipController extends Controller
             $lastPenitip = DB::select("SELECT MAX(CAST(SUBSTRING(idPenitip, 2) AS UNSIGNED)) AS last_id FROM penitip");
             $lastPenitip = $lastPenitip[0]->last_id;
             $newId = $lastPenitip ? 'T' . ($lastPenitip + 1) : 'T1';
-            \Log::info("Created new penitip ID: {$newId}");
+            // \Log::info("Created new penitip ID: {$newId}");
             $dompet = (new DompetController)->createDompetPenitip(null);
             $idDompet = (string) $dompet->idDompet;
 
-            \Log::info("Created new dompet with ID: {$idDompet}");
+            // \Log::info("Created new dompet with ID: {$idDompet}");
             $penitip = Penitip::create([
                 'idPenitip' => $newId,
                 'username' => $request->username,
@@ -181,7 +192,7 @@ public function deletePenitip($id){
     public function myData(Request $request)    
     {
         // $penitip = $request->user();
-         $penitip = auth('penitip')->user()->load('dompet');
+$penitip = auth('penitip')->user()->load('dompet');
 
         return response()->json([
             "status" => true,
@@ -220,6 +231,69 @@ public function deletePenitip($id){
         'data' => $penitips
     ]);
 }
+public function getTopPenitipByMonth(Request $request)
+{
+    $validated = $request->validate([
+        'month' => 'required|string|min:1|max:12',
+        'year' => 'nullable|integer|min:2000|max:2100',
+    ]);
+
+    $month = $validated['month'];
+    $year = $validated['year'] ?? now()->year;
+
+    $topPenitip = DB::table('barang')
+        ->join('detailTransaksiPenitipan', 'barang.idBarang', '=', 'detailTransaksiPenitipan.idBarang')
+        ->join('transaksiPenitipan', 'detailTransaksiPenitipan.idTransaksiPenitipan', '=', 'transaksiPenitipan.idTransaksiPenitipan')
+        ->join('penitip', 'transaksiPenitipan.idPenitip', '=', 'penitip.idPenitip')
+        ->join('detailTransaksiPembelian', 'barang.idBarang', '=', 'detailTransaksiPembelian.idBarang')
+        ->join('transaksiPembelian', 'detailTransaksiPembelian.noNota', '=', 'transaksiPembelian.noNota')
+        ->where('barang.statusBarang', 'Terjual')
+        ->whereMonth('transaksiPembelian.tanggalWaktuPelunasan', $month)
+        ->whereYear('transaksiPembelian.tanggalWaktuPelunasan', $year)
+        ->select(
+            'penitip.idPenitip',
+            'penitip.namaPenitip',
+            DB::raw('COUNT(barang.idBarang) as totalBarangTerjual')
+        )
+        ->groupBy('penitip.idPenitip', 'penitip.namaPenitip')
+        ->orderByDesc('totalBarangTerjual')
+        ->limit(1)
+        ->first();
+
+    if (!$topPenitip) {
+        return response()->json([
+            'month' => $month,
+            'year' => $year,
+            'message' => 'Tidak ada penitip yang menjual barang di bulan ini.'
+        ], 404);
+    }
+
+
+    $totalPendapatan = DB::table('barang')
+        ->join('detailTransaksiPenitipan', 'barang.idBarang', '=', 'detailTransaksiPenitipan.idBarang')
+        ->join('transaksiPenitipan', 'detailTransaksiPenitipan.idTransaksiPenitipan', '=', 'transaksiPenitipan.idTransaksiPenitipan')
+        ->join('penitip', 'transaksiPenitipan.idPenitip', '=', 'penitip.idPenitip')
+        ->join('detailTransaksiPembelian', 'barang.idBarang', '=', 'detailTransaksiPembelian.idBarang')
+        ->join('transaksiPembelian', 'detailTransaksiPembelian.noNota', '=', 'transaksiPembelian.noNota')
+        ->where('barang.statusBarang', 'Terjual')
+        ->whereMonth('transaksiPembelian.tanggalWaktuPelunasan', $month)
+        ->whereYear('transaksiPembelian.tanggalWaktuPelunasan', $year)
+        ->where('penitip.idPenitip', $topPenitip->idPenitip)
+        ->select('transaksiPembelian.totalHarga', 'transaksiPembelian.noNota')
+        ->distinct()
+        ->get()
+        ->sum('totalHarga');
+
+    return response()->json([
+        'month' => $month,
+        'year' => $year,
+        'idPenitip' => $topPenitip->idPenitip,
+        'totalPendapatan' => $totalPendapatan,
+        'topPenitip' => $topPenitip
+    ]);
 }
+}
+
+
 
 

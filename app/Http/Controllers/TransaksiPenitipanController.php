@@ -3,6 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+
+use Illuminate\Support\Facades\DB;
+use App\Models\TransaksiPenitipan;
+use App\Models\DetailTransaksiPenitipan;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\Pegawai;
 use App\Models\TransaksiPenitipan;
 use App\Models\DetailTransaksiPenitipan;
 use App\Models\Penitip;
@@ -70,6 +76,66 @@ public function store(Request $request)
             'message' => 'Transaction failed: ' . $e->getMessage()
         ], 500);
     }
+}
+
+
+public function add30($id){
+    $tanggalMulai = new \DateTime($id);
+
+     $tanggalSelesai = (clone $tanggalMulai)->modify('+30 days');
+    return $tanggalSelesai;
+
+}
+
+public function getallbyid($id){
+    try {
+        // Try to find the barang by its ID
+       
+        $barang = TransaksiPenitipan::where('tanggalPenitipanSelesai', $id)->get();
+
+        // If the barang is found, return it as JSON
+        if ($barang) {
+            return response()->json($barang);
+        } else {
+            // If the barang is not found, return a 404 error with a custom message
+            return response()->json(['message' => 'Barang not found'], 404);
+        }
+    } catch (\Exception $e) {
+        // Catch any exception and return a 500 internal server error
+        return response()->json([
+            'error' => 'An error occurred while fetching the product.',
+            'message' => $e->getMessage(), // Include the exception message for debugging
+        ], 500);
+    }
+}
+public function notaPenitipanPdf($id)
+{
+    $idTransaksi=$id;
+    $transaksiPenitipan = TransaksiPenitipan::with(['penitip', 'detailTransaksiPenitipan.barang'])->findOrFail($idTransaksi);
+    $detailTransaksiPenitipan = $transaksiPenitipan->detailTransaksiPenitipan;
+    $pegawai = Pegawai::find($transaksiPenitipan->idPegawai1); // misal idPegawaiQC untuk yang QC
+    
+
+    $pdf = Pdf::loadView('PegawaiGudang.notaPenitipan', compact('transaksiPenitipan', 'detailTransaksiPenitipan', 'pegawai'));
+
+    return $pdf->download('nota-penitipan-' . $id . '.pdf');
+
+    // $transaksi = \App\Models\TransaksiPenitipan::with([
+    //     'detailTransaksiPenitipan.barang',
+    //     'pegawai',
+    //     'pegawai2',
+    //     'penitip',
+
+        
+    // ])->where('idTransaksiPenitipan', $id)->firstOrFail();
+    // // return response()->json([
+    // //     'status' => true,
+    // //     'message' => 'Data transaksi berhasil diambil',
+    // //     'data' => $transaksi
+    // // ]);
+
+    // return Pdf::loadView('Pegawai.notaPenitipan', compact('transaksi'))
+    //     ->download("nota-penitipan-{$id}.pdf");
 }
 
 
@@ -217,4 +283,5 @@ public function store(Request $request)
             ->setPaper('a4', 'landscape')
             ->stream("Laporan Penitip.pdf");
     }
+
 }
