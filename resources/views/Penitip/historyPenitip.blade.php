@@ -183,6 +183,7 @@ document.addEventListener("DOMContentLoaded", function(){
             hideLoading();
             if (data.status && Array.isArray(data.data)) {
                 allBarangData = data.data;
+                console.log(allBarangData);
                 displayBarang(allBarangData);
             } else {
                 document.getElementById("barangContainer").innerHTML = "<div class='col-12 text-center text-muted'>Tidak ada data barang ditemukan.</div>";
