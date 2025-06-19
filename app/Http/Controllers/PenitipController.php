@@ -201,26 +201,46 @@ $penitip = auth('penitip')->user()->load('dompet');
         ]);
     }
 
-    public function loadBarang(Request $request)
-    {
-        $penitip = auth('penitip')->user();
+public function loadBarang(Request $request)
+{
+    $penitip = auth('penitip')->user();
 
-        $penitipan = TransaksiPenitipan::with('detailTransaksiPenitipan.barang.detailTransaksiPembelian.transaksiPembelian')
-            ->where('idPenitip', $penitip->idPenitip)
-            ->get();
+    // Eager load imagesbarang for each barang, and only barang with status 'Terjual'
+    $penitipan = \App\Models\TransaksiPenitipan::with([
+        'detailTransaksiPenitipan.barang' => function ($query) {
+            $query->where('statusBarang', 'Terjual');
+        },
+        'detailTransaksiPenitipan.barang.imagesbarang'
+    ])
+    ->where('idPenitip', $penitip->idPenitip)
+    ->get();
 
-        // $penitipan = TransaksiPenitipan::with([
-        //     'detailTransaksiPenitipan.barang.detailTransaksiPembelian.transaksiPembelian'
-        // ])->where('idPenitip', auth('penitip')->user()->idPenitip)
-        // ->get();
+    // Map the response to include all images for each barang
+    $result = $penitipan->map(function($tp) {
+        $tpArr = $tp->toArray();
+        $tpArr['detailTransaksiPenitipan'] = collect($tp->detailTransaksiPenitipan)->map(function($detail) {
+            $barang = $detail->barang;
+            // If images are in the related imagesbarang table
+            $images = [
+                'image1' => $barang->imagesbarang->image1 ?? null,
+                'image2' => $barang->imagesbarang->image2 ?? null,
+                'image3' => $barang->imagesbarang->image3 ?? null,
+                'image4' => $barang->imagesbarang->image4 ?? null,
+                'image5' => $barang->imagesbarang->image5 ?? null,
+            ];
+            $detailArr = $detail->toArray();
+            $detailArr['imagesBarang'] = $images;
+            return $detailArr;
+        });
+        return $tpArr;
+    });
 
-
-        return response()->json([
-            "status" => true,
-            "message" => "Barang penitipan berhasil dimuat",
-            "data" => $penitipan
-        ]);
-    }
+    return response()->json([
+        "status" => true,
+        "message" => "Barang penitipan berhasil dimuat",
+        "data" => $result
+    ]);
+}
 
     public function getPenitip()
 {

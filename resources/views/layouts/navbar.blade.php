@@ -516,6 +516,7 @@
                 } else if (role === "penitip") {
                     sidebarMenu.appendChild(createMenuItem("/penitip/dashboard", "Home", "bi bi-house-door"));
                     sidebarMenu.appendChild(createMenuItem("/penitip/history", "History Penitip", "bi bi-clock-history"));
+                    sidebarMenu.appendChild(createMenuItem("/penitip/historyPenjualan", "History Penjualan", "bi bi-clock-history"));
 
                 } else if (role === "organisasi") {
                     sidebarMenu.appendChild(createMenuItem("/OrganisasiMain", "Request Donasi", "bi bi-heart"));

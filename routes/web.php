@@ -233,3 +233,8 @@ Route::get('/laporanPenjualan', function () {
 Route::get('/laporanPenjualan/pdf', [TransaksiPembelianController::class, 'notaReqPdf'])->name('nota.pdf.laporanPenjualan');
 
 
+Route::get('/penitip/historyPenjualan', function () {
+    return view('Penitip.historyPenjualan');
+});
+
+
