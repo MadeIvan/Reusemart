@@ -57,7 +57,7 @@
             <!-- Product details will be dynamically loaded here -->
         <!-- </div>
     </div> -->
-    <div class="container my-5">
+    <div class="container my-5" style = "margin-top: 5% !important; margin-left: 5% !important;" >
         <h2>Keranjang Belanja</h2>
         <div class="row">
             <!-- ///////////////kolom produk/////////////////// -->

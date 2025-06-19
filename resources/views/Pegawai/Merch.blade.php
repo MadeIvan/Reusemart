@@ -74,6 +74,9 @@
 </head>
 <body>
     @include('layouts.navbar')
+<div class="container mt-4" style = "margin-top: 5% !important; margin-left: 5% !important;" >
+
+
 
     <div class="modal fade" id="addClaimModal" tabindex="-1" aria-labelledby="addClaimModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -172,7 +175,7 @@
             </table>
         </div>
     </div>
-
+</div>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token from meta tag

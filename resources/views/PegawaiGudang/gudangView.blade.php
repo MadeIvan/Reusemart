@@ -74,11 +74,11 @@
 </head>
 <body>
 @include('layouts.navbar')
-    <div class="container mt-4">
+    <div class="container mt-4" style = "margin-top: 5% !important; margin-left: 5% !important;"  >
         <h2>Menu Gudang</h2>
 
         <!-- Form for Pegawai data -->
-        <form id="PegawaiForm">
+        <form id="PegawaiForm" >
             
 
             <div class="row">
@@ -88,7 +88,7 @@
                 </div>
             </div>
         </form>
-    </div>
+
 
 
     <div class="modal fade" id="addBarangModal" tabindex="-1" aria-labelledby="addBarangModalLabel" aria-hidden="true">
@@ -279,7 +279,7 @@
             </table>
         </div>
     </div>
-
+    </div>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const pegawaiDataString = localStorage.getItem("pegawaiData");

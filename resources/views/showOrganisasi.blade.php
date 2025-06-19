@@ -75,7 +75,7 @@
 <body>
     @include('layouts.navbar')
 
-    <div class="container mt-4">
+    <div class="container mt-4" style = "margin-top: 5% !important; margin-left: 5% !important;" >
         <h2>Data Organisasi</h2>
 
         <!-- Form for Organisasi data -->
@@ -90,7 +90,7 @@
                     <label for="username" class="form-label">Username</label>
                     <input type="text" class="form-control" id="username" disabled>
                 </div>
-            </div>
+
 
             <div class="row mb-3">
                 <div class="col-md-4">
@@ -145,7 +145,7 @@
             </table>
         </div>
     </div>
-
+            </div>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token from meta tag

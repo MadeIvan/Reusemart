@@ -22,7 +22,7 @@ use App\Services\FCMService;
 //     return view('Pegawai.Merch');
 // });
 Route::get('/', function () {
-    return view('Login.loginPegawai');
+    return view('utama');
 });
 Route::get('/home', function () {
     return view('home');
@@ -59,9 +59,9 @@ Route::get('/Pegawailogin', function () {
     return view('Login.loginPegawai');
 });
 // Code 2:
-// Route::get('/PegawaiLogin', function () {
-//     return view('Login.PegawaiLogin');
-// });
+Route::get('/pegaawilogin', function () {
+    return view('Login.loginPegawai');
+});
 
 Route::get('/pegawai/PenitipData', function () {
     return view('Pegawai.CsView');

@@ -24,7 +24,7 @@
 <body>
 @include('layouts.navbar')
 
-    <div class="container mt-4">
+    <div class="container mt-4" style="margin-top: 8% !important; margin-left: 8% !important;">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h3>Daftar Penjadwalan Barang</h3>
             <div>

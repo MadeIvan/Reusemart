@@ -10,7 +10,7 @@
 <body>
 @include('layouts.navbar')
 
-<div class="container py-4">
+<div class="container py-4 "style = "margin-top: 5% !important; margin-left: 7% !important;" >
     <h3 class="text-center mb-4 text-success">Riwayat Pembelian</h3>
     <div id="pembelianContainer" class="row g-3"></div>
 </div>

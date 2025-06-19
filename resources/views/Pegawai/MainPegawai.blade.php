@@ -32,7 +32,7 @@
     <source src="{{ asset('ReUseMartVid.mp4') }}" type="video/mp4">
     Your browser does not support the video tag.
 </video>
-  <main class="container my-5 p-4 bg-white rounded shadow-sm" style="max-width: 700px;">
+  <main class="container my-5 p-4 bg-white rounded shadow-sm" style="max-width: 60%; margin-top: 10% !important;">
     <h1 class="text-center text-success mb-3">Selamat Datang!</h1>
     <p class="lead text-center">
       Anda masuk sebagai <strong><span id="loggedInAs">Memuat...</span></strong>.

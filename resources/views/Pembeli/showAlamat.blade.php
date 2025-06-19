@@ -224,7 +224,7 @@
 
     
     <!-- ////////////////////INI ISI///////////////////////////// -->
-    <div class="container py-4">
+    <div class="container py-4" style = "margin-top: 5% !important; margin-left: 5% !important;" >
         <h2 class="mb-4">Daftar Alamat</h2>
         
         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -235,7 +235,7 @@
         </div>
     </div>
 
-    <div class="container mt-2">
+    <div class="container mt-2 " style = "margin-top: 5% !important; margin-left: 5% !important;" >
         <div class="row flex-column" id="alamatContainer">
             <!-- NANTI DISINI -->
         </div>

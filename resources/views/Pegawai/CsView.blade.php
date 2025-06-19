@@ -77,7 +77,7 @@
 
 
 
-    <div class="container mt-4 ">
+    <div class="container mt-4 "style = "margin-top: 5% !important; margin-left: 5% !important;" >
         <h2>Data Penitip</h2>
 
         <!-- Form for Penitip data -->
@@ -96,7 +96,7 @@
                     <label for="username" class="form-label">Username</label>
                     <input type="text" class="form-control" id="username" required />
                 </div>
-            </div>
+ 
 
             <div class="row mb-3">
                 <div class="col-md-4">
@@ -139,6 +139,10 @@
             <div class="mb-3">
                 <label for="registerPassword" class="form-label">Password</label>
                 <input type="password" class="form-control" id="registerPassword" required />
+            </div>
+            <div class="mb-3">
+                <label for="registeremail" class="form-label">Email</label>
+                <input type="email" class="form-control" id="registeremail" required />
             </div>
             <div class="mb-3 d-flex gap-2">
                 <button type="submit" class="btn btn-success">Register</button>
@@ -195,7 +199,7 @@
             </table>
         </div>
     </div>
-
+</div>
     <footer class="bg-dark text-white text-center p-3">
         <p>&copy; 2025 Reusemart</p>
     </footer>
@@ -451,8 +455,9 @@
                     nik: document.getElementById("registerNik").value,
                     username: document.getElementById("registerUsername").value,
                     password: document.getElementById("registerPassword").value,
+                    email: document.getElementById("registeremail").value
                 };
-        
+                console.log("Registering new penitip with data:", registerData);
                 try {
                     const response = await fetch("http://127.0.0.1:8000/api/penitip/register", {
                         method: "POST",

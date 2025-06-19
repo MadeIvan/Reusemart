@@ -93,8 +93,7 @@ public function store(Request $request)
     }
 }
 
-     * Display the specified claim.
-     */
+
     public function show($id)
     {
         $claim = ClaimMerchandise::with(['pegawai', 'merchandise', 'pembeli'])->find($id);

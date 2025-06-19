@@ -21,7 +21,7 @@
 <body class="bg-dark">
     @include('layouts.navbar')
 
-    <div class="container mt-4 mb-5" style="max-width: 1000px;">
+    <div class="container mt-4 mb-5" style="max-width: 80%; margin-top: 10% !important; margin-left: 10 % !important;">
         <div class="bg-light rounded-4 p-4 shadow">
             <div class="mb-4">
                 <div class="input-group">

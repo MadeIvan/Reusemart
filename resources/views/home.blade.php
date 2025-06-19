@@ -13,16 +13,8 @@
 <body">
         
     @include('layouts.navbar')
-    <!-- Header Section -->
-    <header class="bg-dark text-white p-4">
-        <div class="container text-center">
-            <h1>Reusemart</h1>
-            <form action="" method="get" class="d-flex justify-content-center mt-3">
-                <input type="text" name="search" class="form-control w-50" placeholder="Search for products..." value="{{ request('search') }}" />
-                <button type="submit" class="btn btn-warning ms-2">Search</button>
-            </form>
-        </div>
-    </header>
+    <div class="container-fluid" style = "margin-top:7% !important; margin-left: 5% !important;" >
+ <!-- Header Section -->
 
     <!-- Product List Section -->
     <!-- <section class="container my-5" id="product-list"> -->
@@ -31,6 +23,8 @@
         </div>
     <!-- </section> -->
 
+    </div>
+   
     <!-- Footer Section -->
     <footer class="bg-dark text-white text-center p-3">
         <p>&copy; 2025 Reusemart</p>

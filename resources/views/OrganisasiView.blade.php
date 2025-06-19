@@ -75,7 +75,7 @@
 <body>
     @include('layouts.navbar')
 
-    <div class="container mt-4">
+    <div class="container mt-4" style = "margin-top: 8% !important; margin-left: 5% !important;" >
         <h2>REQUEST DONASI</h2>
         
         <!-- Form for ReqDonasi data -->
@@ -94,7 +94,7 @@
                     <label for="tanggalRequest" class="form-label">Tanggal Request</label>
                     <input type="date" class="form-control" id="tanggalRequest" disabled>
                 </div>
-            </div>
+
 
             <div class="row mb-3">
                 <div class="col-md-4">
@@ -167,7 +167,7 @@
             </table>
         </div>
     </div>
-
+            </div>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const auth_token = localStorage.getItem('auth_token');
