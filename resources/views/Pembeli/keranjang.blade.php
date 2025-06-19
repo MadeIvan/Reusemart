@@ -149,7 +149,7 @@
                     const itemHtml = `
                         <div class="card mb-4 shadow-sm rounded-4 p-3">
                             <div class="d-flex align-items-start">
-                                <img src="${item.image}" alt="${item.namaBarang}" class="rounded-3 me-3" style="width: 150px; ">
+                                <img src="${`http://127.0.0.1:8000/${item.image}`}" alt="${item.namaBarang}" class="rounded-3 me-3" style="width: 150px; ">
 
                                 <div class="flex-grow-1">
                                     <h3 class="mb-1">${item.namaBarang}</h3>

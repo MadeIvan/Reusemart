@@ -35,40 +35,40 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>    
     
     <!-- Custom JavaScript to fetch and display products -->
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // Fetch products from the API
-            fetch('http://127.0.0.1:8000/api/getBarang')  // Add '/api' to match your Postman route
-                .then(response => response.json())
-                .then(data => {
-                    // Get the product list container
-                    const productList = document.getElementById('product-list');
-
-                    // Loop through each product and create a card
-                    data.forEach(product => {
-                        const formattedPrice = Number(product.hargaBarang).toLocaleString('id-ID');
-                        const productCard = `
-                            <div class="col-md-3 mb-4"> <!-- 4 cards per row on medium screens -->
-                                <div class="card">
-                                    <img src="{{ asset('${product.image}.jpg') }}" class="card-img-top" alt="${product.namaBarang}" />
-                                    <div class="card-body d-flex flex-column justify-content-between">
-                                        <div>
-                                            <h5 class="card-title">${product.namaBarang}</h5>
-                                            <p class="card-text text-success">Rp. ${formattedPrice}</p>
-                                        </div>
-                                        <a href="/getBarang/${product.idBarang}" class="btn btn-dark align-self-end">Lihat Barang</a>
-
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // Fetch products from the API
+    fetch('http://127.0.0.1:8000/api/getBarang')
+        .then(response => response.json())
+        .then(data => {
+            const productList = document.getElementById('product-list');
+            data.forEach(product => {
+                // Only show if image1 exists
+                if (product.imagesbarang && product.imagesbarang.image1) {
+                    const productCard = `
+                        <div class="col-md-3 mb-4">
+                            <div class="card">
+                                <div style="width:100%;height:200px;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                                    <img src="http://127.0.0.1:8000/${product.imagesbarang.image1}" class="card-img-top" alt="${product.namaBarang}" style="max-width:100%;max-height:100%;object-fit:contain;">
+                                </div>
+                                <div class="card-body d-flex flex-column justify-content-between">
+                                    <div>
+                                        <h5 class="card-title">${product.namaBarang}</h5>
+                                        <p class="card-text text-success">Rp. ${Number(product.hargaBarang).toLocaleString('id-ID')}</p>
                                     </div>
+                                    <a href="/getBarang/${product.idBarang}" class="btn btn-dark align-self-end">Lihat Barang</a>
                                 </div>
                             </div>
-                        `;
-                        productList.innerHTML += productCard;
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching products:', error);
-                });
+                        </div>
+                    `;
+                    productList.innerHTML += productCard;
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error fetching products:', error);
         });
-    </script>
+});
+</script>
 </body>
 </html>

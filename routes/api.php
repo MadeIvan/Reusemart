@@ -146,8 +146,7 @@ Route::middleware(['auth:sanctum', 'auth.pembeli'])->group(function () {
     Route::post('/batalkanPesanan/{id}', [TransaksiPembelianController::class, 'canceled']);
 
     Route::get('/pembeli/poin', [PembeliController::class, 'getPoin']);
-
-
+    Route::get('/pembeli/history', [TransaksiPembelianController::class, 'showTransaksiPembeliId']);
     Route::post('/pembeli/logout', [LoginController::class, 'logout']);
 
 });

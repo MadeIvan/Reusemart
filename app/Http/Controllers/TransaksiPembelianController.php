@@ -869,9 +869,8 @@ public function laporanPerKategoriBarang(Request $request)
 
 public function showHistoriKomisiHunter($idHunter)
 {
-    // Get all TransaksiPenitipan where idPegawai2 == $idHunter and status == 'Terjual'
     $transaksis = \App\Models\TransaksiPenitipan::with([
-        'detailTransaksiPenitipan.barang'
+        'detailTransaksiPenitipan.barang.detailTransaksiPembelian.transaksiPembelian'
     ])
     ->where('idPegawai2', $idHunter)
     ->whereHas('detailTransaksiPenitipan.barang', function($q) {
@@ -880,20 +879,27 @@ public function showHistoriKomisiHunter($idHunter)
     ->get();
 
     $result = [];
+
     foreach ($transaksis as $tp) {
         foreach ($tp->detailTransaksiPenitipan as $detail) {
             $barang = $detail->barang;
-            if (!$barang || $barang->statusBarang !== 'Terjual') continue;
+            $detailPembelian = $barang->detailTransaksiPembelian->first();
+            $pembelian = optional($detailPembelian)->transaksiPembelian;
+            $noNota = optional($detailPembelian)->noNota ?? null;
 
-            // Find Komisi by idBarang and noNota (from transaksi pembelian)
-            $noNota = optional($barang->detailTransaksiPembelian->first())->noNota ?? null;
-            $komisi = null;
-            if ($noNota) {
-                $komisi = \App\Models\Komisi::where('idBarang', $barang->idBarang)
-                    ->where('noNota', $noNota)
-                    ->whereNotNull('komisiHunter')
-                    ->first();
+            if (
+                !$barang ||
+                $barang->statusBarang !== 'Terjual' ||
+                !$pembelian ||
+                !($noNota && (Str::contains($pembelian->status, 'Lunas') || $pembelian->status === 'Barang Diterima'))
+            ) {
+                continue;
             }
+
+            $komisi = \App\Models\Komisi::where('idBarang', $barang->idBarang)
+                ->where('noNota', $noNota)
+                ->whereNotNull('komisiHunter')
+                ->first();
 
             $result[] = [
                 'idTransaksiPenitipan' => $tp->idTransaksiPenitipan,
@@ -901,6 +907,7 @@ public function showHistoriKomisiHunter($idHunter)
                 'hargaBarang' => $barang->hargaBarang,
                 'noNota' => $noNota,
                 'komisiHunter' => $komisi ? $komisi->komisiHunter : null,
+                'pembelian' => $pembelian,
             ];
         }
     }
@@ -911,7 +918,6 @@ public function showHistoriKomisiHunter($idHunter)
         'data' => $result
     ]);
 }
-
 public function laporanKategori(Request $request)
 {
     $tahun = $request->input('tahun', date('Y'));
@@ -1145,6 +1151,34 @@ public function laporanKategori(Request $request)
             ], 500);
         }
     }
+public function showTransaksiPembeliId()
+    {
+        $pembeli = auth('pembeli')->user();
+        $idPembeli = $pembeli->idPembeli;
 
+        try {
+            $transaksi = \App\Models\TransaksiPembelian::with([
+                'detailTransaksiPembelian.barang',
+                'pegawai3',
+                'pembeli.alamat'
+            ])
+            ->where('idPembeli', $idPembeli)
+            ->where('status', 'Barang Diterima')
+            ->orderBy('tanggalWaktuPembelian', 'desc')
+            ->get();
+
+            return response()->json([
+                "status" => true,
+                "message" => "Get successful",
+                "data" => $transaksi
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                "status" => false,
+                "message" => $e->getMessage(),
+                "data" => null
+            ], 500);
+        }
+    }
 
 }
