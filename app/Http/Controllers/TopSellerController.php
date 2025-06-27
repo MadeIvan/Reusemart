@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Carbon;
 use App\Models\TopSeller;
 use Illuminate\Http\Request;
 
@@ -130,4 +131,25 @@ public function store(Request $request)
         'nominal' => $topSeller->nominal,
     ]);
 }
+
+public function cekTopSellerBulanIni($idPenitip)
+    {
+        // Format ID bulan ini (contoh: "2025.06")
+        $bulanIni = Carbon::now()->format('Y.m');
+
+        // Cek apakah penitip termasuk top seller bulan ini
+        $isTopSeller = TopSeller::where('idTopSeller', $bulanIni)
+                        ->where('idPenitip', $idPenitip)
+                        ->exists();
+
+        return response()->json([
+            'status' => true,
+            'periode' => $bulanIni,
+            'idPenitip' => $idPenitip,
+            'isTopSeller' => $isTopSeller,
+            'message' => $isTopSeller 
+                ? 'Penitip adalah Top Seller bulan ini.'
+                : 'Penitip bukan Top Seller bulan ini.',
+        ]);
+    }
 }

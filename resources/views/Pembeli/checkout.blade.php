@@ -219,8 +219,13 @@
                     if (selectedRadio) {
                         const selectedId = selectedRadio.value;
                         pilihAlamat(selectedId);
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalAlamat'));
-                        modal.hide();
+                        const modalEl = document.getElementById('modalAlamat');
+                        let modal = bootstrap.Modal.getInstance(modalEl);
+                        if (!modal) {
+                            modal = new bootstrap.Modal(modalEl);
+                        }
+                        modal.hide();   
+
                     } else {
                         alert('Silakan pilih alamat terlebih dahulu');
                     }
@@ -231,6 +236,12 @@
         })
         .catch(error => console.error("Gagal mengambil daftar alamat:", error));
     }
+
+    document.getElementById('modalAlamat').addEventListener('hidden.bs.modal', function () {
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+    });
     
     function pilihAlamat(selectedId) {
         const alamatTerpilih = alamatList.find(a => a.idAlamat == selectedId);

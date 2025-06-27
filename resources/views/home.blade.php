@@ -13,16 +13,13 @@
 <body">
         
     @include('layouts.navbar')
-    <div class="container-fluid" style = "margin-top:7% !important; margin-left: 5% !important;" >
- <!-- Header Section -->
-
-    <!-- Product List Section -->
-    <!-- <section class="container my-5" id="product-list"> -->
-        <div class="row" id="product-list">
+    <!-- <div class="container-fluid" style = "margin-top:7% !important; margin-left: 5% !important;" > -->
+    <div class="main-content">
+        <div class="container-fluid px-4 mt-5">
+            <div class="row" id="product-list">
             <!-- Products will be dynamically loaded here -->
+            </div>
         </div>
-    <!-- </section> -->
-
     </div>
    
     <!-- Footer Section -->

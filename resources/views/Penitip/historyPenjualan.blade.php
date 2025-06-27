@@ -28,7 +28,7 @@
 @include('layouts.navbar')
 
 
-
+<div class="main-content">
 <div id="loadingIndicator" class="container my-4">
     <div class="text-center">
         <div class="spinner-border text-success" role="status">
@@ -79,6 +79,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 
 <!-- Fullscreen Image Modal -->

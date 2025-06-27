@@ -511,6 +511,7 @@
                     sidebarMenu.appendChild(createMenuItem("/home", "Produk", "bi bi-box-seam"));
                     sidebarMenu.appendChild(createMenuItem("/pembeli/alamat", "Alamat", "bi bi-geo-alt"));
                     sidebarMenu.appendChild(createMenuItem("/pembeli/HistoryPembeli", "History Pembelian", "bi bi-clock-history"));
+                    sidebarMenu.appendChild(createMenuItem("/pembeli/pembatalan", "Pembatalan Pembelian", "bi bi-clock-history"));
                     sidebarMenu.appendChild(createMenuItem("/keranjang", "Keranjang", "bi bi-cart3", true));
 
                 } else if (role === "penitip") {
@@ -523,9 +524,10 @@
 
                 } else if (role === "admin") {
                     sidebarMenu.appendChild(createMenuItem("/organisasi", "Organisasi", "bi bi-building"));
-                    sidebarMenu.appendChild(createMenuItem("/pegawaiView", "Pegawai", "bi bi-people"));
+                    sidebarMenu.appendChild(createMenuItem("/pegawaiview", "Pegawai", "bi bi-people"));
 
                 } else if (role === "cs") {
+                    sidebarMenu.appendChild(createMenuItem("/home", "Produk", "bi bi-box-seam"));
                     sidebarMenu.appendChild(createMenuItem("/pegawai/PenitipData", "Data Penitip", "bi bi-database"));
                     sidebarMenu.appendChild(createMenuItem("/verifikasi", "Verifikasi Pembayaran", "bi bi-check-circle"));
                     sidebarMenu.appendChild(createMenuItem("/merchandise", "Merchandise", "bi bi-bag"));

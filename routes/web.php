@@ -236,5 +236,7 @@ Route::get('/laporanPenjualan/pdf', [TransaksiPembelianController::class, 'notaR
 Route::get('/penitip/historyPenjualan', function () {
     return view('Penitip.historyPenjualan');
 });
-
+Route::get('/pembeli/pembatalan', function () {
+    return view('Pembeli.pembatalan');
+});
 

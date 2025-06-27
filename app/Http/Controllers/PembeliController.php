@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Cache;
 use App\Models\Pembeli;
 use App\Models\Barang;
 use App\Models\Alamat;
+use App\Models\TransaksiPembelian;
+use App\Models\DetailTransaksiPenitipan;
 
 class PembeliController extends Controller
 {
@@ -266,30 +268,113 @@ class PembeliController extends Controller
         ], 200);
     }
 
-public function getPoin(Request $request)
-{
-    try {
-        $user = $request->user() ?? auth('pembeli')->user();
-        if (!$user) {
+    public function getPoin(Request $request)
+    {
+        try {
+            $user = $request->user() ?? auth('pembeli')->user();
+            if (!$user) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'User not authenticated',
+                    'data' => null
+                ], 401);
+            }
+            $pembeli = \App\Models\Pembeli::with('alamat')->where('idPembeli', $user->idPembeli)->first();
+            return response()->json([
+                'status' => true,
+                'message' => 'Get successful',
+                'data' => $pembeli
+            ], 200);
+        } catch (\Exception $e) {
             return response()->json([
                 'status' => false,
-                'message' => 'User not authenticated',
+                'message' => $e->getMessage(),
                 'data' => null
+            ], 500);
+        }
+    }
+
+    public function pembatalan (){
+        $pembeli = auth('pembeli')->user();
+        if (!$pembeli) {
+            return response()->json([
+                "status" => false,
+                "message" => "Pembeli belum login",
             ], 401);
         }
-        $pembeli = \App\Models\Pembeli::with('alamat')->where('idPembeli', $user->idPembeli)->first();
+
+        $idPembeli = $pembeli->idPembeli;
+
+        $pembatalan = \App\Models\TransaksiPembelian::where('status', 'Lunas Belum Dijadwalkan')
+                    ->where('idPembeli', $idPembeli)->get();
+        
         return response()->json([
-            'status' => true,
-            'message' => 'Get successful',
-            'data' => $pembeli
+            "status" => true,
+            "message" => "Get successful",
+            "data" => $pembatalan
         ], 200);
-    } catch (\Exception $e) {
-        return response()->json([
-            'status' => false,
-            'message' => $e->getMessage(),
-            'data' => null
-        ], 500);
+
     }
-}
+
+    public function batalkanPembelian(Request $request, $noNota)
+    {
+        try {
+            $pembeli = auth('pembeli')->user();
+            if (!$pembeli) {
+                return response()->json([
+                    "status" => false,
+                    "message" => "pembeli belum login",
+                    "data" => null,
+                ], 400);
+            }
+
+            $transaksi = \App\Models\TransaksiPembelian::where('noNota', $noNota)->first();
+            if (!$transaksi) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Transaksi tidak ditemukan.'
+                ]);
+            }
+
+            $pembeli = Pembeli::where('idPembeli', $transaksi->idPembeli)->first();
+            $alamat = $transaksi->idAlamat;
+
+            $detailBarang = \App\Models\DetailTransaksiPembelian::where('noNota', $noNota)->get();
+            $totalHarga = 0;
+
+            foreach ($detailBarang as $detail) {
+                // \Log::info("Detail ID Barang: " . $detail->idBarang);
+                $barang = Barang::where('idBarang', $detail->idBarang)->first();
+
+                if ($barang) {
+                    // \Log::info("Barang ditemukan: " . $barang->idBarang . " | Harga: " . $barang->hargaBarang);
+                    $totalHarga += $barang->hargaBarang;
+                    $barang->update([
+                        'statusBarang' => 'Tersedia'
+                    ]);
+                }
+            }
+
+            $pembeli->poin = $pembeli->poin + $transaksi->totalHarga / 10000;
+            $pembeli->save();
+
+            $transaksi->status = 'Dibatalkan Pembeli';
+            $transaksi->save();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'berhasil.'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                "status" => false,
+                "message" => $e->getMessage(),
+                "data" => null
+            ], 500);
+        }
+    }
+
+    
 
 }

@@ -121,6 +121,7 @@ Route::middleware(['auth:pegawai','role:5'])->group(function () {
     Route::get('/dibayar', [TransaksiPembelianController::class, 'getDibayar']); 
     Route::post('/pegawai/buat-diskusi/{id}', [DiskusiController::class, 'store']);
 });
+
 Route::middleware(['auth:sanctum', 'auth.pembeli'])->group(function () {
     Route::post('/pembeli/buat-alamat', [AlamatController::class, 'store']);
     Route::get('/pembeli/alamat', [AlamatController::class, 'index']);
@@ -129,12 +130,8 @@ Route::middleware(['auth:sanctum', 'auth.pembeli'])->group(function () {
     Route::delete('/pembeli/alamat/delete/{id}', [AlamatController::class, 'delete']);
     Route::put('/pembeli/alamat/set-default/{id}', [AlamatController::class, 'setAsDefault']);
     Route::get('/alamatUtama', [AlamatController::class, 'getUtama']);
-
-
     Route::post('/pembeli/buat-diskusi/{id}', [DiskusiController::class, 'store']);
-
     Route::get('/pembeli/getData', [PembeliController::class, 'getData']);
-    
     Route::put('/updatePoin', [PembeliController::class, 'updatePoin']);
     Route::post('/tambah-keranjang/{id}', [PembeliController::class, 'addToCart']);
     Route::get('/keranjang', [PembeliController::class, 'getCart']);
@@ -144,11 +141,11 @@ Route::middleware(['auth:sanctum', 'auth.pembeli'])->group(function () {
     Route::get('/getData', [TransaksiPembelianController::class, 'getDataTerbaru']);
     Route::post('/buktiBayar/{id}', [TransaksiPembelianController::class, 'buktiBayar']);
     Route::post('/batalkanPesanan/{id}', [TransaksiPembelianController::class, 'canceled']);
-
     Route::get('/pembeli/poin', [PembeliController::class, 'getPoin']);
     Route::get('/pembeli/history', [TransaksiPembelianController::class, 'showTransaksiPembeliId']);
     Route::post('/pembeli/logout', [LoginController::class, 'logout']);
-
+    Route::get('/pembeli/pembatalan', [PembeliController::class, 'pembatalan']);
+    Route::post('/pembeli/batal/{noNota}', [PembeliController::class, 'batalkanPembelian']);
 });
 
 Route::middleware(['auth:penitip'])->group(function () {
@@ -264,6 +261,7 @@ Route::middleware('auth:pegawai')->post('/pegawai/register-fcm-token', [FCMToken
 Route::middleware('auth:penitip')->post('/penitip/register-fcm-token', [FCMTokenController::class, 'registerFcmToken']);
 Route::middleware('auth:pembeli')->post('/pembeli/register-fcm-token', [FCMTokenController::class, 'registerFcmToken']);
 
+
 Route::get('/topseller/get', [TopSellerController::class, 'index']);
 Route::get('/topseller', [PenitipController::class, 'getTopPenitipByMonth']);
 Route::post('/topseller/add', [TopSellerController::class, 'store']);
@@ -284,3 +282,4 @@ Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'
 Route::get('/laporan-kategori', [TransaksiPembelianController::class, 'laporanKategori']);
 
 Route::get('/penitipan-habis', [TransaksiPenitipanController::class, 'apiPenitipanHabis']);
+Route::get('/top-seller/bulan-ini/{idPenitip}', [TopSellerController::class, 'cekTopSellerBulanIni']);

@@ -53,19 +53,36 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="batalkan" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title fs-5" id="exampleModalLabel">Pembatalan Pembelian</h3>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Apakah Anda yakin akan membatalkan transaksi ini, dengan total transaksi <strong> Rp <span id="totalTransaksi"></strong> dan di konversi menjadi poin reward sebanyak <strong> <span id="poinDidapat"></strong> ? Total poin anda setelah ini adalah  <strong><span id="poinAkhir"></strong>.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Batal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
   @include('layouts.navbar')
 
-  <h3 class="text-center mb-3 mt-3">Verifikasi Pembayaran</h3>
+  <h3 class="text-center mb-3 mt-2 my-5 p-4">Pembatalan Transaksi Pembelian</h3>
 
   <div class="custom-table-container">
     <table class="table table-striped table-bordered table-hover mt-3">
       <thead class="text-center">
         <tr>
-          <th scope="col">No Nota</th>
-          <th scope="col">Nama Pemesan</th>
-          <th scope="col">Total Pesanan</th>
-          <th scope="col">Bukti Pembayaran</th>
-          <th scope="col">Status</th>
+          <th scope="col">No Transaksi</th>
+          <th scope="col">Tanggal Transaksi</th>
+          <th scope="col">Total Transaksi</th>
+          <th scope="col">Status Transaksi</th>
           <th scope="col">Action</th>
         </tr>
       </thead>
@@ -87,13 +104,13 @@
     document.addEventListener("DOMContentLoaded", function () {
       const token = localStorage.getItem("auth_token");
       if (!token) {
-        window.location.href = "/PegawaiLogin";
+        window.location.href = "/UsersLogin";
         return;
       }
 
       const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-      fetch(`http://127.0.0.1:8000/api/verifikasi`, {
+      fetch(`http://127.0.0.1:8000/api/pembeli/pembatalan`, {
         method: "GET",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -107,7 +124,7 @@
           if (result.status && result.data.length > 0) {
             renderTable(result.data);
           } else {
-            document.getElementById("verif-body").innerHTML = `<tr><td colspan="5">Tidak ada data yang perlu diverifikasi</td></tr>`;
+            document.getElementById("verif-body").innerHTML = `<tr><td colspan="5">Tidak ada data transaksi pembelian</td></tr>`;
           }
         })
         .catch(error => {
@@ -124,60 +141,42 @@
           const row = document.createElement("tr");
 
           row.innerHTML = `
-          <td>${item.noNota}</td>
-            <td>${item.pembeli.namaPembeli}</td>
+            <td>${item.noNota}</td>
+            <td>${item.tanggalWaktuPembelian}</td>
             <td>Rp${item.totalHarga.toLocaleString("id-ID")}</td>
+            <td><span class="badge bg-warning text-dark">${item.status}</span></td>
             <td>
-                <img src="http://127.0.0.1:8000/storage/${item.buktiPembayaran}" class="bukti-img" alt="Bukti Pembayaran"
-                style="cursor:pointer"
-                data-bs-toggle="modal"
-                data-bs-target="#viewGambar"
-                onclick="showImageModal(this.src)">
-            </td>
-            <td><span class="badge 
-                ${item.status === 'Lunas Belum Dijadwalkan' ? 'bg-success text-white' : 'bg-warning text-dark'}">
-                ${item.status}
-              </span>
-            </td>
-            <td>
-              ${item.status === 'Lunas Belum Dijadwalkan' 
-                ? `
-                  <button class="btn btn-success btn-sm me-1" disabled><i class="bi bi-check-circle"></i></button>
-                  <button class="btn btn-danger btn-sm" disabled><i class="bi bi-x-circle"></i></button>
-                `
-                : `
-                  <button class="btn btn-success btn-sm me-1 confirmPembayaran" data-id="${item.noNota}"><i class="bi bi-check-circle"></i></button>
-                  <button class="btn btn-danger btn-sm rejectPembayaran" data-id="${item.noNota}"><i class="bi bi-x-circle"></i></button>
-                `
-              }
+              <button class="btn btn-danger btn-batalkan btn-sm rejectPembelian" data-id="${item.noNota}" data-bs-toggle="modal" 
+              data-bs-target="#batalkan" data-totalTransaksi="${item.totalHarga}" data-poinDidapat="${item.totalHarga}"
+              data-poinAkhir="${item.totalHarga}"><i class="bi bi-x-circle"></i></button>
             </td>
           `;
           tbody.appendChild(row);
         });
 
         
-        document.querySelectorAll(".confirmPembayaran").forEach(link => {
+        document.querySelectorAll(".rejectPembelian").forEach(link => {
             link.addEventListener("click", function () {
                 const noNota = this.getAttribute("data-id");
-                updatePembayaran(noNota, "Lunas Belum Dijadwalkan");
+                updateStatus(noNota, "Dibatalkan Pembeli");
             });
         });
-        
-        document.querySelectorAll(".rejectPembayaran").forEach(link => {
-            link.addEventListener("click", function () {
-                const noNota = this.getAttribute("data-id");
-                tolakPembayaran(noNota);
-            });
-        });
-    }
-    
-    window.showImageModal = function(src) {
-        const modalImg = document.getElementById("modalImage");
-        modalImg.src = src;
     }
 
-    function updatePembayaran(noNota, status) {
-        fetch(`http://127.0.0.1:8000/api/verifikasi/${noNota}`, {
+    document.addEventListener("click", function (e) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        if (e.target.classList.contains("btn-batalkan")) {
+            const button = e.target;
+            document.getElementById("totalTransaksi").textContent = button.getAttribute("data-totalTransaksi");
+            document.getElementById("poinDidapat").textContent = button.getAttribute("data-poinDidapat");
+            document.getElementById("poinAkhir").textContent = button.getAttribute("data-poinAkhir");
+
+        }
+    });
+
+    function updateStatus(noNota, status) {
+        fetch(`http://127.0.0.1:8000/api/pembeli/batal/${noNota}`, {
             method: "POST",
             headers: {
             "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
@@ -191,18 +190,17 @@
         .then(data => {
             if (data.status) {
             Toastify({
-                text: `Berhasil mengubah status menjadi ${status}`,
+                text: `Berhasil membatalkan transaksi Pembelian`,
                 duration: 3000,
                 gravity: "top",
                 position: "right",
                 style: { background: "#4caf50" }
             }).showToast();
 
-            // Reload ulang data
             location.reload();
             } else {
             Toastify({
-                text: data.message || "Gagal memperbarui status",
+                text: data.message || "Gagal membatalkan transaksi pembelian",
                 duration: 3000,
                 gravity: "top",
                 position: "right",
@@ -221,56 +219,6 @@
             }).showToast();
         });
     }
-
-    function tolakPembayaran(noNota) {
-        fetch(`http://127.0.0.1:8000/api/tolak-verifikasi/${noNota}`, {
-            method: "POST",
-            headers: {
-            "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": csrfToken,
-            },
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status) {
-            Toastify({
-                text: `Berhasil mengubah status menjadi ${status}`,
-                duration: 3000,
-                gravity: "top",
-                position: "right",
-                style: { background: "#4caf50" }
-            }).showToast();
-
-            // Reload ulang data
-            location.reload();
-            } else {
-            Toastify({
-                text: data.message || "Gagal menolak pembayaran",
-                duration: 3000,
-                gravity: "top",
-                position: "right",
-                style: { background: "#d32f2f" }
-            }).showToast();
-            }
-        })
-        .catch(error => {
-            console.error("Update error:", error);
-            Toastify({
-            text: "Terjadi kesalahan",
-            duration: 3000,
-            gravity: "top",
-            position: "right",
-            style: { background: "#d32f2f" }
-            }).showToast();
-        });
-    }
-
-
-
-
-
     });
   </script>
 </body>

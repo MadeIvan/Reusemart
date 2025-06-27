@@ -153,7 +153,7 @@
             const tableBody = document.querySelector("#tableBody");
             const searchInput = document.getElementById("searchInput");
             const form = document.getElementById("OrganisasiForm");
-            let OrganisasiData = [];
+            let organisasiData = [];
             let currentOrganisasiId = null;
 
             // Toast functionality
@@ -200,32 +200,32 @@
   
             // Render the table with fetched data
             function renderTable(data) {
-            tableBody.innerHTML = "";
+                tableBody.innerHTML = "";
 
-            if (!data || data.length === 0) {
-                const row = tableBody.insertRow();
-                const cell = row.insertCell(0);
-                cell.colSpan = 7;
-                cell.classList.add("no-data-message");
-                cell.innerText = "No organisasi data available.";
-                return;
+                if (!data || data.length === 0) {
+                    const row = tableBody.insertRow();
+                    const cell = row.insertCell(0);
+                    cell.colSpan = 7;
+                    cell.classList.add("no-data-message");
+                    cell.innerText = "No organisasi data available.";
+                    return;
+                }
+
+                data.forEach(item => {
+                    if (item.deleted_at !== null) return;
+
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${item.idOrganisasi}</td>
+                        <td>${item.namaOrganisasi || '-'}</td>
+                        <td>${item.username}</td>
+                        <td>${item.email}</td>
+                        <td>${item.alamat}</td>
+                    `;
+                    row.addEventListener("click", () => populateForm(item));
+                    tableBody.appendChild(row);
+                });
             }
-
-            data.forEach(item => {
-                if (item.deleted_at !== null) return;
-
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${item.idOrganisasi}</td>
-                    <td>${item.namaOrganisasi || '-'}</td>
-                    <td>${item.username}</td>
-                    <td>${item.email}</td>
-                    <td>${item.alamat}</td>
-                `;
-                row.addEventListener("click", () => populateForm(item));
-                tableBody.appendChild(row);
-            });
-        }
 
 
             // Populate the form when a row is clicked
@@ -350,24 +350,37 @@
 
             // Search functionality
             searchInput.addEventListener("input", function() {
-                const searchTerm = this.value.toLowerCase();
+                // console.log("KETIK:", this.value);
+                // const searchTerm = this.value.toLowerCase();
                 
-                if (searchTerm === "") {
-                    renderTable(organisasiData); // Show all data if search is empty
-                    return;
-                }
+                // if (searchTerm === "") {
+                //     renderTable(organisasiData); // Show all data if search is empty
+                //     return;
+                // }
                 
-                // Filter the data based on search term
-                const filteredData = organisasiData.filter(item => {
-                    return (
-                        (item.username && item.username.toLowerCase().includes(searchTerm)) ||
-                        (item.namaOrganisasi && item.namaOrganisasi.toLowerCase().includes(searchTerm))||
-                        (item.alamat && item.alamat.toLowerCase().includes(searchTerm)) ||
-                        (item.email && item.email.toLowerCase().includes(searchTerm))
-                    );
-                });
-                
-                renderTable(filteredData);
+                // // Filter the data based on search term
+                // const filteredData = organisasiData.filter(item => {
+                //     return (
+                //         (item.username && item.username.toLowerCase().includes(searchTerm)) ||
+                //         (item.namaOrganisasi && item.namaOrganisasi.toLowerCase().includes(searchTerm))||
+                //         (item.alamat && item.alamat.toLowerCase().includes(searchTerm)) ||
+                //         (item.email && item.email.toLowerCase().includes(searchTerm))
+                //     );
+                // });
+                //  console.log("Filtered data:", filteredData);
+                const query = searchInput.value.toLowerCase();
+                fetch(`http://127.0.0.1:8000/api/organisasi/search?q=${query}`, {
+                    headers: { 
+                        "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
+                        'Accept': 'application/json',
+                        "Content-Type": "application/json",
+                        "X-CSRF-TOKEN": csrfToken,
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => renderTable(data.data))
+                    .catch(error => console.error("Error searching organisasi:", error));
+                // renderTable(filteredData);
             });
 
             // Initial fetch when the page loads

@@ -267,8 +267,13 @@ public function updatePenjadwalan(Request $request, $noNota)
     ])->where('noNota', $noNota)->first();
 
     if (!$transaksi) {
-        return response()->json(['status' => false, 'message' => 'Transaksi tidak ditemukan'], 404);
+        return response()->json([
+            "status" => false,
+            "message" => "Transaksi tidak ditemukan untuk noNota: $noNota",
+            "data" => null
+        ], 200); // ✅ Tetap status 200 biar Flutter bisa decode
     }
+
 
     // Simpan id kurir sebelumnya sebelum diubah
     $kurirLama = $transaksi->idPegawai3;
@@ -497,7 +502,9 @@ public function buktiBayar(Request $request, $id){
 
     public function getNotConfirmed(){
         try{
-            $data = TransaksiPembelian::where('status', 'Menunggu Verifikasi')->get();
+            $data = TransaksiPembelian::with([
+                'pembeli'
+            ])->whereIn('status', ['Menunggu Verifikasi', 'Lunas Belum Dijadwalkan'])->get();
             return response()->json([
                 "status" => true,
                 "message" => "Get successful",
@@ -748,6 +755,7 @@ public function updateStatus(Request $request, $noNota)
         'data' => $transaksi,
     ]);
 }
+
 public function showAllTransaksiPembeli()
 {
     try {
@@ -1114,35 +1122,73 @@ public function laporanKategori(Request $request)
            // === Kirim notifikasi ke semua penitip yang unik ===
             $notifiedPenitipIds = [];
 
-            foreach ($transaksi->detailTransaksiPembelian as $detail) {
+            // foreach ($transaksi->detailTransaksiPembelian as $detail) {
                 
-                $penitip = $detail->barang->detailTransaksiPenitipan?->transaksiPenitipan?->penitip;
+            //     $penitip = $detail->barang->detailTransaksiPenitipan?->transaksiPenitipan?->penitip;
 
-                if ($penitip && $penitip->fcm_token && !in_array($penitip->id, $notifiedPenitipIds)) {
-                    app(FCMService::class)->sendNotification(
-                        $penitip->fcm_token,
-                        'Barang Diterima',
-                        'Barang titipan Anda telah diterima oleh pembeli.'
-                    );
-                    $notifiedPenitipIds[] = $penitip->id;
-                }
-            }
+            //     if ($penitip && $penitip->fcm_token && !in_array($penitip->id, $notifiedPenitipIds)) {
+            //         app(FCMService::class)->sendNotification(
+            //             $penitip->fcm_token,
+            //             'Barang Diterima',
+            //             'Barang titipan Anda telah diterima oleh pembeli.'
+            //         );
+            //         $notifiedPenitipIds[] = $penitip->id;
+            //     }
+            // }
+            foreach ($transaksi->detailTransaksiPembelian as $detail) {
+    try {
+        $penitip = $detail->barang->detailTransaksiPenitipan?->transaksiPenitipan?->penitip;
+
+        if ($penitip && $penitip->fcm_token && !in_array($penitip->id, $notifiedPenitipIds)) {
+            app(FCMService::class)->sendNotification(
+                $penitip->fcm_token,
+                'Barang Diterima',
+                'Barang titipan Anda telah diterima oleh pembeli.'
+            );
+            $notifiedPenitipIds[] = $penitip->id;
+        }
+    } catch (\Exception $e) {
+        \Log::error("Gagal kirim notifikasi penitip: " . $e->getMessage());
+    }
+}
+
 
             // === Kirim notifikasi ke PEMBELI ===
+            // $pembeli = $transaksi->pembeli;
+            // if ($pembeli && $pembeli->fcm_token) {
+            //     app(FCMService::class)->sendNotification(
+            //         $pembeli->fcm_token,
+            //         'Barang Diterima',
+            //         'Barang Anda telah diterima. Terima kasih telah berbelanja di toko kami.'
+            //     );
+            // }
+
             $pembeli = $transaksi->pembeli;
-            if ($pembeli && $pembeli->fcm_token) {
-                app(FCMService::class)->sendNotification(
-                    $pembeli->fcm_token,
-                    'Barang Diterima',
-                    'Barang Anda telah diterima. Terima kasih telah berbelanja di toko kami.'
-                );
+            \Log::info("FCM Pembeli Token: " . $pembeli?->fcm_token);
+
+            try {
+                if ($pembeli && $pembeli->fcm_token) {
+                    app(FCMService::class)->sendNotification(
+                        $pembeli->fcm_token,
+                        'Barang Diterima',
+                        'Barang Anda telah diterima. Terima kasih telah berbelanja di toko kami.'
+                    );
+                }
+            } catch (\Exception $e) {
+                \Log::error("Gagal kirim notifikasi pembeli: " . $e->getMessage());
             }
+
 
             return response()->json([
                 "status" => true,
                 "message" => "Status transaksi dengan noNota $noNota berhasil diperbarui menjadi 'Barang Diterima'",
-                "data" => $transaksi
+                "data" => [
+                    'noNota' => $transaksi->noNota,
+                    'status' => $transaksi->status,
+                    // 'updated_at' => $transaksi->updated_at->toDateTimeString(),
+                ]
             ]);
+
         }catch (\Exception $e) {
             return response()->json([
                 "status" => false,
@@ -1151,6 +1197,94 @@ public function laporanKategori(Request $request)
             ], 500);
         }
     }
+
+//     public function pengirimanDone(Request $request, $noNota)
+// {
+//     try {
+//         $pegawai = auth('pegawai')->user();
+//         if (!$pegawai) {
+//             return response()->json([
+//                 "status" => false,
+//                 "message" => "Pegawai belum login",
+//                 "data" => null,
+//             ], 400);
+//         }
+
+//         if (!$noNota) {
+//             return response()->json([
+//                 "status" => false,
+//                 "message" => "noNota tidak boleh kosong",
+//                 "data" => null
+//             ], 400);
+//         }
+
+//         $transaksi = TransaksiPembelian::with([
+//             'detailTransaksiPembelian.barang.detailTransaksiPenitipan.transaksiPenitipan.penitip',
+//             'pembeli'
+//         ])
+//         ->where('noNota', $noNota)
+//         ->first();
+
+//         if (!$transaksi) {
+//             return response()->json([
+//                 "status" => false,
+//                 "message" => "Transaksi tidak ditemukan untuk noNota: $noNota",
+//                 "data" => null
+//             ], 404);
+//         }
+
+//         // Update status
+//         $transaksi->status = 'Barang Diterima';
+//         $transaksi->save();
+
+//         // === Kirim notifikasi ke semua penitip yang unik ===
+//         $notifiedPenitipIds = [];
+
+//         foreach ($transaksi->detailTransaksiPembelian as $detail) {
+//             $penitip = $detail->barang->detailTransaksiPenitipan?->transaksiPenitipan?->penitip;
+
+//             if ($penitip && $penitip->fcm_token && !in_array($penitip->id, $notifiedPenitipIds)) {
+//                 app(FCMService::class)->sendNotification(
+//                     $penitip->fcm_token,
+//                     'Barang Diterima',
+//                     'Barang titipan Anda telah diterima oleh pembeli.'
+//                 );
+//                 $notifiedPenitipIds[] = $penitip->id;
+//             }
+//         }
+
+//         // === Kirim notifikasi ke PEMBELI ===
+//         $pembeli = $transaksi->pembeli;
+//         if ($pembeli && $pembeli->fcm_token) {
+//             app(FCMService::class)->sendNotification(
+//                 $pembeli->fcm_token,
+//                 'Barang Diterima',
+//                 'Barang Anda telah diterima. Terima kasih telah berbelanja di toko kami.'
+//             );
+//         }
+
+//         // ✅ Return hanya data penting, bukan model full
+//         return response()->json([
+//             "status" => true,
+//             "message" => "Status transaksi dengan noNota $noNota berhasil diperbarui menjadi 'Barang Diterima'",
+//             "data" => [
+//                 'noNota' => $transaksi->noNota,
+//                 'status' => $transaksi->status,
+//                 'updated_at' => $transaksi->updated_at->toDateTimeString(),
+//             ]
+//         ]);
+//     } catch (\Exception $e) {
+//         // 🐞 Log untuk debug jika perlu
+//         \Log::error('pengirimanDone error: ' . $e->getMessage());
+
+//         return response()->json([
+//             "status" => false,
+//             "message" => $e->getMessage(),
+//             "data" => null
+//         ], 500);
+//     }
+// }
+
 public function showTransaksiPembeliId()
     {
         $pembeli = auth('pembeli')->user();

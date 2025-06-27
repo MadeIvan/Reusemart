@@ -228,7 +228,7 @@
         <h2 class="mb-4">Daftar Alamat</h2>
         
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <input class="form-control me-2 flex-grow-1" name="name" id="searchInput" type="text" placeholder="Search" aria-label="Search"style="width: 200px;" >
+            <input class="form-control me-2 flex-grow-1" name="name" id="searchInput1" type="text" placeholder="Search" aria-label="Search"style="width: 200px;" >
             <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createAlamat" type="submit" id="tambahButton">
                 <i class="bi bi-plus-square-fill me-2"></i>Tambah Alamat
             </button>
@@ -255,7 +255,7 @@
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content'); // Get CSRF token from meta tag
 
             const alamatContainer = document.getElementById("alamatContainer");
-            const searchInput = document.getElementById("searchInput");
+            const searchInput1 = document.getElementById("searchInput1");
             let alamatData = [];
             let idToDelete = null;
             let idToUpdate = null;
@@ -554,8 +554,8 @@
 
             }
             
-            searchInput.addEventListener("input", () => {
-                const query = searchInput.value.toLowerCase();
+            searchInput1.addEventListener("input", () => {
+                const query = searchInput1.value.toLowerCase();
                 fetch(`http://127.0.0.1:8000/api/pembeli/alamat/search?q=${query}`, {
                     headers: { 
                         "Authorization": `Bearer ${localStorage.getItem("auth_token")}`,
@@ -594,8 +594,20 @@
                     .then(response => response.json())
                     .then(data => {
                         const modal = bootstrap.Modal.getInstance(document.getElementById('updateAlamat'));
-                        if (modal) modal.hide();
+                        if (modal) {
+                            modal.hide();
 
+                            document.getElementById('updateAlamat').addEventListener('hidden.bs.modal', function handler() {
+                                document.getElementById('updateAlamat').removeEventListener('hidden.bs.modal', handler);
+
+                                document.body.classList.remove('modal-open');
+                                document.body.style.overflow = '';
+                                document.documentElement.style.overflow = '';
+
+                                const backdrop = document.querySelector('.modal-backdrop');
+                                if (backdrop) backdrop.remove();
+                            });
+                        }
                         Toastify({
                             text: "Berhasil Mengubah Alamat",
                             duration: 3000,
@@ -635,8 +647,20 @@
                     .then(response => response.json())
                     .then(data => {
                         const modal = bootstrap.Modal.getInstance(document.getElementById('deleteAlamat'));
-                        if (modal) modal.hide();
+                        if (modal) {
+                            modal.hide();
 
+                            document.getElementById('deleteAlamat').addEventListener('hidden.bs.modal', function handler() {
+                                document.getElementById('deleteAlamat').removeEventListener('hidden.bs.modal', handler);
+
+                                document.body.classList.remove('modal-open');
+                                document.body.style.overflow = '';
+                                document.documentElement.style.overflow = '';
+
+                                const backdrop = document.querySelector('.modal-backdrop');
+                                if (backdrop) backdrop.remove();
+                            });
+                        }
                         Toastify({
                             text: "Berhasil Menghapus Alamat",
                             duration: 3000,
@@ -733,11 +757,22 @@
                 .then(data => {
                     console.log("Data berhasil ditambahkan:", data);
                     const modal = bootstrap.Modal.getInstance(document.getElementById("createAlamat"));
-                    if (modal){
+                    if (modal) {
                         modal.hide();
-                        resetFormCreateAlamat();
-                    } ;
-    
+
+                        document.getElementById("createAlamat").addEventListener('hidden.bs.modal', function handler() {
+                            document.getElementById("createAlamat").removeEventListener('hidden.bs.modal', handler);
+
+                            document.body.classList.remove('modal-open');
+                            document.body.style.overflow = '';
+                            document.documentElement.style.overflow = '';
+
+                            const backdrop = document.querySelector('.modal-backdrop');
+                            if (backdrop) backdrop.remove();
+
+                            resetFormCreateAlamat();
+                        });
+                    }
                     Toastify({
                         text: "Berhasil Menambahkan Alamat",
                         duration: 3000,
